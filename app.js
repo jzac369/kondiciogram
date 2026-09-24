@@ -570,17 +570,81 @@ $('#feedBtn').addEventListener('click', () => {
 $('#toDash').addEventListener('click', () => { if (machineDone) machineDone(); });
 $('#skipMachine').addEventListener('click', () => { if (machineDone) machineDone(); });
 
-/* ================= TITULKY ================= */
+/* ================= ÚVOD: REKLAMNÉ TITULKY (česky, štýl 70. rokov) ================= */
 const CREDITS = [
-  ['SAMOČINNÝ POČÍTAČ UVÁDZA', 'KONDICIOGRAM'], ['SCÉNÁR', 'VAŠE BIORYTMY'], ['HUDBA', 'IHLIČKOVÁ TLAČIAREŇ'],
-  ['KAMERA', 'OSCILOSKOP'], ['STRIH', 'DIERNY ŠTÍTOK'], ['V HLAVNEJ ÚLOHE', 'VY']
+  ['SOUDRUZI A SOUDRUŽKY!', 'NECHTE SI VYPOČÍTAT KONDICI!'],
+  ['VÍTE, KDY MÁTE KRITICKÝ DEN?', 'STROJ TO VÍ ZA VÁS!'],
+  ['S KONDICIOGRAMEM', 'SPLNÍTE NORMU NA 120 %'],
+  ['KONEC ÚRAZŮM NA PRACOVIŠTI!', 'ZNÁTE SVÉ DNY X?'],
+  ['VĚDECKY. PŘESNĚ. ZDARMA.', 'KONDICIOGRAM PRO KAŽDOU RODINU'],
+  ['V DEN OŠIDNÝ NEJEZDĚTE K TCHYNI', 'STROJ VÁS VČAS VAROVAL'],
+  ['NOVINKA VÝPOČETNÍHO STŘEDISKA', 'SAMOČINNÝ POČÍTAČ SPC-74'],
+  ['PODEPISUJTE JEN VE DNY S HVĚZDIČKOU', 'KONDICIOGRAM VÁM ŘEKNE KDY'],
+  ['LÁSKA PODLE PLÁNU', 'OSUDOVÝ PARTNER DO PĚTI MINUT'],
+  ['BEZ FRONTY. BEZ PŘÍDĚLU. BEZ PROTEKCE.', 'STAČÍ DATUM NAROZENÍ'],
+  ['DOPORUČENO ZÁVODNÍM LÉKAŘEM', 'VÁŠ RÁDCE NA CELÝ ROK'],
+  ['ELEKTRONKY UŽ JSOU NAHŘÁTÉ', 'VYPLŇTE DĚRNÝ ŠTÍTEK JEŠTĚ DNES!']
 ];
-let crI = 0;
-setInterval(() => {
-  if ($('#scr-login').classList.contains('hidden')) return;
-  const c = document.querySelector('.credits'); c.classList.add('out');
-  setTimeout(() => { crI = (crI + 1) % CREDITS.length; $('#crS').textContent = CREDITS[crI][0]; $('#crB').textContent = CREDITS[crI][1]; c.classList.remove('out'); }, 460);
-}, 2800);
+(function credits() {
+  const box = $('#credits'); if (!box) return;
+  let i = 0;
+  setInterval(() => {
+    if ($('#scr-login').classList.contains('hidden') || document.hidden) return;
+    box.classList.add('out');
+    setTimeout(() => { i = (i + 1) % CREDITS.length; $('#crS').textContent = CREDITS[i][0]; $('#crB').textContent = CREDITS[i][1]; box.classList.remove('out'); }, 460);
+  }, 6500);   // pomaly, aby sa slogan stihol prečítať
+})();
+
+/* ================= ÚVOD: SAMOČINNÝ POČÍTAČ SPC-74 POČÍTA UKÁŽKY ================= */
+// obrazovka vypíše výpočet pre náhodný dátum narodenia (skutočné biorytmy na dnešok), tlačiareň ho potom vytlačí
+(function pcDemo() {
+  const scr = $('#pcScreen'), pap = $('#pcPaper');
+  if (!scr || !pap) return;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const advice = st => {
+    if (st.F.s === 'X') return 'DNES NERIDTE AUTO.';
+    if (st.C.s === 'X') return 'VYHNETE SE TCHYNI.';
+    if (st.I.s === 'X') return 'DNES NIC NEPODEPISOVAT.';
+    const pool = CH.some(ch => st[ch].s === '0') ? ['POZOR NA SCHODY.', 'MLCET JE ZLATO.', 'JEDNO PIVO, NE VIC.', 'DNES RADEJI NIC NESLIBUJTE.']
+      : CH.every(ch => st[ch].s === '*') ? ['VHODNY DEN NA RANDE.', 'KUPTE KVETINY.', 'POZADEJTE O PRIDANI.', 'DNES VAM TO MYSLI.']
+      : ['ZACNETE DIETU ZITRA.', 'SEF MA DNES PRAVDU.', 'DNES STACI NEVYCNIVAT.', 'OBED VAS ZACHRANI.'];
+    return pool[rnd(0, pool.length - 1)];
+  };
+  const dots = (label, v, w) => label + ' ' + '.'.repeat(Math.max(2, w - label.length - v.length - 2)) + ' ' + v;
+  (async function loop() {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    let first = true;
+    for (;;) {
+      if (document.hidden || $('#scr-login').classList.contains('hidden')) { await wait(1500); continue; }
+      const birth = first ? parseISO(KOUDELKA_BIRTH) : dn(rnd(1935, 2004), rnd(0, 11), rnd(1, 28));
+      first = false;
+      const who = { birthN: birth, bias: { F: 0, C: 0, I: 0 } }, st = dayState(who, todayN()), tip = advice(st);
+      const lines = [
+        '> VYPOCET PROBIHA...',
+        dots('NAROZEN', fmt(birth), 26), '',
+        dots('FYZICKY', st.F.s, 20), dots('CITOVY', st.C.s, 20), dots('INTELEKT', st.I.s, 20), '',
+        'STROJ DOPORUCUJE:'
+      ];
+      scr.innerHTML = ''; pap.textContent = '';
+      let out = '';
+      for (const l of lines) {
+        for (let i = 1; i <= l.length; i++) { scr.innerHTML = esc(out + l.slice(0, i)) + '<span class="cur">█</span>'; await wait(22); }
+        out += l + '\n'; await wait(l ? 90 : 40);
+      }
+      scr.innerHTML = esc(out) + `<span class="box">${esc(tip)}</span> <span class="cur">_</span>`;
+      await wait(600);
+      // tlačiareň: rovnaké údaje na papier, riadok po riadku
+      const p = ['KONDICIOGRAM', '-'.repeat(18), 'DATUM: ' + fmt(todayN()), 'NAR.:  ' + fmt(birth), '-'.repeat(18),
+        dots('FYZICKY', st.F.s, 18), dots('CITOVY', st.C.s, 18), dots('INTELEKT', st.I.s, 18), '-'.repeat(18), 'STROJ DOPORUCUJE:'];
+      const words = tip.split(' '); let row = '';
+      for (const w of words) { if ((row + ' ' + w).trim().length > 18) { p.push(row.trim()); row = ''; } row += ' ' + w; }
+      p.push(row.trim());
+      for (const l of p) { pap.textContent += l + '\n'; await wait(110); }
+      await wait(7000);
+    }
+  })();
+})();
 
 /* ================= VÝBĚR OSUDOVÉHO PARTNERA (česky; jména, města a obce slovensky) ================= */
 // seznamy jmen, míst, povolání, zálib, inzerátů, milostného provozu a hlášek stroje jsou v names.js
@@ -620,6 +684,8 @@ function matchData(u, sex) {
   const hob = [pick(r, NAMES.hobby)], h2 = pick(r, NAMES.hobby); if (h2 !== hob[0]) hob.push(h2);
   const ad = pick(r, NAMES.ads), love = pick(r, N.love);
   const robot = []; while (robot.length < 3) { const x = pick(r, NAMES.robot); if (!robot.includes(x)) robot.push(x); }
+  const face = pick(r, sex === 'f' ? ['tvar-z1', 'tvar-z2'] : ['tvar-m1', 'tvar-m2']);
+  const photo = { src: 'img/' + face + '.jpg', cut: FACE_CUT[face], bytes: 180 + Math.floor(r() * 700), err: pick(r, PHOTO_ERR) };
   const other = { birthN: c.b, bias: { F: 0, C: 0, I: 0 } };
   let date = null;
   for (let n = todayN(); n < todayN() + 60; n++) {
@@ -628,17 +694,60 @@ function matchData(u, sex) {
     const sc = a.C.v + o.C.v + .4 * (a.F.v + o.F.v);
     if (!date || sc > date.sc) date = { n, sc };
   }
-  return (matchCache[key] = { c, sex, name, city, job, hob, ad, love, robot, date: date && date.n, age: ageYears(c.b, todayN()), diff: Math.abs(c.b - u.birthN) });
+  return (matchCache[key] = { c, sex, name, city, job, hob, ad, love, robot, photo, date: date && date.n, age: ageYears(c.b, todayN()), diff: Math.abs(c.b - u.birthN) });
 }
 const cap = s => s[0].toUpperCase() + s.slice(1);
+// podobenka partnera: stroj ju číta z pásky riadok po riadku, ale skončí pri obočí a nahlási chybu
+const FACE_CUT = { 'tvar-z1': .35, 'tvar-z2': .28, 'tvar-m1': .35, 'tvar-m2': .30 };
+const PHOTO_ERR = ['CHYBA CTENI Z PASKY.', 'PAMET POCITACE PREKROCENA.', 'DETEKOVANO POSKOZENI DAT.', 'DATA NENALEZENA.',
+  'PASKA SE ZAMOTALA. VOLEJTE UDRZBU.', 'OBRAZEK ZABAVEN KADROVYM ODDELENIM.', 'NEDOSTATEK DERNYCH STITKU.', 'PREHRATA ELEKTRONKA C. 7.'];
+let photoJob = 0;
+function drawPhoto(box, ph) {
+  const cv = box.querySelector('canvas'), err = box.querySelector('.ph-err'), c = cv.getContext('2d'), W = cv.width, H = cv.height, job = ++photoJob;
+  c.fillStyle = '#0b0805'; c.fillRect(0, 0, W, H); err.textContent = '';
+  const img = new Image();
+  img.onload = () => {
+    const off = document.createElement('canvas'); off.width = W; off.height = H;
+    const o = off.getContext('2d'); o.drawImage(img, 0, 0, W, H);
+    const src = o.getImageData(0, 0, W, H).data, out = c.createImageData(W, H), d = out.data;
+    for (let i = 0; i < src.length; i += 4) {     // jantárová obrazovka, jemné riadkovanie
+      const y = (i / 4 / W) | 0, l = Math.pow((src[i] * .3 + src[i + 1] * .59 + src[i + 2] * .11) / 255, .9) * (y % 2 ? .78 : 1);
+      d[i] = 255 * l; d[i + 1] = 165 * l; d[i + 2] = 60 * l; d[i + 3] = 255;
+    }
+    const stop = Math.round(H * ph.cut);
+    let row = 0;
+    const step = () => {
+      if (job !== photoJob) return;
+      if (row < stop) {
+        c.putImageData(out, 0, 0, 0, row, W, 2); row += 2;
+        return setTimeout(step, 45);
+      }
+      for (let g = 0; g < 3; g++) {                 // pár poškodených riadkov
+        const y = stop + g * 2, off2 = (Math.random() * 12 - 6) | 0;
+        c.putImageData(out, off2, 0, 0, y, W, 1);
+      }
+      err.textContent = `NACTENO ${ph.bytes} BAJTU.
+${ph.err}
+NELZE NACIST CELY OBRAZEK.`;
+      beep(180, .18);
+    };
+    step();
+  };
+  img.src = ph.src;
+}
 function renderMatch() {
   if (!U) return;
   const sex = $('#mSex').value, m = matchData(U, sex), out = $('#mOut');
   $('#mTitle').textContent = sex === 'f' ? 'Vaše osudová partnerka' : 'Váš osudový partner';
   if (!m) { out.innerHTML = '<p>Stroj páruje osoby od 18 do 90 let. Ve vašem okolí ±12 let nikoho takového nenašel.</p>'; return; }
   out.innerHTML = `<div class="ad-clip">
-      <p class="who">${esc(m.name)}</p>
-      <p class="meta">nar. ${fmt(m.c.b)} ${esc(m.city)} · ${m.age} ${yearsCz(m.age)} · ${zodiac(m.c.b)}</p>
+      <div class="ph-head">
+        <div class="ph-box" title="Podobenka z pásky"><canvas width="64" height="72"></canvas><div class="ph-err"></div></div>
+        <div>
+          <p class="who">${esc(m.name)}</p>
+          <p class="meta">nar. ${fmt(m.c.b)} ${esc(m.city)} · ${m.age} ${yearsCz(m.age)} · ${zodiac(m.c.b)}</p>
+        </div>
+      </div>
       <p>${icon('stress')} ${esc(cap(m.job))}</p>
       <p>${icon('pin')} Žije ${esc(m.city)}</p>
       <p>${icon('love')} Milostný provoz: <b>${esc(m.love)}</b></p>
@@ -652,6 +761,7 @@ function renderMatch() {
       ${m.date != null ? `<div class="m-date">${icon('calendar')} Ideální první rande: <b>${fmtLongCz(m.date)}</b>. Citová ani fyzická křivka nebude mít u nikoho z vás kritický ani ošidný den.</div>` : ''}
       <div class="robot-box"><div class="robot-lbl">Hlášení stroje</div>${m.robot.map(x => `<div>&gt; ${esc(x)}</div>`).join('')}</div>
     </div>`;
+  drawPhoto(out.querySelector('.ph-box'), m.photo);
 }
 $('#mSex').addEventListener('change', () => {
   U.sex = $('#mSex').value;
@@ -680,6 +790,7 @@ function partnerLines(u, width) {
   wrap('POVOLANI', ascii(m.job));
   wrap('ZALIBY', ascii(m.hob.join(', ')));
   wrap('MIL.PROVOZ', ascii(m.love));
+  wrap('FOTO', `NACTENO ${m.photo.bytes} BAJTU. ${m.photo.err} NELZE NACIST CELY OBRAZEK.`);
   wrap('INZERAT', '"' + ascii(m.ad).replace(/[„“]/g, '"') + '"');
   wrap('SHODA', `F ${m.c.p.F} %  C ${m.c.p.C} %  I ${m.c.p.I} %  CELKEM ${m.c.p.T} %`);
   if (m.date != null) wrap('RANDE', ascii(fmtLongCz(m.date)));
@@ -906,6 +1017,7 @@ function monthsForRange() {
   }
   return out;
 }
+const signOff = w => w >= 41 ? ['S POZDRAVEM VAS SAMOCINNY POCITAC SPC-74.'] : ['S POZDRAVEM VAS SAMOCINNY', 'POCITAC SPC-74.'];
 function buildLines(u, months, avail) {
   const today = todayN(), L = [], sg = x => (x >= 0 ? '+' : '') + x.toFixed(2);
   const chunk = avail >= 13 + 93 ? 31 : Math.max(5, Math.floor((avail - 13) / 3));
@@ -977,7 +1089,7 @@ function buildLines(u, months, avail) {
   L.push({ cls: 'muted-line', h: '-'.repeat(width) });
   if (width >= 70) L.push('ZNAKY:  * USPESNY DEN   . NEUSPESNY DEN   0 OSIDNY DEN   X KRITICKY DEN');
   else L.push('ZNAKY:  * USPESNY DEN', '        . NEUSPESNY DEN', '        0 OSIDNY DEN', '        X KRITICKY DEN');
-  L.push('KONEC VYPISU.', 'S POZDRAVEM VAS SAMOCINNY POCITAC.');
+  L.push('KONEC VYPISU.', ...signOff(width));
   return L.map(x => typeof x === 'string' ? { h: esc(x) } : x);
 }
 // celý výpis podľa zvolených služieb: kondiciogram a pod ním (za perforáciou) výber osudového partnera
@@ -988,7 +1100,7 @@ function buildAll(u, months, avail) {
     const w = sv.k ? 12 + 3 * Math.min(31, avail >= 106 ? 31 : Math.max(5, Math.floor((avail - 13) / 3))) : Math.min(avail, 72);
     if (sv.k) out.push({ h: '' }, { cls: 'muted-line perf', h: '- '.repeat(Math.ceil(w / 2)).slice(0, w) }, { h: '' });
     out.push(...partnerLines(u, Math.min(w, avail)).map(x => typeof x === 'string' ? { h: esc(x) } : x));
-    out.push({ h: '' }, { h: 'KONEC VYPISU.' }, { h: 'S POZDRAVEM VAS SAMOCINNY POCITAC.' });
+    out.push({ h: '' }, { h: 'KONEC VYPISU.' }, ...signOff(w).map(h => ({ h })));
   }
   return out;
 }

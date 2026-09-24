@@ -8,7 +8,7 @@
 <title>Kondiciogram Koudelka</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Courier+Prime:wght@400;700&family=Doto:wght@400..900&family=Righteous&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Courier+Prime:wght@400;700&family=Doto:wght@400..900&family=Oswald:wght@600;700&family=Righteous&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <!-- Google AdSense: odkomentujte a doplňte svoje ID vydavateľa, keď bude web verejný a schválený
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
@@ -44,38 +44,38 @@
         </div>
       </div>
 
-      <div class="card login-card crossroad">
-        <h2>Výpočetní středisko nabízí</h2>
-        <p class="muted">Zaškrtněte, co má stroj zpracovat. Můžete zvolit jednu službu nebo obě, vytisknou se naráz.</p>
-        <label class="svc-check">
+      <!-- výber služieb: grafická šablóna, políčka a tlačidlá sú klikateľné vrstvy nad obrázkom -->
+      <div class="svc-panel" id="svcPanel" role="group" aria-label="Výpočetní středisko nabízí: zaškrtněte služby, vytisknou se naráz">
+        <img class="svc-panel-img" src="img/sluzby.webp" alt="" aria-hidden="true" width="1086" height="1448">
+        <label class="sp-tile sp-t1" title="Kondiciogram">
           <input type="checkbox" id="svcK" checked>
-          <span class="svc-box" aria-hidden="true"></span>
-          <img class="svc-img" src="img/tabula.jpg" alt="" aria-hidden="true">
-          <span class="svc-body">
-            <span class="svc-title">Kondiciogram</span>
-            <span class="svc-desc">Vaše kondice na každý den: úspěšné, neúspěšné, ošidné a kritické dny.</span>
-          </span>
+          <span class="sp-box"><svg class="sp-check" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 21 L16 31 L34 7"/></svg></span>
+          <span class="sr-only">Kondiciogram: vaše kondice na každý den</span>
         </label>
-        <label class="svc-check">
+        <label class="sp-tile sp-t2" title="Výběr osudového partnera">
           <input type="checkbox" id="svcP">
-          <span class="svc-box" aria-hidden="true"></span>
-          <img class="svc-img" src="img/rodina.jpg" alt="" aria-hidden="true">
-          <span class="svc-body">
-            <span class="svc-title">Výběr osudového partnera</span>
-            <span class="svc-desc">Stroj porovná biorytmy a najde jediný protějšek s nejlepší shodou.</span>
-          </span>
+          <span class="sp-box"><svg class="sp-check" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 21 L16 31 L34 7"/></svg></span>
+          <span class="sr-only">Výběr osudového partnera: stroj najde jediný protějšek s nejlepší shodou</span>
         </label>
-        <div id="svcErr" class="err" role="alert"></div>
-        <div class="login-alt">
-          <button id="toRegister" class="btn" type="button">Vyplnit štítek</button>
-          <button id="demoBtn" class="btn ghost" type="button">Zkusit jako Fr. Koudelka</button>
-        </div>
+        <button id="toRegister" class="sp-btn sp-red" type="button">Vyplnit štítek</button>
+        <button id="demoBtn" class="sp-btn sp-cream" type="button">Zkusit jako<br>Fr. Koudelka</button>
+        <div id="svcErr" class="sp-err" role="alert"></div>
       </div>
     </div>
 
-    <div class="credits film" aria-hidden="true">
-      <div class="film-s" id="crS">HUDBA</div>
-      <div class="film-b" id="crB">IHLIČKOVÁ TLAČIAREŇ</div>
+    <!-- samočinný počítač SPC-74: obrazovka a tlačiareň vypisujú ukážkový výpočet -->
+    <div class="pc-band" aria-label="Samočinný počítač SPC-74 počítá ukázkový kondiciogram">
+      <img class="pc-img" src="img/pocitac.webp" alt="" aria-hidden="true" width="1655" height="512">
+      <span class="pc-lamp" aria-hidden="true"></span>
+      <div class="pc-leds" aria-hidden="true"><span>PRACUJE</span><span>TISK</span><span>PRIPRAVEN</span></div>
+      <div class="pc-screen"><pre id="pcScreen"></pre></div>
+      <div class="pc-paper"><div class="pc-paper-in"><pre id="pcPaper"></pre></div></div>
+    </div>
+
+    <!-- reklamné titulky vo filmovom písme: výzva urobiť si kondiciogram (česky) -->
+    <div class="credits film" id="credits" aria-live="off">
+      <div class="film-s" id="crS">SOUDRUZI A SOUDRUŽKY!</div>
+      <div class="film-b" id="crB">NECHTE SI VYPOČÍTAT KONDICI!</div>
     </div>
 
     <div class="how">

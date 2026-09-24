@@ -1,4 +1,4 @@
-:root{
+﻿:root{
   --cream:#f3e2bf;
   --cream2:#ead4a6;
   --card:#fbf3e1;
@@ -272,18 +272,18 @@ footer p{padding:14px 16px 24px;margin:0}
 }
 
 /* ---------- print ---------- */
-/* Tlač: na papier ide len samostatný hárok #printSheet (perforovaný papier s dierkami) */
+/* TlaÄ: na papier ide len samostatnÃ½ hÃ¡rok #printSheet (perforovanÃ½ papier s dierkami) */
 .print-sheet{display:none}
-/* Bez okrajov a so šetrením atramentu: biele (priehľadné) pozadie, dierky iba ako tenké krúžky od vrchu po spodok. Pásy s dierkami sú position:fixed,
-   takže ich prehliadač zopakuje na každej vytlačenej strane. Veľkosť písma zostáva pevná (nenaťahuje sa). */
+/* Bez okrajov a so Å¡etrenÃ­m atramentu: biele (priehÄ¾adnÃ©) pozadie, dierky iba ako tenkÃ© krÃºÅ¾ky od vrchu po spodok. PÃ¡sy s dierkami sÃº position:fixed,
+   takÅ¾e ich prehliadaÄ zopakuje na kaÅ¾dej vytlaÄenej strane. VeÄ¾kosÅ¥ pÃ­sma zostÃ¡va pevnÃ¡ (nenaÅ¥ahuje sa). */
 @media print{
   @page{size:A4 landscape;margin:0}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  html,body{background:transparent!important;margin:0;padding:0}   /* biele pozadie = šetrí atrament */
+  html,body{background:transparent!important;margin:0;padding:0}   /* biele pozadie = Å¡etrÃ­ atrament */
   body > *:not(.print-sheet){display:none!important}
   .print-sheet{display:block}
   .print-sheet .tractor{position:fixed;top:0;bottom:0;width:13mm;
-    background:radial-gradient(circle at 6.5mm 3.2mm,transparent 0 1.85mm,#b9b3a6 1.9mm 2.1mm,transparent 2.2mm) 0 0/13mm 6.35mm repeat-y}   /* dierky len ako tenké krúžky */
+    background:radial-gradient(circle at 6.5mm 3.2mm,transparent 0 1.85mm,#b9b3a6 1.9mm 2.1mm,transparent 2.2mm) 0 0/13mm 6.35mm repeat-y}   /* dierky len ako tenkÃ© krÃºÅ¾ky */
   .print-sheet .tractor.l{left:0;border-right:1px dashed #b9b3a6}
   .print-sheet .tractor.r{right:0;border-left:1px dashed #b9b3a6}
   .print-sheet .paper{box-shadow:none;margin:0;max-width:none;width:auto;min-height:0;background:transparent;border:0;
@@ -296,7 +296,7 @@ footer p{padding:14px 16px 24px;margin:0}
 }
 
 /* =========================================================
-   FILMOVÉ PÍSMO (titulky), DIERNY ŠTÍTOK, STROJ, ZOZNAMKA, REKLAMA
+   FILMOVÃ‰ PÃSMO (titulky), DIERNY Å TÃTOK, STROJ, ZOZNAMKA, REKLAMA
    ========================================================= */
 .film{font-family:"Bangers",cursive;letter-spacing:.04em;line-height:1}
 .film-s,.film-b{display:block;
@@ -317,7 +317,7 @@ footer p{padding:14px 16px 24px;margin:0}
 .credits .film-s,.credits .film-b{transition:opacity .45s,transform .45s}
 .credits.out .film-s,.credits.out .film-b{opacity:0;transform:translateY(8px) scale(.97)}
 
-/* ---- dierny štítok ---- */
+/* ---- dierny Å¡tÃ­tok ---- */
 .pc-cap{font:700 .78rem "Courier Prime";letter-spacing:.14em;text-transform:uppercase;color:var(--brown2);margin:0 0 6px}
 .pc-wrap{position:relative}
 .pc{display:block;width:100%;height:auto;filter:drop-shadow(3px 4px 0 rgba(74,42,20,.35))}
@@ -333,7 +333,7 @@ footer p{padding:14px 16px 24px;margin:0}
 @keyframes punch{0%{transform:scale(2.2);fill:#e2472b}100%{transform:scale(1)}}
 .reg-card .pc-wrap{margin-bottom:18px}
 
-/* ---- stroj so vstupom štítku a výstupom papiera ---- */
+/* ---- stroj so vstupom Å¡tÃ­tku a vÃ½stupom papiera ---- */
 .mach-wrap{max-width:1140px;margin:0 auto;position:relative}
 .card-in{position:relative;z-index:1;max-width:640px;margin:0 auto -34px;padding:0 10px;
   transition:transform 1.5s cubic-bezier(.55,0,.75,.45)}
@@ -389,7 +389,7 @@ footer p{padding:14px 16px 24px;margin:0}
 .ad-ph small{font-size:.75rem;opacity:.8}
 .ad-body ins.adsbygoogle[data-ad-status="filled"] + .ad-ph{display:none}
 
-/* ---- päta: upozornenie ---- */
+/* ---- pÃ¤ta: upozornenie ---- */
 .disclaimer{text-align:center;padding:30px 16px 6px}
 .disclaimer .film-s{font-size:1.5rem}
 .disclaimer .film-b{font-size:2.4rem;margin:.1em 0}
@@ -410,7 +410,7 @@ footer p{padding:14px 16px 24px;margin:0}
   .film-s,.film-b{text-shadow:-1.5px -1.5px 0 #111,1.5px -1.5px 0 #111,-1.5px 1.5px 0 #111,1.5px 1.5px 0 #111,0 2px 0 #111,2px 0 0 #111,-2px 0 0 #111,0 -2px 0 #111}
 }
 
-/* ---- ikony a kódy odpovedí ---- */
+/* ---- ikony a kÃ³dy odpovedÃ­ ---- */
 .ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .chip .ic{margin-right:2px}
 .q-title .q-ic{width:1.1em;height:1.1em;margin-right:.35em;color:var(--orange);vertical-align:-.15em}
@@ -423,7 +423,7 @@ footer p{padding:14px 16px 24px;margin:0}
 .best-hour .ic,.ad-clip .ic{color:var(--orange)}
 footer .inspired{font:700 .95rem "Courier Prime";color:var(--brown);padding-bottom:0;letter-spacing:.03em}
 
-/* ---- ilustrácie ---- */
+/* ---- ilustrÃ¡cie ---- */
 .match-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;align-items:start;margin-top:14px}
 .match-body .match-out{margin-top:0}
 .match-photo{margin:0;background:var(--brown);padding:9px 9px 8px;border-radius:14px;transform:rotate(-1.5deg);box-shadow:5px 5px 0 rgba(74,42,20,.3)}
@@ -434,7 +434,7 @@ footer .inspired{font:700 .95rem "Courier Prime";color:var(--brown);padding-bott
 @media (max-width:680px){ .match-body{grid-template-columns:1fr} .match-photo{max-width:260px;margin:0 auto} }
 
 /* =========================================================
-   ZARIADENIA: mobil, tablet, iPad (na výšku aj na šírku), PC
+   ZARIADENIA: mobil, tablet, iPad (na vÃ½Å¡ku aj na Å¡Ã­rku), PC
    ========================================================= */
 button,.opt,.pcard{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .topbar{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
@@ -442,19 +442,19 @@ main{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env
 footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 @media (hover:none){ .btn:hover{background:var(--orange)} .btn.ghost:hover{background:var(--cream)} .opt:hover{background:#fffaf0} .opt.sel:hover{background:var(--orange)} }
 
-/* veľké PC */
+/* veÄ¾kÃ© PC */
 @media (min-width:1400px){ main{max-width:1280px} .mach-wrap{max-width:1220px} }
 
-/* iPad na šírku a menšie notebooky (1024–1199) */
+/* iPad na Å¡Ã­rku a menÅ¡ie notebooky (1024â€“1199) */
 @media (max-width:1199px) and (min-width:981px){
   .title .film-b{font-size:3.4rem}
   .tv img{width:190px;height:220px}
   .grid3{gap:18px}
 }
 
-/* tablety a iPad na výšku (681–980) */
+/* tablety a iPad na vÃ½Å¡ku (681â€“980) */
 @media (max-width:980px){
-  input,select{font-size:16px}              /* iOS nepribližuje stránku pri písaní */
+  input,select{font-size:16px}              /* iOS nepribliÅ¾uje strÃ¡nku pri pÃ­sanÃ­ */
   .controls select,.controls input{font-size:16px}
   .poster{min-height:0}
   .poster-inner{grid-template-columns:auto 1fr}
@@ -493,14 +493,14 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
   .q-title{font-size:1.3rem}
 }
 
-/* malé telefóny (do 380) */
+/* malÃ© telefÃ³ny (do 380) */
 @media (max-width:380px){
   .title .film-b{font-size:2.6rem}
   .logo-txt{font-size:1.3rem}
   .film-btn{font-size:1.3rem}
 }
 
-/* telefón na šírku: nízka obrazovka */
+/* telefÃ³n na Å¡Ã­rku: nÃ­zka obrazovka */
 @media (max-height:500px) and (orientation:landscape){
   .poster-inner{grid-template-columns:auto 1fr}
   .tv img{width:150px;height:170px}
@@ -509,7 +509,7 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 .kbd-hint{display:none;margin:10px 0 0;font:.8rem "Courier Prime";color:#86603f}
 @media (hover:hover) and (pointer:fine){ .kbd-hint{display:block} }
 
-/* ---- úvod bez prihlasovania ---- */
+/* ---- Ãºvod bez prihlasovania ---- */
 .intro-list{list-style:none;padding:0;margin:0 0 6px}
 .intro-list li{position:relative;padding:4px 0 4px 26px;font-weight:500}
 .intro-list li::before{content:"*";position:absolute;left:4px;top:2px;font:700 1.2rem "Courier Prime";color:var(--orange)}
@@ -517,7 +517,7 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 .login-card .login-alt{margin-top:auto;padding-top:16px}
 .login-card .login-alt .btn{width:100%}
 
-/* ---- logo v štýle filmových titulkov ---- */
+/* ---- logo v Å¡tÃ½le filmovÃ½ch titulkov ---- */
 .logo-txt{font-size:1.9rem;letter-spacing:.05em;transform:rotate(-2deg);display:inline-block;margin-top:-2px}
 .logo-txt .film-b{text-shadow:-2px -2px 0 #111,2px -2px 0 #111,-2px 2px 0 #111,2px 2px 0 #111,0 3px 0 #111,3px 0 0 #111,-3px 0 0 #111,0 -3px 0 #111,4px 4px 0 rgba(0,0,0,.45)}
 
@@ -525,7 +525,7 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 .mach-wrap .ad-slot{margin-top:30px}
 @media (max-width:680px){ .logo-txt{font-size:1.5rem} }
 
-/* ---- displej s hláškami stroja v hornom pruhu (jantárový bodkový displej zo 70. rokov) ---- */
+/* ---- displej s hlÃ¡Å¡kami stroja v hornom pruhu (jantÃ¡rovÃ½ bodkovÃ½ displej zo 70. rokov) ---- */
 .topbar{flex-wrap:nowrap}
 .ticker{flex:1 1 auto;min-width:0;max-width:700px;height:44px;margin:0 8px;position:relative;display:flex;align-items:center;gap:10px;
   padding:0 12px 0 10px;background:linear-gradient(#17120b,#0b0805);border:3px solid #1d1510;border-radius:9px;
@@ -538,7 +538,7 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 .tk-view{flex:1;min-width:0;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
 .tk-text{display:inline-block;white-space:nowrap;font:1.55rem/1 "VT323",monospace;letter-spacing:.07em;color:#ffb347;
   text-shadow:0 0 5px #ff8a1f,0 0 12px rgba(255,120,20,.55);transition:transform .12s linear;will-change:transform}
-.tk-text::after{content:"█";margin-left:2px;animation:blink2 .6s steps(1) infinite}
+.tk-text::after{content:"â–ˆ";margin-left:2px;animation:blink2 .6s steps(1) infinite}
 .tk-text.off{opacity:0;transition:opacity .25s}
 @media (max-width:980px){
   .topbar{flex-wrap:wrap}
@@ -551,7 +551,7 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 }
 @media (prefers-reduced-motion:reduce){ .tk-text::after,.tk-led{animation:none} }
 
-/* ---- rozcestník na úvode ---- */
+/* ---- rozcestnÃ­k na Ãºvode ---- */
 .crossroad h2{margin-bottom:.6em}
 .svc{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start;padding:14px;border:2px solid var(--brown);
   border-radius:14px;background:#fffaf0;margin-bottom:14px}
@@ -562,13 +562,13 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 .svc p{margin:0 0 .6em;font-size:.95rem}
 .svc-btns{display:flex;gap:8px;flex-wrap:wrap}
 
-/* ---- výber dátumu po slovensky ---- */
+/* ---- vÃ½ber dÃ¡tumu po slovensky ---- */
 .date3{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr) minmax(0,1fr);gap:8px;margin:.3em 0 .6em}
 .date3 label{margin:0;font-size:.82rem}
 .date3 select{margin-top:3px}
 .lbl-txt{font-weight:500;font-size:.95rem;margin:.6em 0 0}
 
-/* ---- služba č. 2 ---- */
+/* ---- sluÅ¾ba Ä. 2 ---- */
 .partner-card{max-width:680px;margin:0 auto}
 .partner-head .film-s{font-size:1.4rem}
 .partner-head .film-b{font-size:2.3rem;margin:.1em 0 .4em}
@@ -584,14 +584,14 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
   .partner-head .film-b{font-size:1.8rem}
 }
 
-/* ---- logo = odkaz na úvod; ošidný deň v verdikte ---- */
+/* ---- logo = odkaz na Ãºvod; oÅ¡idnÃ½ deÅˆ v verdikte ---- */
 a.logo{text-decoration:none;color:inherit;cursor:pointer;border-radius:10px}
 a.logo:hover .logo-mark{background:#f0b632}
 a.logo:hover .logo-txt{transform:rotate(-2deg) scale(1.04)}
 .logo-txt{transition:transform .15s}
 .verdict-list li.tricky .s{background:var(--mustard);color:var(--brown)}
 
-/* ---- výber služieb na úvode: veľké zaškrtávacie políčka ---- */
+/* ---- vÃ½ber sluÅ¾ieb na Ãºvode: veÄ¾kÃ© zaÅ¡krtÃ¡vacie polÃ­Äka ---- */
 .svc-check{display:grid;grid-template-columns:auto 84px 1fr;gap:14px;align-items:center;cursor:pointer;margin:0 0 12px;
   padding:14px;border:3px solid var(--brown);border-radius:16px;background:#fffaf0;font-weight:400;transition:background .15s,box-shadow .15s,transform .08s}
 .svc-check:hover{background:#fdf0cf}
@@ -617,12 +617,78 @@ a.logo:hover .logo-txt{transform:rotate(-2deg) scale(1.04)}
   .svc-check .svc-title{font-size:1.15rem}
 }
 
-/* ---- nástenka: zobraziť len časti zvolených služieb ---- */
+/* ---- nÃ¡stenka: zobraziÅ¥ len Äasti zvolenÃ½ch sluÅ¾ieb ---- */
 body.no-k .k-only{display:none!important}
 body.no-p .p-only{display:none!important}
 
-/* ---- hlášky stroja pri osudovom partnerovi ---- */
+/* ---- hlÃ¡Å¡ky stroja pri osudovom partnerovi ---- */
 .robot-box{margin-top:12px;background:#08140b;color:#8dff9f;border-radius:10px;padding:10px 12px;border:3px solid #1d1c1a;
   font:1.1rem/1.3 "VT323",monospace;letter-spacing:.04em;text-shadow:0 0 6px rgba(141,255,159,.5)}
 .robot-lbl{font-size:.8rem;color:#4f9a5c;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px}
 .pl.perf{color:#a39f95}
+
+/* =========================================================
+   ÃšVOD: grafickÃ¡ Å¡ablÃ³na sluÅ¾ieb a samoÄinnÃ½ poÄÃ­taÄ SPC-74
+   ========================================================= */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* panel sluÅ¾ieb: obrÃ¡zok 1086Ã—1448, vrstvy v percentÃ¡ch */
+.svc-panel{position:relative;container-type:inline-size;align-self:start;border-radius:22px;
+  filter:drop-shadow(6px 6px 0 rgba(74,42,20,.9))}
+.svc-panel-img{width:100%;height:auto;display:block;border-radius:22px}
+.sp-tile{position:absolute;left:6.3%;width:87.7%;margin:0;cursor:pointer;border-radius:3cqw}
+.sp-t1{top:29.3%;height:22.9%}
+.sp-t2{top:54.5%;height:23.8%}
+.sp-tile input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.sp-tile:hover{background:rgba(255,255,255,.07)}
+.sp-box{position:absolute;left:2.4%;width:12.6%;aspect-ratio:1;top:50%;transform:translateY(-50%);display:block;border-radius:1.4cqw}
+.sp-t1 .sp-box{top:48.5%}
+.sp-t2 .sp-box{top:46.5%}
+.sp-check{width:100%;height:100%;display:block;fill:none;stroke:#c8321f;stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:50;stroke-dashoffset:50;transition:stroke-dashoffset .25s ease-out;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.25))}
+.sp-tile input:checked + .sp-box .sp-check{stroke-dashoffset:0}
+.sp-tile input:focus-visible + .sp-box{outline:.6cqw solid var(--mustard);outline-offset:.4cqw}
+.sp-btn{position:absolute;top:84.2%;height:9.8%;border:0;background:transparent;cursor:pointer;border-radius:2.2cqw;
+  display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.05;padding:0 2%}
+.sp-red{left:8.8%;width:38.9%;font:700 5.6cqw "Oswald",sans-serif;color:#fbe9cf;letter-spacing:.02em;
+  text-shadow:.25cqw .3cqw 0 rgba(60,20,8,.75)}
+.sp-cream{left:55.4%;width:36.2%;font:700 3.9cqw/1.2 "Courier Prime",monospace;color:#3a2412}
+.sp-btn:hover{background:rgba(255,255,255,.1)}
+.sp-btn:active{background:rgba(0,0,0,.14);transform:translateY(.3cqw)}
+.sp-btn:focus-visible{outline:.6cqw solid var(--mustard);outline-offset:.3cqw}
+.sp-err{position:absolute;left:8%;right:8%;top:79.6%;text-align:center;font:700 2.9cqw "Courier Prime";color:#b8241b;min-height:0}
+
+/* poÄÃ­taÄ: obrÃ¡zok 1655Ã—512 */
+.pc-band{position:relative;margin:30px auto 0;container-type:inline-size;filter:drop-shadow(5px 6px 0 rgba(74,42,20,.55))}
+.pc-img{width:100%;height:auto;display:block}
+.pc-lamp{position:absolute;left:6.55%;top:25.3%;width:3.9%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,190,80,.95),rgba(255,120,20,.35) 45%,transparent 70%);mix-blend-mode:screen;animation:lampPulse 1.2s ease-in-out infinite}
+@keyframes lampPulse{50%{opacity:.25}}
+.pc-leds{position:absolute;left:10.6%;top:26.5%;height:44%;width:7.2%;display:flex;flex-direction:column;justify-content:space-between}
+.pc-leds span{font:1.15cqw/1 "VT323",monospace;letter-spacing:.08em;color:#d8cbb0;text-shadow:0 1px 0 #000}
+.pc-screen{position:absolute;left:22.4%;top:13.2%;width:43%;height:73%;overflow:hidden;padding:1.3cqw 2.2cqw}
+.pc-screen pre{margin:0;font:2.15cqw/1.12 "VT323",monospace;color:#ffb347;letter-spacing:.06em;white-space:pre;
+  text-shadow:0 0 .5cqw #ff8a1f,0 0 1.2cqw rgba(255,110,20,.45)}
+.pc-screen .box{outline:.18cqw solid #ffb347;outline-offset:.25cqw}
+.pc-screen .cur{animation:blink2 .7s steps(1) infinite}
+.pc-paper{position:absolute;left:76.2%;top:14%;width:17.6%;height:80%;overflow:hidden}
+.pc-paper-in{position:absolute;left:0;right:0;top:0;padding:1.4cqw 1.6cqw 0}
+.pc-paper pre{margin:0;font:700 .95cqw/1.35 "Doto","Courier Prime",monospace;color:#2a2a30;white-space:pre}
+@media (max-width:680px){ .pc-band{margin-top:22px} }
+@media (prefers-reduced-motion:reduce){ .pc-lamp{animation:none} }
+
+/* ---- podobenka partnera načítaná z pásky ---- */
+.ph-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:.4em}
+.ph-box{position:relative;flex:none;width:118px;aspect-ratio:64/72;background:#0b0805;border:3px solid #2a1c10;border-radius:8px;overflow:hidden;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.9),2px 2px 0 rgba(74,42,20,.4)}
+.ph-box canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.ph-err{position:absolute;left:0;right:0;bottom:0;padding:4px 5px 5px;white-space:pre-line;font:.8rem/1.05 "VT323",monospace;color:#ffb347;
+  text-shadow:0 0 5px #ff8a1f;letter-spacing:.03em}
+.ph-err:empty{display:none}
+@media (max-width:680px){ .ph-box{width:96px} }
+
+/* reklamné titulky: pevná výška, dlhšie slogany sa zalomia */
+.credits{min-height:178px;display:flex;flex-direction:column;justify-content:center}
+.credits .film-b{font-size:clamp(1.7rem,4.6vw,3.2rem);line-height:1.02}
+.credits .film-s{font-size:clamp(1.15rem,2.8vw,2.1rem)}
+@media (max-width:680px){ .credits{min-height:140px} }
