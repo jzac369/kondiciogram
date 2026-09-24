@@ -1,5 +1,5 @@
 'use strict';
-/* Dáta pre „Vhodného partnera“: fiktívne osoby sa skladajú z týchto zoznamov.
+/* Dáta pre „Výběr osudového partnera“: fiktívne osoby sa skladajú z týchto zoznamov (mená a miesta po slovensky, zvyšok po česky).
    Ženské priezviská sa tvoria z mužských podľa slovenských pravidiel (Novotný → Novotná, Oravec → Oravcová, Vlček → Vlčková, Varga → Vargová). */
 
 const FEMALE_FIRST = [
@@ -75,71 +75,95 @@ const VILLAGES = [
 ];
 const CITIES = [...TOWNS, ...VILLAGES];
 
+// ===== Výběr osudového partnera je česky; jména, města a obce zůstávají slovensky =====
+
 // [ženský tvar, mužský tvar]
 const JOBS = [
-  ['učiteľka na základnej škole', 'učiteľ na základnej škole'], ['zdravotná sestra', 'zdravotný brat'], ['účtovníčka', 'účtovník'], ['knihovníčka', 'knihovník'], ['kaderníčka', 'kaderník'],
-  ['architektka', 'architekt'], ['lekárnička', 'lekárnik'], ['programátorka', 'programátor'], ['cukrárka', 'cukrár'], ['veterinárka', 'veterinár'],
-  ['sprievodkyňa vo vlaku', 'sprievodca vo vlaku'], ['fotografka', 'fotograf'], ['referentka na mestskom úrade', 'referent na mestskom úrade'], ['fyzioterapeutka', 'fyzioterapeut'], ['kuchárka', 'kuchár'],
-  ['automechanička', 'automechanik'], ['elektrikárka', 'elektrikár'], ['stolárka', 'stolár'], ['geodetka', 'geodet'], ['záchranárka', 'záchranár'],
-  ['hasička', 'hasič'], ['policajtka', 'policajt'], ['pilotka', 'pilot'], ['rušňovodička', 'rušňovodič'], ['vodička autobusu', 'vodič autobusu'],
-  ['taxikárka', 'taxikár'], ['poštová doručovateľka', 'poštový doručovateľ'], ['predavačka v potravinách', 'predavač v potravinách'], ['čašníčka', 'čašník'], ['barmanka', 'barman'],
-  ['sommelierka', 'sommelier'], ['pekárka', 'pekár'], ['mäsiarka', 'mäsiar'], ['záhradníčka', 'záhradník'], ['kvetinárka', 'kvetinár'],
-  ['lesníčka', 'lesník'], ['včelárka', 'včelár'], ['vinárka', 'vinár'], ['agronómka', 'agronóm'], ['zootechnička', 'zootechnik'],
-  ['krajčírka', 'krajčír'], ['obuvníčka', 'obuvník'], ['hodinárka', 'hodinár'], ['zlatníčka', 'zlatník'], ['keramikárka', 'keramikár'],
-  ['sklárka', 'sklár'], ['maliarka obrazov', 'maliar obrazov'], ['sochárka', 'sochár'], ['grafička', 'grafik'], ['ilustrátorka', 'ilustrátor'],
-  ['spisovateľka', 'spisovateľ'], ['novinárka', 'novinár'], ['redaktorka v rozhlase', 'redaktor v rozhlase'], ['moderátorka', 'moderátor'], ['herečka v divadle', 'herec v divadle'],
-  ['speváčka v zbore', 'spevák v zbore'], ['huslistka', 'huslista'], ['klaviristka', 'klavirista'], ['učiteľka hudby', 'učiteľ hudby'], ['tanečnica', 'tanečník'],
-  ['trénerka plávania', 'tréner plávania'], ['inštruktorka lyžovania', 'inštruktor lyžovania'], ['horská vodkyňa', 'horský vodca'], ['sprievodkyňa na hrade', 'sprievodca na hrade'], ['archeologička', 'archeológ'],
-  ['historička', 'historik'], ['archivárka', 'archivár'], ['prekladateľka', 'prekladateľ'], ['tlmočníčka', 'tlmočník'], ['právnička', 'právnik'],
-  ['notárka', 'notár'], ['sudkyňa', 'sudca'], ['ekonómka', 'ekonóm'], ['bankárka', 'bankár'], ['poisťovacia agentka', 'poisťovací agent'],
-  ['realitná maklérka', 'realitný maklér'], ['personalistka', 'personalista'], ['projektová manažérka', 'projektový manažér'], ['asistentka riaditeľa', 'asistent riaditeľa'], ['psychologička', 'psychológ'],
-  ['logopédka', 'logopéd'], ['sociálna pracovníčka', 'sociálny pracovník'], ['učiteľka v škôlke', 'učiteľ v škôlke'], ['zubárka', 'zubár'], ['detská lekárka', 'detský lekár'],
-  ['chirurgička', 'chirurg'], ['laborantka', 'laborant'], ['chemička', 'chemik'], ['meteorologička', 'meteorológ'], ['astronómka na hvezdárni', 'astronóm na hvezdárni'],
-  ['stavebná inžinierka', 'stavebný inžinier'], ['strojárka', 'strojár'], ['zváračka', 'zvárač'], ['inštalatérka', 'inštalatér'], ['kominárka', 'kominár'],
-  ['dispečerka dopravy', 'dispečer dopravy'], ['letuška', 'steward'], ['recepčná v hoteli', 'recepčný v hoteli'], ['masérka', 'masér'], ['módna návrhárka', 'módny návrhár']
+  ['učitelka na základní škole', 'učitel na základní škole'], ['zdravotní sestra', 'zdravotní bratr'], ['účetní', 'účetní'], ['knihovnice', 'knihovník'], ['kadeřnice', 'kadeřník'],
+  ['architektka', 'architekt'], ['lékárnice', 'lékárník'], ['programátorka', 'programátor'], ['cukrářka', 'cukrář'], ['veterinářka', 'veterinář'],
+  ['průvodčí ve vlaku', 'průvodčí ve vlaku'], ['fotografka', 'fotograf'], ['referentka na městském úřadě', 'referent na městském úřadě'], ['fyzioterapeutka', 'fyzioterapeut'], ['kuchařka', 'kuchař'],
+  ['automechanička', 'automechanik'], ['elektrikářka', 'elektrikář'], ['truhlářka', 'truhlář'], ['geodetka', 'geodet'], ['záchranářka', 'záchranář'],
+  ['hasička', 'hasič'], ['policistka', 'policista'], ['pilotka', 'pilot'], ['strojvedoucí', 'strojvedoucí'], ['řidička autobusu', 'řidič autobusu'],
+  ['taxikářka', 'taxikář'], ['pošťačka', 'pošťák'], ['prodavačka v potravinách', 'prodavač v potravinách'], ['číšnice', 'číšník'], ['barmanka', 'barman'],
+  ['someliérka', 'someliér'], ['pekařka', 'pekař'], ['řeznice', 'řezník'], ['zahradnice', 'zahradník'], ['květinářka', 'květinář'],
+  ['lesnice', 'lesník'], ['včelařka', 'včelař'], ['vinařka', 'vinař'], ['agronomka', 'agronom'], ['zootechnička', 'zootechnik'],
+  ['krejčová', 'krejčí'], ['obuvnice', 'obuvník'], ['hodinářka', 'hodinář'], ['zlatnice', 'zlatník'], ['keramička', 'keramik'],
+  ['sklářka', 'sklář'], ['malířka obrazů', 'malíř obrazů'], ['sochařka', 'sochař'], ['grafička', 'grafik'], ['ilustrátorka', 'ilustrátor'],
+  ['spisovatelka', 'spisovatel'], ['novinářka', 'novinář'], ['redaktorka v rozhlase', 'redaktor v rozhlase'], ['moderátorka', 'moderátor'], ['herečka v divadle', 'herec v divadle'],
+  ['zpěvačka ve sboru', 'zpěvák ve sboru'], ['houslistka', 'houslista'], ['klavíristka', 'klavírista'], ['učitelka hudby', 'učitel hudby'], ['tanečnice', 'tanečník'],
+  ['trenérka plavání', 'trenér plavání'], ['instruktorka lyžování', 'instruktor lyžování'], ['horská vůdkyně', 'horský vůdce'], ['průvodkyně na hradě', 'průvodce na hradě'], ['archeoložka', 'archeolog'],
+  ['historička', 'historik'], ['archivářka', 'archivář'], ['překladatelka', 'překladatel'], ['tlumočnice', 'tlumočník'], ['právnička', 'právník'],
+  ['notářka', 'notář'], ['soudkyně', 'soudce'], ['ekonomka', 'ekonom'], ['bankéřka', 'bankéř'], ['pojišťovací agentka', 'pojišťovací agent'],
+  ['realitní makléřka', 'realitní makléř'], ['personalistka', 'personalista'], ['projektová manažerka', 'projektový manažer'], ['asistentka ředitele', 'asistent ředitele'], ['psycholožka', 'psycholog'],
+  ['logopedka', 'logoped'], ['sociální pracovnice', 'sociální pracovník'], ['učitelka ve školce', 'učitel ve školce'], ['zubařka', 'zubař'], ['dětská lékařka', 'dětský lékař'],
+  ['chirurgyně', 'chirurg'], ['laborantka', 'laborant'], ['chemička', 'chemik'], ['meteoroložka', 'meteorolog'], ['astronomka na hvězdárně', 'astronom na hvězdárně'],
+  ['stavební inženýrka', 'stavební inženýr'], ['strojařka', 'strojař'], ['svářečka', 'svářeč'], ['instalatérka', 'instalatér'], ['kominice', 'kominík'],
+  ['dispečerka dopravy', 'dispečer dopravy'], ['letuška', 'steward'], ['recepční v hotelu', 'recepční v hotelu'], ['masérka', 'masér'], ['módní návrhářka', 'módní návrhář']
 ];
 
 const HOBBIES = [
-  'turistika v Tatrách', 'záhradka na chate', 'volejbal', 'tanečné kurzy', 'krížovky', 'huby a les', 'platne zo 70. rokov', 'plávanie', 'bežky', 'šach',
-  'rybačka', 'divadlo', 'motorky Jawa', 'bicykel', 'pečenie koláčov', 'kino', 'zjazdové lyžovanie', 'korčuľovanie', 'hokej na zamrznutom rybníku', 'futbal',
-  'stolný tenis', 'tenis', 'bedminton', 'bowling', 'kolky', 'joga', 'beh', 'nordic walking', 'horolezectvo', 'vodáctvo na Hrone',
-  'splav Dunajca', 'kempovanie', 'jaskyne', 'hrady a zrúcaniny', 'kúpele', 'termálne kúpaliská', 'fotografovanie', 'kamera Super 8', 'zbieranie známok', 'zbieranie mincí',
-  'zbieranie pohľadníc', 'staré autá', 'oprava bicyklov', 'modelárstvo', 'vláčiky', 'rádioamatérstvo', 'astronómia', 'pozorovanie vtákov', 'včelárstvo', 'bylinky',
-  'pestovanie paradajok', 'kaktusy', 'orchidey', 'akvárium', 'psy', 'mačky', 'jazda na koni', 'varenie', 'grilovanie', 'zaváranie',
-  'víno a vinice', 'syry', 'bryndzové halušky', 'pletenie', 'háčkovanie', 'šitie', 'výšivky', 'drevorezba', 'keramika', 'akvarely',
-  'kreslenie', 'kaligrafia', 'písanie básní', 'detektívky', 'historické romány', 'sci-fi', 'antikvariáty', 'kvízy', 'hlavolamy', 'sudoku',
-  'mariáš', 'spoločenské hry', 'cudzie jazyky', 'cestovanie vlakom', 'geocaching', 'folklór', 'ľudové tance', 'spev v zbore', 'gitara', 'akordeón',
-  'heligónka', 'klavír', 'jazz', 'rock and roll', 'disko', 'opereta', 'rozhlasové hry', 'otužovanie', 'sauna', 'dobrovoľníctvo'
+  'turistika v Tatrách', 'zahrádka na chatě', 'volejbal', 'taneční kurzy', 'křížovky', 'houby a les', 'desky ze 70. let', 'plavání', 'běžky', 'šachy',
+  'rybaření', 'divadlo', 'motorky Jawa', 'kolo', 'pečení koláčů', 'kino', 'sjezdové lyžování', 'bruslení', 'hokej na zamrzlém rybníku', 'fotbal',
+  'stolní tenis', 'tenis', 'badminton', 'bowling', 'kuželky', 'jóga', 'běh', 'nordic walking', 'horolezectví', 'vodáctví na Hronu',
+  'splav Dunajce', 'kempování', 'jeskyně', 'hrady a zříceniny', 'lázně', 'termální koupaliště', 'fotografování', 'kamera Super 8', 'sbírání známek', 'sbírání mincí',
+  'sbírání pohlednic', 'stará auta', 'opravy kol', 'modelářství', 'vláčky', 'radioamatérství', 'astronomie', 'pozorování ptáků', 'včelaření', 'bylinky',
+  'pěstování rajčat', 'kaktusy', 'orchideje', 'akvárium', 'psi', 'kočky', 'jízda na koni', 'vaření', 'grilování', 'zavařování',
+  'víno a vinice', 'sýry', 'brynzové halušky', 'pletení', 'háčkování', 'šití', 'výšivky', 'řezbářství', 'keramika', 'akvarely',
+  'kreslení', 'kaligrafie', 'psaní básní', 'detektivky', 'historické romány', 'sci-fi', 'antikvariáty', 'kvízy', 'hlavolamy', 'sudoku',
+  'mariáš', 'společenské hry', 'cizí jazyky', 'cestování vlakem', 'geocaching', 'folklór', 'lidové tance', 'zpěv ve sboru', 'kytara', 'akordeon',
+  'heligonka', 'klavír', 'jazz', 'rock and roll', 'disko', 'opereta', 'rozhlasové hry', 'otužování', 'sauna', 'dobrovolnictví'
 ];
 
-// inzeráty sú písané bez rodu, sedia k partnerovi aj partnerke
+// inzeráty jsou psané bez rodu, sedí k partnerovi i partnerce
 const ADS = [
-  'Hľadá niekoho, s kým sa dá rozprávať aj mlčať.', 'Ozvi sa, ak ťa bavia nedeľné obedy a dlhé prechádzky.', 'Hľadá parťáka na túry, ktorý neutečie pred prvým kopcom.', 'Vie uvariť halušky aj opraviť kvapkajúci kohútik.', 'Hľadá niekoho, kto sa smeje aj na slabších vtipoch.',
-  'Na prvé rande prinesie kondiciogram, aby nevyšlo na kritický deň.', 'Hľadá spoločnosť na večery pri platniach a čaji.', 'Pozná všetky zastávky električky a chce ti ukázať tie najkrajšie.', 'Hľadá niekoho, s kým postaví chatu aj vzťah.', 'Ozvi sa, ak vieš tancovať twist alebo sa ho chceš naučiť.',
-  'Hľadá spolujazdca na výlety do Tatier.', 'Má záhradku, psa a voľné miesto pri stole.', 'Hľadá niekoho, kto nepozerá na hodinky, keď je dobre.', 'Pečie najlepšiu bábovku v paneláku a nemá ju s kým jesť.', 'Hľadá človeka, ktorý si pamätá narodeniny aj bez kalendára.',
-  'Ozvi sa, ak ťa neodradí dážď ani stan.', 'Hľadá niekoho, kto pochopí, prečo sú doma tri rádiá.', 'Stroj tvrdí, že sa k sebe hodíme. Kto by sa hádal so strojom?', 'Hľadá partiu na kolky a spoločnú cestu domov.', 'Hľadá spoločnosť do kina na polnočné predstavenie.',
-  'Kto dočíta tento inzerát do konca, má u mňa kávu.', 'Hľadá niekoho, kto má rád rána rovnako ako noci.', 'Vie, kde rastú najlepšie dubáky. Prezradí to iba správnemu človeku.', 'Hľadá spriaznenú dušu, ktorá tiež zbiera pohľadnice.', 'Ozvi sa, ak máš radšej vlak ako auto.',
-  'Hľadá niekoho na spoločné nedeľné krížovky.', 'Nechce princa ani princeznú, stačí slušný človek s humorom.', 'Hľadá spoločnosť na tanečnú zábavu v kultúrnom dome.', 'Má dva lístky na operetu. Jeden je voľný.', 'Hľadá niekoho, kto neznáša nudu.',
-  'Ozvi sa, ak vieš, čo je to diaprojektor.', 'Hľadá spoločnosť na bicyklovanie popri Dunaji.', 'Kondiciogram hlási plusovú citovú fázu. Využi ju.', 'Hľadá niekoho, kto sa nebojí urobiť prvý krok.', 'Vie variť, prať aj žehliť. Chýba už len niekto na spoločnú večeru.',
-  'Hľadá človeka, s ktorým sa dá smiať aj v rade na banány.', 'Ozvi sa, ak ťa baví spievať pri gitare.', 'Hľadá spoluautora spoločných spomienok.', 'Na Silvestra chce mať koho objať o polnoci.', 'Hľadá niekoho, kto má rád vôňu kávy a starých kníh.',
-  'Ozvi sa, ak si myslíš, že najlepšie roky sú ešte pred nami.', 'Hľadá niekoho na dlhé listy aj krátke telefonáty.', 'Vymení samotu za spoločnú prechádzku parkom.', 'Hľadá niekoho, s kým bude jesť zmrzlinu aj v zime.', 'Ozvi sa, ak máš doma viac kníh ako tanierov.',
-  'Hľadá spoločnosť na výstavy a vernisáže.', 'Kondiciogram má samé hviezdičky. Hľadá niekoho, s kým sa o ne podelí.', 'Hľadá niekoho, kto vie opraviť bicykel alebo aspoň podať kľúč.', 'Ozvi sa, ak ti chutí bryndza a dobrá nálada.', 'Hľadá parťáka na splav Dunajca.',
-  'Nehľadá dokonalosť, hľadá úprimnosť.', 'Hľadá niekoho, kto sa nesťažuje na počasie.', 'Ozvi sa, ak ťa nebaví sedieť doma pri televízore.', 'Hľadá niekoho, kto bude pri hokeji fandiť rovnako nahlas.', 'Chce spoznať človeka, ktorý miluje leto na kúpalisku.',
-  'Hľadá spoločnosť na nedeľné výlety autobusom do neznáma.', 'Ozvi sa, ak si nočná sova a nevadí ti ranné vtáča.', 'Hľadá niekoho, s kým sa dá variť bez hádok o soľ.', 'Stroj vyrátal ideálny deň na rande. Nepremárnime ho.', 'Hľadá niekoho, kto má rád Vianoce už od novembra.',
-  'Ozvi sa, ak poznáš aspoň tri ľudové piesne.', 'Hľadá partnera do štvorhry v tenise aj v živote.', 'Pestuje paradajky a nádej. Oboje sa darí.', 'Hľadá niekoho, kto ocení domáci slivkový lekvár.', 'Ozvi sa, ak ťa baví hľadať hviezdy ďalekohľadom.',
-  'Hľadá spolucestujúceho na dlhú cestu vlakom k moru.', 'Nemá auto, ale má bicykel s nosičom.', 'Hľadá niekoho, kto neodíde z kina pred koncom filmu.', 'Ozvi sa, ak vieš, že najlepšie rozhovory sú v kuchyni.', 'Hľadá človeka so zmyslom pre humor a poriadok. Stačí aj jedno.',
-  'Hľadá spoločnosť na jarné upratovanie aj letné dobrodružstvá.', 'Ozvi sa, ak ťa teší prvý sneh.', 'Hľadá niekoho, s kým sa dá dlho mlčať pri ohni.', 'Rodina sa stále pýta „a kedy už?“. Pomôž.', 'Hľadá niekoho, kto pozná cestu k srdcu aj na chatu.',
-  'Ozvi sa, ak si pamätáš Večerníček a stále ťa poteší.', 'Hľadá spolutanečníka na čardáš.', 'Nefajčí, pije s mierou, smeje sa bez miery.', 'Hľadá niekoho, kto má rád zvieratá aspoň tak ako ľudí.', 'Ozvi sa, ak veríš, že šťastie sa dá vypočítať.',
-  'Hľadá niekoho na spoločné nedeľné raňajky.', 'Má vlastnú dielňu a chuť niečo spolu vytvoriť.', 'Hľadá niekoho, kto neprestal snívať.', 'Ozvi sa, ak ťa bavia hrady, zámky a zrúcaniny.', 'Hľadá spoločnosť na kúpeľný pobyt v Piešťanoch.',
-  'Kritické dni prečká, plusové chce prežiť vo dvojici.', 'Hľadá niekoho, kto vie počúvať.', 'Ozvi sa, ak máš radšej listy písané rukou.', 'Hľadá parťáka na stanovačku pri jazere.', 'Kuchyňa je veľká, stôl ešte väčší, chýba len spoločnosť.',
-  'Hľadá niekoho, kto sa teší z maličkostí.', 'Ozvi sa, ak ťa baví jazdiť na koni alebo aspoň kŕmiť kone jablkami.', 'Hľadá niekoho, s kým bude v aute nahlas spievať.', 'Ideálne rande: prechádzka, lokše a dlhý rozhovor.', 'Hľadá niekoho, kto zvládne aj pondelky.',
-  'Ozvi sa, ak vieš, že najkrajšie výhľady sú po dlhom stúpaní.', 'Hľadá spoločnosť na večerné prechádzky po námestí.', 'Verí v lásku na prvý pohľad aj na druhý kondiciogram.', 'Hľadá niekoho, kto ešte posiela pohľadnice z dovolenky.', 'Ozvi sa. Stroj sa nemýli, a keď áno, aspoň bude zábava.'
+  'Hledá někoho, s kým se dá povídat i mlčet.', 'Ozvi se, pokud tě baví nedělní obědy a dlouhé procházky.', 'Hledá parťáka na túry, který neuteče před prvním kopcem.', 'Umí uvařit halušky i opravit kapající kohoutek.', 'Hledá někoho, kdo se směje i slabším vtipům.',
+  'Na první rande přinese kondiciogram, aby to nevyšlo na kritický den.', 'Hledá společnost na večery u desek a čaje.', 'Zná všechny zastávky tramvaje a chce ti ukázat ty nejhezčí.', 'Hledá někoho, s kým postaví chatu i vztah.', 'Ozvi se, pokud umíš tancovat twist nebo se ho chceš naučit.',
+  'Hledá spolujezdce na výlety do Tater.', 'Má zahrádku, psa a volné místo u stolu.', 'Hledá někoho, kdo se nedívá na hodinky, když je dobře.', 'Peče nejlepší bábovku v paneláku a nemá ji s kým jíst.', 'Hledá člověka, který si pamatuje narozeniny i bez kalendáře.',
+  'Ozvi se, pokud tě neodradí déšť ani stan.', 'Hledá někoho, kdo pochopí, proč jsou doma tři rádia.', 'Stroj tvrdí, že se k sobě hodíme. Kdo by se hádal se strojem?', 'Hledá partu na kuželky a společnou cestu domů.', 'Hledá společnost do kina na půlnoční představení.',
+  'Kdo dočte tento inzerát do konce, má u mě kafe.', 'Hledá někoho, kdo má rád rána stejně jako noci.', 'Ví, kde rostou nejlepší hřiby. Prozradí to jen správnému člověku.', 'Hledá spřízněnou duši, která taky sbírá pohlednice.', 'Ozvi se, pokud máš raději vlak než auto.',
+  'Hledá někoho na společné nedělní křížovky.', 'Nechce prince ani princeznu, stačí slušný člověk s humorem.', 'Hledá společnost na taneční zábavu v kulturním domě.', 'Má dva lístky na operetu. Jeden je volný.', 'Hledá někoho, kdo nesnáší nudu.',
+  'Ozvi se, pokud víš, co je to diaprojektor.', 'Hledá společnost na kolo podél Dunaje.', 'Kondiciogram hlásí úspěšnou citovou fázi. Využij ji.', 'Hledá někoho, kdo se nebojí udělat první krok.', 'Umí vařit, prát i žehlit. Chybí už jen někdo na společnou večeři.',
+  'Hledá člověka, se kterým se dá smát i ve frontě na banány.', 'Ozvi se, pokud tě baví zpívat u kytary.', 'Hledá spoluautora společných vzpomínek.', 'Na Silvestra chce mít koho obejmout o půlnoci.', 'Hledá někoho, kdo má rád vůni kávy a starých knih.',
+  'Ozvi se, pokud si myslíš, že nejlepší roky jsou ještě před námi.', 'Hledá někoho na dlouhé dopisy i krátké telefonáty.', 'Vymění samotu za společnou procházku parkem.', 'Hledá někoho, s kým bude jíst zmrzlinu i v zimě.', 'Ozvi se, pokud máš doma víc knih než talířů.',
+  'Hledá společnost na výstavy a vernisáže.', 'Kondiciogram má samé hvězdičky. Hledá někoho, s kým se o ně podělí.', 'Hledá někoho, kdo umí opravit kolo nebo aspoň podat klíč.', 'Ozvi se, pokud ti chutná brynza a dobrá nálada.', 'Hledá parťáka na splav Dunajce.',
+  'Nehledá dokonalost, hledá upřímnost.', 'Hledá někoho, kdo si nestěžuje na počasí.', 'Ozvi se, pokud tě nebaví sedět doma u televize.', 'Hledá někoho, kdo bude u hokeje fandit stejně nahlas.', 'Chce poznat člověka, který miluje léto na koupališti.',
+  'Hledá společnost na nedělní výlety autobusem do neznáma.', 'Ozvi se, pokud jsi noční sova a nevadí ti ranní ptáče.', 'Hledá někoho, s kým se dá vařit bez hádek o sůl.', 'Stroj vypočítal ideální den na rande. Nepromarněme ho.', 'Hledá někoho, kdo má rád Vánoce už od listopadu.',
+  'Ozvi se, pokud znáš aspoň tři lidové písničky.', 'Hledá partnera do čtyřhry v tenise i v životě.', 'Pěstuje rajčata a naději. Obojímu se daří.', 'Hledá někoho, kdo ocení domácí švestková povidla.', 'Ozvi se, pokud tě baví hledat hvězdy dalekohledem.',
+  'Hledá spolucestujícího na dlouhou cestu vlakem k moři.', 'Nemá auto, ale má kolo s nosičem.', 'Hledá někoho, kdo neodejde z kina před koncem filmu.', 'Ozvi se, pokud víš, že nejlepší rozhovory jsou v kuchyni.', 'Hledá člověka se smyslem pro humor a pořádek. Stačí i jedno.',
+  'Hledá společnost na jarní úklid i letní dobrodružství.', 'Ozvi se, pokud tě těší první sníh.', 'Hledá někoho, s kým se dá dlouho mlčet u ohně.', 'Rodina se pořád ptá „a kdy už?“. Pomoz.', 'Hledá někoho, kdo zná cestu k srdci i na chatu.',
+  'Ozvi se, pokud si pamatuješ Večerníček a pořád tě potěší.', 'Hledá spolutanečníka na čardáš.', 'Nekouří, pije s mírou, směje se bez míry.', 'Hledá někoho, kdo má rád zvířata aspoň tak jako lidi.', 'Ozvi se, pokud věříš, že štěstí se dá vypočítat.',
+  'Hledá někoho na společné nedělní snídaně.', 'Má vlastní dílnu a chuť něco spolu vytvořit.', 'Hledá někoho, kdo nepřestal snít.', 'Ozvi se, pokud tě baví hrady, zámky a zříceniny.', 'Hledá společnost na lázeňský pobyt v Piešťanech.',
+  'Kritické dny přečká, ty úspěšné chce prožít ve dvou.', 'Hledá někoho, kdo umí naslouchat.', 'Ozvi se, pokud máš raději dopisy psané rukou.', 'Hledá parťáka na stanování u jezera.', 'Kuchyně je velká, stůl ještě větší, chybí jen společnost.',
+  'Hledá někoho, kdo se raduje z maličkostí.', 'Ozvi se, pokud tě baví jezdit na koni nebo aspoň krmit koně jablky.', 'Hledá někoho, s kým bude v autě nahlas zpívat.', 'Ideální rande: procházka, lokše a dlouhý rozhovor.', 'Hledá někoho, kdo zvládne i pondělky.',
+  'Ozvi se, pokud víš, že nejkrásnější výhledy jsou po dlouhém stoupání.', 'Hledá společnost na večerní procházky po náměstí.', 'Věří v lásku na první pohled i na druhý kondiciogram.', 'Hledá někoho, kdo ještě posílá pohlednice z dovolené.', 'Ozvi se. Stroj se nemýlí, a když ano, aspoň bude legrace.'
+];
+
+// Milostný provoz (stav partnera), [ženský tvar, mužský tvar]
+const LOVE = [
+  ['stále panna', 'stále panic'], ['nezahájen', 'nezahájen'], ['ve zkušebním provozu', 've zkušebním provozu'],
+  ['v generální opravě', 'v generální opravě'], ['dočasně mimo provoz', 'dočasně mimo provoz'], ['omezen na víkendy', 'omezen na víkendy'],
+  ['po záruce, ale funkční', 'po záruce, ale funkční'], ['čeká na schválení nadřízeným', 'čeká na schválení nadřízeným'],
+  ['přerušen z technických důvodů', 'přerušen z technických důvodů'], ['obnoven po rekonstrukci', 'obnoven po rekonstrukci'],
+  ['v úsporném režimu', 'v úsporném režimu'], ['plně provozuschopná', 'plně provozuschopný'],
+  ['zahájen, výsledky neprůkazné', 'zahájen, výsledky neprůkazné'], ['v třísměnném provozu', 'v třísměnném provozu']
+];
+
+// robotické hlášky stroje k výběru partnera (česky, velkými písmeny, bez diakritiky)
+const ROBOT = [
+  'PAROVANI DOKONCENO. NAVRAT NENI MOZNY.', 'OSUDOVOST OVERENA NA TRI DESETINNA MISTA.', 'DOPORUCENI: PRVNI SCHUZKU NEHLASIT NADRIZENEMU.',
+  'CITOVA PREVODOVKA VYZADUJE MAZANI.', 'SLUCITELNOST V NORME. ROMANTIKA NAD NORMU NENI HRAZENA.', 'STROJ NERUCI ZA PRIPADNOU TCHYNI.',
+  'VZTAH SCHVALEN VYPOCETNIM STREDISKEM.', 'ZARUCNI DOBA: 24 MESICU OD PRVNI SCHUZKY.', 'PRI PORUCHE KONTAKTUJTE SERVIS LASKY.',
+  'ZADOSTI O VYMENU PARTNERA SE NEPRIJIMAJI.', 'OCEKAVANA SPOTREBA KVETIN: 3 KYTICE MESICNE.', 'DOPORUCENY ODSTUP NA PRVNI SCHUZCE: 60 CM.',
+  'SYNCHRONIZACE SRDCI PROBIHA. NEVYPINAT.', 'SPOLECNA DOMACNOST MOZNA PO SCHVALENI BYTOVYM PODNIKEM.', 'RIZIKO ZAMILOVANI: VYSOKE.',
+  'PORUCHA CITOVEHO OBVODU VYLOUCENA.', 'PARTNER DODAN BEZ NAVODU K OBSLUZE.', 'KONVERZACI DOPORUCUJEME ZAHAJIT TEMATEM POCASI.',
+  'LASKA NA PRVNI POHLED: ZAMITNUTO. LASKA NA DRUHY VYPOCET: SCHVALENO.', 'VAROVANI: PARTNER MUZE OBSAHOVAT STOPY MAMINKY.'
 ];
 
 const NAMES = {
-  f: { first: FEMALE_FIRST, last: FEMALE_LAST, job: JOBS.map(j => j[0]) },
-  m: { first: MALE_FIRST, last: MALE_LAST, job: JOBS.map(j => j[1]) },
+  f: { first: FEMALE_FIRST, last: FEMALE_LAST, job: JOBS.map(j => j[0]), love: LOVE.map(l => l[0]) },
+  m: { first: MALE_FIRST, last: MALE_LAST, job: JOBS.map(j => j[1]), love: LOVE.map(l => l[1]) },
   cities: CITIES,
   hobby: HOBBIES,
-  ads: ADS
+  ads: ADS,
+  robot: ROBOT
 };

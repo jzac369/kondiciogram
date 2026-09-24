@@ -11,14 +11,15 @@ Stačí otvoriť `index.html` v prehliadači. Server ani build nie sú potrebné
 ## Čo stránka vie
 
 - **Bez registrácie a hesiel.** Stačí vyplniť štítok. Rovnaké meno, dátum narodenia a odpovede dajú vždy rovnaký kondiciogram. Posledný štítok si prehliadač zapamätá, aby sa výsledok nestratil po obnovení stránky.
-- **Dve služby na rozcestníku:** Kondiciogram a Výber partnera podľa počítača (stačí meno a dátum narodenia).
+- **Dve služby na úvode (česky):** zaškrtávacie políčka „Kondiciogram“ a „Výběr osudového partnera“. Dá sa zvoliť jedna alebo obe; stroj ich vytlačí naraz na jeden výpis.
+- **Výběr osudového partnera** je celý po česky (mená, mestá a obce po slovensky): jediný partner s najlepšou zhodou biorytmov, milostný provoz a hlášky stroja.
 - **Displej v hornom pruhu** vypisuje 48 hlášok stroja (česky, veľkými písmenami, bez diakritiky).
 - **Zvuk:** pri vložení štítku do stroja zaznie vytáčaný modem, pri tlači ihličková tlačiareň. Zvuk je vždy zapnutý.
 - **Dátum** sa vyberá po slovensky: deň, mesiac slovom, rok.
 - **Dotazník** s 9 otázkami: spánok, pohyb, káva, pivo, stres, láska, tréning hlavy, denný rytmus a povolanie.
 - **Dierny štítok** v Hollerithovom kóde (80 stĺpcov), ktorý sa dieruje priebežne podľa odpovedí.
 - **Stroj:** štítok zajde do stroja a z tlačiarne vyjde kondiciogram so zvukom ihličkovej tlačiarne.
-- **Tlač na papier alebo do PDF** v dizajne perforovaného papiera (A4 na šírku).
+- **Tlač na papier alebo do PDF**: A4 na šírku, bez okrajov, biele pozadie (šetrí atrament), dierky po stranách a písmo ihličkovej tlačiarne (Doto).
 - **Dnešný verdikt**, osciloskop biorytmov, plánovač dní, partnerská zhoda a osudový partner alebo partnerka (fiktívna osoba).
 - **Kontrola s filmom:** pre dátum 16. 2. 1935 a rok 1973 stroj vytlačí rovnaké znaky ako originál z filmu.
 - Rozloženie pre mobil, tablet, iPad (na výšku aj na šírku) a počítač.

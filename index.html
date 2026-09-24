@@ -25,7 +25,7 @@
   </div>
   <div class="top-right">
     <span id="whoami" class="chip plain hidden"></span>
-    <button id="newBtn" class="chip hidden" type="button">Nový kondiciogram</button>
+    <button id="newBtn" class="chip hidden" type="button">Nový štítok</button>
   </div>
 </header>
 
@@ -45,29 +45,30 @@
       </div>
 
       <div class="card login-card crossroad">
-        <h2>Výpočtové stredisko ponúka</h2>
-        <div class="svc">
+        <h2>Výpočetní středisko nabízí</h2>
+        <p class="muted">Zaškrtněte, co má stroj zpracovat. Můžete zvolit jednu službu nebo obě, vytisknou se naráz.</p>
+        <label class="svc-check">
+          <input type="checkbox" id="svcK" checked>
+          <span class="svc-box" aria-hidden="true"></span>
           <img class="svc-img" src="img/tabula.jpg" alt="" aria-hidden="true">
-          <div class="svc-body">
-            <div class="svc-kick">Služba č. 1</div>
-            <h3 class="svc-title">Kondiciogram</h3>
-            <p>Meno, dátum narodenia a 9 krátkych otázok. Stroj vytlačí vašu kondíciu na každý deň.</p>
-            <div class="svc-btns">
-              <button id="toRegister" class="btn small" type="button">Vyplniť štítok</button>
-              <button id="demoBtn" class="btn small ghost" type="button">Skúsiť ako Fr. Koudelka</button>
-            </div>
-          </div>
-        </div>
-        <div class="svc">
+          <span class="svc-body">
+            <span class="svc-title">Kondiciogram</span>
+            <span class="svc-desc">Vaše kondice na každý den: úspěšné, neúspěšné, ošidné a kritické dny.</span>
+          </span>
+        </label>
+        <label class="svc-check">
+          <input type="checkbox" id="svcP">
+          <span class="svc-box" aria-hidden="true"></span>
           <img class="svc-img" src="img/rodina.jpg" alt="" aria-hidden="true">
-          <div class="svc-body">
-            <div class="svc-kick">Služba č. 2</div>
-            <h3 class="svc-title">Výber partnera podľa počítača</h3>
-            <p>Stroj porovná biorytmy a nájde vášho osudového partnera alebo partnerku. Stačí meno a dátum narodenia.</p>
-            <div class="svc-btns">
-              <button id="toPartner" class="btn small" type="button">Hľadať partnera</button>
-            </div>
-          </div>
+          <span class="svc-body">
+            <span class="svc-title">Výběr osudového partnera</span>
+            <span class="svc-desc">Stroj porovná biorytmy a najde jediný protějšek s nejlepší shodou.</span>
+          </span>
+        </label>
+        <div id="svcErr" class="err" role="alert"></div>
+        <div class="login-alt">
+          <button id="toRegister" class="btn" type="button">Vyplnit štítek</button>
+          <button id="demoBtn" class="btn ghost" type="button">Zkusit jako Fr. Koudelka</button>
         </div>
       </div>
     </div>
@@ -90,57 +91,6 @@
         <div class="ad-ph">Tu môže byť vaša reklama.<br><small>Priestor pre Google AdSense</small></div>
       </div>
     </aside>
-  </section>
-
-  <!-- ============ SLUŽBA Č. 2: VÝBER PARTNERA PODĽA POČÍTAČA ============ -->
-  <section id="scr-partner" class="screen hidden">
-    <div class="card partner-card">
-      <div class="film partner-head"><span class="film-s">Služba č. 2</span><span class="film-b">Výber partnera podľa počítača</span></div>
-      <p class="muted">Samočinný počítač prehľadá ročníky ±12 rokov okolo vás a nájde jediný dátum narodenia, ktorého biorytmy sa s vašimi zhodujú najlepšie: vášho osudového partnera. Osoba je vymyslená, zhoda je vypočítaná.</p>
-      <form id="sForm" class="s-form" novalidate>
-        <label>Meno a priezvisko súdruha<input id="sName" type="text" maxlength="40" autocomplete="name" placeholder="napr. František Koudelka"></label>
-        <div class="lbl-txt">Kedy ste sa narodili, súdruh?</div>
-        <div id="sBirthBox"></div>
-        <label>Koho hľadáte?
-          <select id="sSex">
-            <option value="f">Hľadám partnerku</option>
-            <option value="m">Hľadám partnera</option>
-          </select>
-        </label>
-        <div id="sErr" class="err" role="alert"></div>
-        <div class="row">
-          <button class="btn" type="submit">Nájsť partnera</button>
-          <button id="sBack" class="btn ghost" type="button">Späť na úvod</button>
-        </div>
-      </form>
-    </div>
-
-    <div id="sResult" class="hidden">
-      <div class="tty s-tty" id="sTty"></div>
-      <article class="card match" id="sMatch">
-        <div class="match-head">
-          <div>
-            <div class="film"><span class="film-s">Stroj odporúča</span></div>
-            <h3 class="match-title" id="sTitle">Váš osudový partner</h3>
-          </div>
-        </div>
-        <div class="match-body">
-          <figure class="match-photo"><img src="img/rodina.jpg" alt="Ilustrácia: šťastná rodina pri plote máva výtlačkami kondiciogramu"></figure>
-          <div id="sOut" class="match-out"></div>
-        </div>
-        <div class="s-cta">
-          <p>Chcete vedieť aj to, kedy máte vy sami dobrý deň?</p>
-          <button id="sToKond" class="btn ghost small" type="button">Vytlačiť aj môj kondiciogram</button>
-        </div>
-      </article>
-      <aside class="ad-slot" aria-label="Reklama">
-        <div class="ad-label">Reklama · Inzercia</div>
-        <div class="ad-body">
-          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="0000000003" data-ad-format="auto" data-full-width-responsive="true"></ins>
-          <div class="ad-ph">Tu môže byť vaša reklama.<br><small>Priestor pre Google AdSense</small></div>
-        </div>
-      </aside>
-    </div>
   </section>
 
   <!-- ============ REGISTRÁCIA / DOTAZNÍK ============ -->
@@ -211,7 +161,7 @@
       <p class="muted small-txt">Štítok je dierovaný v Hollerithovom kóde: jeden stĺpec je jeden znak. Písmeno alebo číslicu prečítate podľa dierok v riadkoch 12, 11 a 0 až 9.</p>
     </article>
 
-    <div class="grid2 no-print">
+    <div class="grid2 no-print k-only">
       <article class="card verdict">
         <div class="card-title"><h3>Dnešný verdikt stroja</h3><span id="todayStamp" class="stamp"></span></div>
         <div class="meters" id="meters"></div>
@@ -239,9 +189,9 @@
 
     <article class="card printer-card" id="printerCard">
       <div class="printer-head">
-        <h3>Váš kondiciogram</h3>
+        <h3 id="printerTitle">Váš kondiciogram</h3>
         <div class="controls">
-          <select id="rangeSel" aria-label="Obdobie">
+          <span class="k-only range-ctl"><select id="rangeSel" aria-label="Obdobie">
             <option value="1">Tento mesiac</option>
             <option value="3" selected>3 mesiace od dneška</option>
             <option value="6">6 mesiacov od dneška</option>
@@ -249,8 +199,8 @@
             <option value="year">Celý rok…</option>
           </select>
           <input id="yearInp" class="hidden" type="number" min="1900" max="2100" aria-label="Rok">
-          <button id="reprintBtn" class="btn small" type="button">Tlačiť</button>
-          <button id="paperBtn" class="btn small ghost" type="button">Vytlačiť na papier / PDF</button>
+          </span><button id="reprintBtn" class="btn small" type="button">Tlačiť</button>
+          <button id="paperBtn" class="btn small ghost" type="button">Vytlačiť všetko na papier / PDF</button>
         </div>
       </div>
       <div class="printer">
@@ -259,7 +209,29 @@
       </div>
     </article>
 
-    <div class="grid3 no-print">
+    <article class="card match no-print p-only" id="matchCard">
+      <div class="match-head">
+        <div>
+          <div class="film"><span class="film-s">Stroj doporučuje</span></div>
+          <h3 class="match-title" id="mTitle">Váš osudový partner</h3>
+          <p class="muted small-txt">Stroj prohledal ročníky ±12 let kolem vás a vybral jediné datum narození, jehož cykly se s vašimi shodují nejlépe. Osoba je smyšlená, shoda je vypočítaná.</p>
+        </div>
+        <div class="row">
+          <select id="mSex" aria-label="Koho hledáte">
+            <option value="f">Hledám partnerku</option>
+            <option value="m">Hledám partnera</option>
+          </select>
+        </div>
+      </div>
+      <div class="match-body">
+        <figure class="match-photo">
+          <img src="img/rodina.jpg" alt="Ilustrace: šťastná rodina u plotu mává výtisky kondiciogramu">
+        </figure>
+        <div id="mOut" class="match-out"></div>
+      </div>
+    </article>
+
+    <div class="grid3 no-print k-only">
       <article class="card">
         <h3>Plánovač dní</h3>
         <p class="muted small-txt">Stroj prehľadá najbližších 60 dní a nájde najvhodnejší termín.</p>
@@ -288,28 +260,6 @@
       </article>
     </div>
 
-    <article class="card match no-print">
-      <div class="match-head">
-        <div>
-          <div class="film"><span class="film-s">Stroj odporúča</span></div>
-          <h3 class="match-title" id="mTitle">Váš osudový partner</h3>
-          <p class="muted small-txt">Stroj prehľadal ročníky ±12 rokov okolo vás a vybral jediný dátum narodenia, ktorého cykly sa s vašimi zhodujú najlepšie. Osoba je vymyslená, zhoda je vypočítaná.</p>
-        </div>
-        <div class="row">
-          <select id="mSex" aria-label="Koho hľadáte">
-            <option value="f">Hľadám partnerku</option>
-            <option value="m">Hľadám partnera</option>
-          </select>
-        </div>
-      </div>
-      <div class="match-body">
-        <figure class="match-photo">
-          <img src="img/rodina.jpg" alt="Ilustrácia: šťastná rodina pri plote máva výtlačkami kondiciogramu">
-        </figure>
-        <div id="mOut" class="match-out"></div>
-      </div>
-    </article>
-
     <aside class="ad-slot no-print" aria-label="Reklama">
       <div class="ad-label">Reklama · Inzercia</div>
       <div class="ad-body">
@@ -319,7 +269,7 @@
       </div>
     </aside>
 
-    <article class="card legend no-print">
+    <article class="card legend no-print k-only">
       <div class="legend-grid">
         <figure class="legend-photo">
           <img src="img/tabula.jpg" alt="Ilustrácia: muž na žltom lešení drží tabuľu so znakmi * • 0 ×">
