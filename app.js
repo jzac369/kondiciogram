@@ -617,7 +617,7 @@ function renderMatch(view = 'dash') {
     <div>
       <div class="m-total"><div class="nixie">${c.p.T}</div><div><b class="verdict-head">Zhoda biorytmov</b><div class="muted small-txt">rozdiel v dátumoch narodenia: ${nf(Math.abs(c.b - U.birthN))} dní</div></div></div>
       ${CH.map(ch => `<div class="bar-lbl"><span>${CH_NAME[ch]}</span><span>${c.p[ch]} %</span></div><div class="bar"><i style="width:${c.p[ch]}%"></i></div>`).join('')}
-      ${best ? `<div class="m-date">${icon('calendar')} Ideálne prvé rande: <b>${fmtLong(best.n)}</b>. Citová ani fyzická krivka nebude mať u nikoho z vás kritický deň.</div>` : ''}
+      ${best ? `<div class="m-date">${icon('calendar')} Ideálne prvé rande: <b>${fmtLong(best.n)}</b>. Citová ani fyzická krivka nebude mať u nikoho z vás kritický ani ošidný deň.</div>` : ''}
     </div>`;
 }
 $('#mSex').addEventListener('change', () => { renderMatch(); printerBurst(18); });
@@ -661,6 +661,8 @@ $('#sToKond').addEventListener('click', () => {
   if (PU) { reg.data.name = PU.name; reg.data.birth = PU.birth; renderStep(); }
 });
 $('#toPartner').addEventListener('click', () => startPartner(null));
+// klik na logo vľavo hore = späť na úvod (rozcestník)
+$('#homeLink').addEventListener('click', e => { e.preventDefault(); machineStop(); machineDone = null; reg = null; show('scr-login'); });
 $('#sBack').addEventListener('click', () => show('scr-login'));
 
 /* ================= NÁSTENKA ================= */
@@ -692,20 +694,20 @@ const POOL = {
   F: {
     '*': ['Telo je v prevádzke na 100 %. Ideálny deň vyniesť uhlie z pivnice.', 'Svaly hlásia pripravenosť. Dnes choďte po schodoch, nie výťahom!', 'Fyzicky ste ako nová Tatra po generálke.', 'Vhodný deň na futbal s kolegami z podniku.'],
     '.': ['Šetrite sily. Ťažké bremená nechajte na zajtra.', 'Telo ide v úspornom režime. Polievka a skorší spánok.', 'Sťahovanie klavíra dnes stroj neodporúča.', 'Za autobusom dnes nebežte, príde ďalší.'],
-    'X': ['Fyzický kritický deň, krivka padá. Opatrne na schodoch a za volantom!', 'Stroj neodporúča liezť na rebrík ani vešať záclony.'],
-    '0': ['Fyzický kritický deň, krivka sa dvíha. Telo sa prepína, nepreceňujte ho.', 'Opatrne s náradím. Od zajtra už bude lepšie.']
+    'X': ['Fyzicky kritický deň, najhorší variant. Opatrne na schodoch a za volantom!', 'Stroj neodporúča liezť na rebrík ani vešať záclony.'],
+    '0': ['Fyzicky ošidný deň: niečo medzi. Telo sa prepína, nepreceňujte ho.', 'Opatrne s náradím. Ani dobre, ani zle, a práve preto pozor.']
   },
   C: {
     '*': ['Nálada je výborná. Vhodný deň vyznať city alebo zavolať mame.', 'Úsmev vám dnes pristane, kolegovia to ocenia.', 'Citovo stabilný deň, nerozhádže vás ani rad v samoobsluhe.', 'Ideálny deň na rodinnú oslavu aj na smiech.'],
     '.': ['Ste citlivejší. Návštevu u svokry radšej odložte.', 'Emócie sú v útlme. Pustite si platňu s obľúbenými šlágrami.', 'Hádky dnes nevyhráte, tak ich ani nezačínajte.', 'Deň na ticho, čaj a deku.'],
-    'X': ['Citový kritický deň! V láske ani pri nákupoch sa neunáhlite.', 'Na urazené listy dnes radšej neodpovedajte.'],
-    '0': ['Citový kritický deň, nálada sa láme k lepšiemu. Ešte chvíľu trpezlivosti.', 'Nálada skáče hore-dole. Dôležité rozhovory o citoch nechajte na zajtra.']
+    'X': ['Citovo kritický deň! V láske ani pri nákupoch sa neunáhlite.', 'Na urazené listy dnes radšej neodpovedajte.'],
+    '0': ['Citovo ošidný deň: nálada nevie, kam sa pohnúť. Buďte opatrní.', 'Nálada skáče hore-dole. Dôležité rozhovory o citoch nechajte na zajtra.']
   },
   I: {
     '*': ['Hlava pracuje ako samočinný počítač. Hodí sa na skúšky aj porady.', 'Ideálny deň na krížovku, šach alebo vyúčtovanie.', 'Myšlienky sú ostré ako nová žiletka.', 'Vhodný deň naučiť sa niečo nové.'],
     '.': ['Mozog je na dovolenke pri mori. Dôležité podpisy odložte.', 'Na počítanie je dnes slabší deň, nechajte to na stroj.', 'Do televíznej súťaže sa dnes neprihlasujte.', 'Rutinná práca áno, veľké rozhodnutia nie.'],
-    'X': ['Intelektový kritický deň: pozor na chyby z nepozornosti a zabudnuté kľúče.', 'Pred odchodom z domu skontrolujte, či ste vypli sporák.'],
-    '0': ['Intelektový kritický deň, hlava sa reštartuje. Dvakrát si prepočítajte výdavok.', 'Zmluvy čítajte dvakrát, aj s malým písmom.']
+    'X': ['Intelektovo kritický deň: pozor na chyby z nepozornosti a zabudnuté kľúče.', 'Pred odchodom z domu skontrolujte, či ste vypli sporák.'],
+    '0': ['Intelektovo ošidný deň: hlava pracuje napoly. Dvakrát si prepočítajte výdavok.', 'Zmluvy čítajte dvakrát, aj s malým písmom.']
   }
 };
 const JOB_TIP = {
@@ -742,15 +744,15 @@ function renderVerdict() {
   requestAnimationFrame(() => requestAnimationFrame(() =>
     document.querySelectorAll('#meters .needle').forEach(n => n.style.transform = `rotate(${n.dataset.ang}deg)`)));
   $('#nixie').textContent = idx;
-  const crits = CH.filter(ch => isCrit(st[ch].s)), vh = $('#verdictHead');
+  const crits = CH.filter(ch => st[ch].s === 'X'), tricky = CH.filter(ch => st[ch].s === '0'), vh = $('#verdictHead');
   vh.classList.toggle('crit', crits.length > 0);
-  vh.textContent = crits.length === 3 ? 'TROJITÝ KRITICKÝ DEŇ!' : crits.length ? 'KRITICKÝ DEŇ!' :
+  vh.textContent = crits.length === 3 ? 'TROJITÝ KRITICKÝ DEŇ!' : crits.length ? 'KRITICKÝ DEŇ!' : tricky.length ? 'Ošidný deň, buďte opatrní' :
     idx >= 75 ? 'Výborná kondícia' : idx >= 57 ? 'Dobrá kondícia' : idx >= 43 ? 'Priemerná kondícia' : idx >= 25 ? 'Slabšia kondícia' : 'Zostaňte radšej v posteli';
   let html = '';
   if (crits.length >= 2) html += `<li class="crit"><span class="s">!</span><div class="alarm">Stroj hlási ${crits.length} kritické cykly naraz. Podľa kondiciogramu by ste dnes nemali vstávať z postele.</div></li>`;
   html += CH.map((ch, k) => {
     const s = st[ch].s, pool = POOL[ch][s];
-    return `<li class="${isCrit(s) ? 'crit' : ''}"><span class="s">${s}</span><b>${CH_NAME[ch]}:</b> ${esc(pool[(t + k) % pool.length])}</li>`;
+    return `<li class="${s === 'X' ? 'crit' : s === '0' ? 'tricky' : ''}"><span class="s">${s}</span><b>${CH_NAME[ch]}:</b> ${esc(pool[(t + k) % pool.length])}</li>`;
   }).join('');
   if (U.job) html += `<li><span class="s">${icon('job')}</span><b>V práci:</b> ${esc(idx >= 50 ? JOB_TIP[U.job].hi : JOB_TIP[U.job].lo)}</li>`;
   $('#verdictList').innerHTML = html;
@@ -790,9 +792,9 @@ function renderRisks() {
   const today = todayN(), out = [];
   for (let n = today; n < today + 30 && out.length < 8; n++) {
     const st = dayState(U, n), cr = CH.filter(ch => isCrit(st[ch].s));
-    if (cr.length) out.push(`<li><span class="d">${fmtShort(n)} ${DOW[fromN(n).w].slice(0, 2)}</span><span>${cr.map(ch => `${CH_NAME[ch]} <span class="x">${st[ch].s}</span>`).join(', ')}</span></li>`);
+    if (cr.length) out.push(`<li><span class="d">${fmtShort(n)} ${DOW[fromN(n).w].slice(0, 2)}</span><span>${cr.map(ch => `${CH_NAME[ch]} <span class="x">${st[ch].s}</span> ${st[ch].s === 'X' ? 'kritický' : 'ošidný'}`).join(', ')}</span></li>`);
   }
-  $('#riskOut').innerHTML = `<li><b>Kritické dni v najbližších 30 dňoch</b></li>` + (out.join('') || '<li>Žiadne. Stroj je spokojný.</li>');
+  $('#riskOut').innerHTML = `<li><b>Kritické (X) a ošidné (0) dni v najbližších 30 dňoch</b></li>` + (out.join('') || '<li>Žiadne. Stroj je spokojný.</li>');
   const t = today - U.birthN;
   let triple = null;
   for (let n = today; n < today + 400; n++) { const st = dayState(U, n); if (CH.every(ch => st[ch].s === '*' && st[ch].v > .5)) { triple = n; break; } }
@@ -881,7 +883,7 @@ function buildLines(u, months, avail) {
   const multiYear = months.some(o => o.y !== months[0].y);
   const seed = nameSeed(u.name) + u.birth, serial = String(fnv(seed) % 1000000).padStart(6, '0');
   // najprv prejsť dni obdobia, aby sa dali spočítať technické parametre hlavičky
-  let symStr = '', critDays = 0, allDays = 0;
+  let symStr = '', critDays = 0, trickyDays = 0, allDays = 0;
   const corr = { FC: [0, 0, 0, 0, 0], CI: [0, 0, 0, 0, 0] };   // Σx, Σy, Σxy, Σx², Σy² pre koreláciu cyklov
   const addCorr = (k, x, y) => { const c = corr[k]; c[0] += x; c[1] += y; c[2] += x * y; c[3] += x * x; c[4] += y * y; };
   for (const { y, m } of months) {
@@ -889,7 +891,7 @@ function buildLines(u, months, avail) {
       const t = dn(y, m, d) - u.birthN; if (t < 0) continue;
       allDays++;
       const s = CH.map(ch => sym(u, ch, t)); symStr += s.join('');
-      if (s.some(isCrit)) critDays++;
+      if (s.includes('X')) critDays++; else if (s.includes('0')) trickyDays++;
       const v = CH.map(ch => val(u, ch, t));
       addCorr('FC', v[0], v[1]); addCorr('CI', v[1], v[2]);
     }
@@ -905,7 +907,7 @@ function buildLines(u, months, avail) {
     ['KOREKCE', CH.map(ch => `${ch} ${sg(u.bias[ch])}`).join(' ')],
     ['VAHY', CH.map(ch => `${ch} ${u.w[ch].toFixed(2)}`).join(' ')],
     ['KORELACE', `F/C ${sg(pearson('FC'))} C/I ${sg(pearson('CI'))}`],
-    ['KRIT.DNY', `${critDays} Z ${allDays}`],
+    ['KRIT/OSID', `${critDays} / ${trickyDays} Z ${allDays} DNU`],
     ['INDEX', `${overall(u, dayState(u, today))} % (DNES)`],
     ['DOTAZNIK', /\d/.test(ans) ? ans : 'NEVYPLNEN'],
     ['STROJ', `SPC-74 / PASKA ${1000 + fnv('P' + seed) % 9000}`],
@@ -943,8 +945,8 @@ function buildLines(u, months, avail) {
     }
   }
   L.push({ cls: 'muted-line', h: '-'.repeat(width) });
-  if (width >= 70) L.push('ZNAKY:  * DOBRY  . SLABY  X KRITICKY (SESTUP)  0 KRITICKY (VZESTUP)');
-  else L.push('ZNAKY:  * DOBRY   . SLABY', '        X KRITICKY (SESTUP)', '        0 KRITICKY (VZESTUP)');
+  if (width >= 70) L.push('ZNAKY:  * USPESNY DEN   . NEUSPESNY DEN   0 OSIDNY DEN   X KRITICKY DEN');
+  else L.push('ZNAKY:  * USPESNY DEN', '        . NEUSPESNY DEN', '        0 OSIDNY DEN', '        X KRITICKY DEN');
   L.push('KONEC VYPISU.', 'S POZDRAVEM VAS SAMOCINNY POCITAC.');
   return L.map(x => typeof x === 'string' ? { h: esc(x) } : x);
 }

@@ -29,10 +29,10 @@ Tri sínusové cykly od dňa narodenia: fyzický (23 dní), citový (28 dní) a 
 
 | Znak | Význam |
 |------|--------|
-| `*`  | plusová fáza |
-| `.`  | mínusová fáza |
-| `X`  | kritický deň, krivka klesá cez nulu |
-| `0`  | kritický deň, krivka stúpa cez nulu |
+| `*`  | úspešný, priaznivý deň (krivka nad nulou) |
+| `.`  | neúspešný, nepriaznivý deň (krivka pod nulou) |
+| `0`  | ošidný deň: niečo medzi, treba opatrnosť (krivka stúpa cez nulu) |
+| `X`  | kritický deň: najhorší variant, výrazné varovanie (krivka padá cez nulu) |
 
 Odpovede z dotazníka posunú každú krivku hore alebo dole najviac o 0,4. Povolanie určuje váhy cyklov v celkovom indexe.
 

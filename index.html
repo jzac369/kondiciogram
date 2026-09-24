@@ -8,7 +8,7 @@
 <title>Kondiciogram Koudelka</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Courier+Prime:wght@400;700&family=Righteous&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Courier+Prime:wght@400;700&family=Doto:wght@400..900&family=Righteous&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <!-- Google AdSense: odkomentujte a doplňte svoje ID vydavateľa, keď bude web verejný a schválený
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
@@ -17,7 +17,7 @@
 <body>
 <div class="stripes no-print"></div>
 <header class="topbar no-print">
-  <div class="logo"><span class="logo-mark">*•0×</span><span class="logo-txt film"><span class="film-b">Kondiciogram</span></span></div>
+  <a href="./" class="logo" id="homeLink" title="Späť na úvod" aria-label="Kondiciogram, späť na úvod"><span class="logo-mark">*•0×</span><span class="logo-txt film"><span class="film-b">Kondiciogram</span></span></a>
   <div class="ticker" id="ticker" role="marquee" aria-label="Hlásenia stroja">
     <span class="tk-led" aria-hidden="true"></span>
     <span class="tk-label" aria-hidden="true">STROJ<br>HLASI</span>
@@ -80,7 +80,7 @@
     <div class="how">
       <div class="how-step"><span class="num">1</span><h3>Dátum narodenia</h3><p>Stroj spočíta každý váš prežitý deň, až po dnešok.</p></div>
       <div class="how-step"><span class="num">2</span><h3>Doplňujúce otázky</h3><p>Spánok, káva, pivo, šéf, láska. Každá odpoveď trochu posunie vaše krivky.</p></div>
-      <div class="how-step"><span class="num">3</span><h3>Výtlačok</h3><p>Ihličková tlačiareň vytlačí kondiciogram: <b>*</b> dobre, <b>.</b> slabšie, <b>X</b> a <b>0</b> kritické dni.</p></div>
+      <div class="how-step"><span class="num">3</span><h3>Výtlačok</h3><p>Ihličková tlačiareň vytlačí kondiciogram: <b>*</b> úspešný, <b>·</b> neúspešný, <b>0</b> ošidný a <b>X</b> kritický deň.</p></div>
     </div>
 
     <aside class="ad-slot" aria-label="Reklama">
@@ -327,12 +327,12 @@
         <div>
           <h3>Ako stroj počíta</h3>
           <dl class="signs">
-            <dt>*</dt><dd>Plusová fáza. Krivka je nad nulou, máte silu, náladu či bystrú hlavu.</dd>
-            <dt>.</dt><dd>Mínusová fáza, čas na regeneráciu. Nič tragické, len menej výkonu.</dd>
-            <dt>X</dt><dd>Kritický deň, krivka v ten deň <b>klesá</b> cez nulu. Pozor na úrazy a hádky.</dd>
-            <dt>0</dt><dd>Kritický deň, krivka v ten deň <b>stúpa</b> cez nulu. Nestabilné, ale smer je dobrý.</dd>
+            <dt>*</dt><dd><b>Úspešný, priaznivý deň.</b> Krivka je nad nulou, máte silu, náladu či bystrú hlavu.</dd>
+            <dt>·</dt><dd><b>Neúspešný, nepriaznivý deň.</b> Krivka je pod nulou, menej výkonu, čas na oddych.</dd>
+            <dt>0</dt><dd><b>Ošidný deň.</b> Niečo medzi: krivka v ten deň stúpa cez nulu. Treba opatrnosť.</dd>
+            <dt>X</dt><dd><b>Kritický deň.</b> Najhorší variant: krivka v ten deň padá cez nulu. Výrazné varovanie.</dd>
           </dl>
-          <p>Tri sínusové cykly sa počítajú od dňa narodenia: fyzický (23 dní), citový (28 dní) a intelektový (33 dní). Kritický deň je ten, počas ktorého krivka pretne nulu. Vaše odpovede v dotazníku posunú každú krivku hore alebo dole najviac o 0,4. Plusové fázy sa tak predĺžia alebo skrátia a kritické dni sa môžu posunúť. Povolanie určuje, ktorý cyklus má najväčšiu váhu v celkovom indexe.</p>
+          <p>Tri sínusové cykly sa počítajú od dňa narodenia: fyzický (23 dní), citový (28 dní) a intelektový (33 dní). Keď krivka v daný deň pretne nulu, je to ošidný (0, smerom hore) alebo kritický deň (X, smerom dole). Vaše odpovede v dotazníku posunú každú krivku hore alebo dole najviac o 0,4. Úspešné fázy sa tak predĺžia alebo skrátia a ošidné či kritické dni sa môžu posunúť. Povolanie určuje, ktorý cyklus má najväčšiu váhu v celkovom indexe.</p>
           <p class="muted small-txt">Biorytmy nemajú vedecké potvrdenie. Berte ich s humorom, rovnako ako film.</p>
         </div>
       </div>

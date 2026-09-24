@@ -199,7 +199,7 @@ input:focus,select:focus,button:focus-visible{outline:3px solid var(--mustard);o
 .paper-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .paper{position:relative;margin:0 auto;padding:22px 52px 30px;min-height:120px;
   background:linear-gradient(90deg,rgba(0,0,0,.07),transparent 18%,transparent 82%,rgba(0,0,0,.05)),var(--paper);
-  color:var(--ink);font:15px/1.5 "Courier Prime",monospace;
+  color:var(--ink);font:800 15px/1.5 "Doto","Courier Prime",monospace;
   box-shadow:0 6px 14px rgba(0,0,0,.18);border-left:1px dashed #cfcac0;border-right:1px dashed #cfcac0}
 .paper::before,.paper::after{content:"";position:absolute;top:0;bottom:0;width:34px;
   background:radial-gradient(circle at 17px 12px,#d9cdb4 0 5px,transparent 6px) 0 0/34px 24px repeat-y;
@@ -207,7 +207,7 @@ input:focus,select:focus,button:focus-visible{outline:3px solid var(--mustard);o
 .paper::before{left:0}
 .paper::after{right:0;border-right:0;border-left:1px dashed #cfcac0}
 #paper2{margin-top:18px}
-.pl{white-space:pre;min-height:1.5em;text-shadow:0 0 .7px rgba(20,20,30,.75)}
+.pl{white-space:pre;min-height:1.5em;text-shadow:0 0 .6px rgba(20,20,30,.55)}
 .pl.new{animation:head .28s steps(28) both}
 @keyframes head{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 .pl .td,.pl .tdn{position:relative;color:var(--red)}
@@ -274,16 +274,16 @@ footer p{padding:14px 16px 24px;margin:0}
 /* ---------- print ---------- */
 /* Tlač: na papier ide len samostatný hárok #printSheet (perforovaný papier s dierkami) */
 .print-sheet{display:none}
-/* Bez okrajov: papierová farba na celej strane, dierky od vrchu po spodok. Pásy s dierkami sú position:fixed,
+/* Bez okrajov a so šetrením atramentu: biele (priehľadné) pozadie, dierky iba ako tenké krúžky od vrchu po spodok. Pásy s dierkami sú position:fixed,
    takže ich prehliadač zopakuje na každej vytlačenej strane. Veľkosť písma zostáva pevná (nenaťahuje sa). */
 @media print{
   @page{size:A4 landscape;margin:0}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  html,body{background:#f5f3ec!important;margin:0;padding:0}
+  html,body{background:transparent!important;margin:0;padding:0}   /* biele pozadie = šetrí atrament */
   body > *:not(.print-sheet){display:none!important}
   .print-sheet{display:block}
   .print-sheet .tractor{position:fixed;top:0;bottom:0;width:13mm;
-    background:radial-gradient(circle at 6.5mm 3.2mm,#fff 0 1.9mm,#cfc6b2 1.9mm 2.2mm,transparent 2.4mm) 0 0/13mm 6.35mm repeat-y}
+    background:radial-gradient(circle at 6.5mm 3.2mm,transparent 0 1.85mm,#b9b3a6 1.9mm 2.1mm,transparent 2.2mm) 0 0/13mm 6.35mm repeat-y}   /* dierky len ako tenké krúžky */
   .print-sheet .tractor.l{left:0;border-right:1px dashed #b9b3a6}
   .print-sheet .tractor.r{right:0;border-left:1px dashed #b9b3a6}
   .print-sheet .paper{box-shadow:none;margin:0;max-width:none;width:auto;min-height:0;background:transparent;border:0;
@@ -291,7 +291,7 @@ footer p{padding:14px 16px 24px;margin:0}
     -webkit-box-decoration-break:clone;box-decoration-break:clone}
   .print-sheet .paper::before,.print-sheet .paper::after{display:none}
   .print-sheet .blk{break-inside:avoid;page-break-inside:avoid}
-  .print-sheet .pl{text-shadow:none}
+  .print-sheet .pl{text-shadow:none;color:#111}
   .print-sheet .tear{border-top:2px dashed #b9b3a6;margin:10px -19mm 0;padding-top:4px;text-align:center;font:9px "Courier Prime";color:#8c8577;letter-spacing:.3em}
 }
 
@@ -583,3 +583,10 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
   .svc-img{width:72px;height:88px}
   .partner-head .film-b{font-size:1.8rem}
 }
+
+/* ---- logo = odkaz na úvod; ošidný deň v verdikte ---- */
+a.logo{text-decoration:none;color:inherit;cursor:pointer;border-radius:10px}
+a.logo:hover .logo-mark{background:#f0b632}
+a.logo:hover .logo-txt{transform:rotate(-2deg) scale(1.04)}
+.logo-txt{transition:transform .15s}
+.verdict-list li.tricky .s{background:var(--mustard);color:var(--brown)}
