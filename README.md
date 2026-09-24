@@ -54,3 +54,26 @@ Sloty sa potom aktivujú samy (funkcia `initAds` v `app.js`). Kým je tam zástu
 - `img/`: ilustrácie a fotografia originálneho kondiciogramu z filmu
 
 Biorytmy nemajú vedecké potvrdenie. Fanúšikovský projekt bez spojenia s autormi filmu.
+
+## Zóna závodnej rady (administrácia a analytika)
+
+Nenápadné tlačidlo **„Vstup je pro závodní radu“** v päte otvorí prihlásenie správcu. Po prihlásení je k dispozícii:
+
+- návštevy dnes, za 7 a 30 dní, spolu, priemerný a mediánový čas na stránke,
+- grafy návštev podľa dní, hodín a dní v týždni,
+- mestá, kraje a krajiny, zariadenia, prehliadače, odkiaľ ľudia prišli,
+- zvolené služby, koho hľadajú, vek a ročníky, najčastejšie krstné mená, dnešné znaky, najčastejšie odpovede v dotazníku,
+- tabuľky posledných štítkov (meno, dátum narodenia, mesto, skrátená IP, výsledky, osudový partner) a návštev,
+- export do CSV a mazanie záznamov starších ako 365 dní.
+
+Záznamy sa ukladajú **len so súhlasom návštevníka** (lišta pri prvej návšteve, informácia o ochrane údajov v päte).
+
+### Nastavenie (Firebase)
+
+1. Vo [Firebase Console](https://console.firebase.google.com) vytvorte projekt a pridajte **Web app**.
+2. Zapnite **Firestore Database** (región europe-west) a **Authentication → Email/Password**.
+3. V **Authentication → Users** vytvorte účet správcu (svoj e-mail a heslo).
+4. Do **Firestore → Rules** vložte obsah súboru `firestore.rules` a nahraďte `ADMIN@EXAMPLE.COM` svojím e-mailom.
+5. Do `firebase-config.js` vložte konfiguráciu webovej aplikácie, e-mail správcu a meno a kontakt prevádzkovateľa.
+
+Kým je `firebaseConfig = null`, stránka nič nezbiera a funguje ako predtým.

@@ -1,0 +1,31 @@
+rules_version = '2';
+// Pravidlá pre Firestore: návštevníci môžu záznamy iba vytvárať (a pri návšteve dopĺňať čas),
+// čítať a mazať ich môže len účet závodnej rady. ADMIN@EXAMPLE.COM nahraďte svojím e-mailom.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'ADMIN@EXAMPLE.COM';
+    }
+    function shortStr(v, n) { return v is string && v.size() <= n; }
+
+    match /visits/{id} {
+      allow create: if request.resource.data.consent == true
+        && request.resource.data.keys().hasOnly(['consent', 't', 'day', 'hour', 'dow', 'city', 'region', 'country', 'ipPart',
+             'device', 'browser', 'lang', 'ref', 'duration', 'screen'])
+        && shortStr(request.resource.data.city, 80) && shortStr(request.resource.data.ipPart, 40);
+      // pri návšteve sa smie meniť len dĺžka pobytu (v sekundách, max. 1 deň)
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duration'])
+        && request.resource.data.duration is int && request.resource.data.duration >= 0 && request.resource.data.duration <= 86400;
+      allow read, delete: if isAdmin();
+    }
+
+    match /cards/{id} {
+      allow create: if request.resource.data.consent == true
+        && shortStr(request.resource.data.name, 60) && shortStr(request.resource.data.birth, 10)
+        && request.resource.data.keys().size() <= 30;
+      allow read, delete: if isAdmin();
+    }
+  }
+}

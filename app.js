@@ -476,12 +476,25 @@ function nextStep() {
   if (reg.step < reg.steps.length - 1) { reg.step++; renderStep(); return; }
   finishReg();
 }
+// súhrn štítku pre záznam (ukladá sa len so súhlasom návštevníka)
+function cardSummary(u) {
+  const st = dayState(u, todayN()), sv = u.services;
+  const m = sv.p ? matchData(u, u.sex) : null, ok = m && !m.minor;
+  return {
+    name: u.name.slice(0, 60), birth: u.birth, age: ageYears(u.birthN, todayN()),
+    services: sv.k && sv.p ? 'K+P' : sv.k ? 'K' : 'P', sex: sv.p ? u.sex : '',
+    answers: QUESTIONS.map(q => u.answers && u.answers[q.id] != null ? u.answers[q.id] + 1 : '-').join(''),
+    today: CH.map(ch => ch + st[ch].s).join(' '), index: sv.k ? overall(u, st) : null,
+    partner: ok ? m.name : '', partnerBirth: ok ? isoN(m.c.b) : '', partnerCity: ok ? m.city : '', match: ok ? m.c.p.T : null
+  };
+}
 function finishReg() {
   const d = reg.data, demo = reg.editing && U.demo;
   const card = { name: d.name, birth: d.birth, answers: d.services.k ? d.answers : {}, services: d.services, sex: d.sex || 'f' };
   U = derive(demo ? { ...card, demo: true } : card);
   // len aby sa výsledok nestratil po obnovení stránky; žiadne účty ani heslá
   if (!demo) store.set(K_LAST, card);
+  if (!demo && window.kgTrack) window.kgTrack.card(cardSummary(U));
   reg = null;
   runMachine(() => showDash(false));
 }
@@ -723,6 +736,7 @@ function matchData(u, sex) {
   const robot = []; while (robot.length < 3) { const x = pick(r, NAMES.robot); if (!robot.includes(x)) robot.push(x); }
   const face = pick(r, sex === 'f' ? ['tvar-z1', 'tvar-z2'] : ['tvar-m1', 'tvar-m2']);
   const photo = { face, src: 'img/' + face + '.jpg', cut: FACE_CUT[face], bytes: 180 + Math.floor(r() * 700), err: pick(r, PHOTO_ERR) };
+  const ticket = { film: pick(r, FILMS), time: pick(r, ['17:30', '19:30', '20:00']), row: 10 + Math.floor(r() * 5), seat: 3 + Math.floor(r() * 18), price: pick(r, [3, 4, 5, 6]), no: String(Math.floor(r() * 900000) + 100000) };
   const other = { birthN: c.b, bias: { F: 0, C: 0, I: 0 } };
   let date = null;
   for (let n = todayN(); n < todayN() + 60; n++) {
@@ -731,11 +745,16 @@ function matchData(u, sex) {
     const sc = a.C.v + o.C.v + .4 * (a.F.v + o.F.v);
     if (!date || sc > date.sc) date = { n, sc };
   }
-  return (matchCache[key] = { c, sex, name, city, job, hob, ad, love, robot, photo, date: date && date.n, age: ageYears(c.b, todayN()), diff: Math.abs(c.b - u.birthN) });
+  return (matchCache[key] = { c, sex, name, city, job, hob, ad, love, robot, photo, ticket, date: date && date.n, age: ageYears(c.b, todayN()), diff: Math.abs(c.b - u.birthN) });
 }
 const cap = s => s[0].toUpperCase() + s.slice(1);
 // podobenka partnera: stroj ju číta z pásky riadok po riadku, ale skončí pri obočí a nahlási chybu
 const FACE_CUT = { 'tvar-z1': .35, 'tvar-z2': .28, 'tvar-m1': .35, 'tvar-m2': .30 };
+// vtipné názvy filmov v štýle 70. rokov (česky)
+const FILMS = ['Láska v době děrných štítků', 'Soudruh Romeo a traktoristka Julie', 'Dovolená s elektronkou', 'Kritický den paní Novákové',
+  'Srdce na bytovém pořadníku', 'Rande u samočinného počítače', 'Zamilovaný traktor', 'Noc ve výpočetním středisku',
+  'Poslední polibek v paneláku', 'Jáchyme, vrať mi srdce!', 'Šest dnů s hvězdičkou', 'Muž, který překročil normu',
+  'Pan Novák a ošidný den', 'Tchyně na služební cestě', 'Operace Kondiciogram', 'Dívka s děrnou páskou'];
 const PHOTO_ERR = ['CHYBA CTENI Z PASKY.', 'PAMET POCITACE PREKROCENA.', 'DETEKOVANO POSKOZENI DAT.', 'DATA NENALEZENA.',
   'PASKA SE ZAMOTALA. VOLEJTE UDRZBU.', 'OBRAZEK ZABAVEN KADROVYM ODDELENIM.', 'NEDOSTATEK DERNYCH STITKU.', 'PREHRATA ELEKTRONKA C. 7.'];
 const FACE_DOTS = {};
@@ -746,11 +765,11 @@ function prepFaceDots() {
     const img = new Image();
     img.onload = img.onerror = () => {
       try {
-        const C = 60, RW = 68, cell = 5, rows = Math.round(RW * FACE_CUT[face]);
+        const C = 60, RW = 68, cell = 5, rows = RW;
         const off = document.createElement('canvas'); off.width = C; off.height = RW;
         const o = off.getContext('2d'); o.drawImage(img, 0, 0, C, RW);
         const d = o.getImageData(0, 0, C, RW).data;
-        const cv = document.createElement('canvas'); cv.width = C * cell + 40; cv.height = (rows + 3) * cell;
+        const cv = document.createElement('canvas'); cv.width = C * cell + 40; cv.height = rows * cell;
         const c = cv.getContext('2d'); c.fillStyle = '#1b1b20';
         const row = (y, drawY, shift, keep) => {
           for (let x = 0; x < C; x++) {
@@ -762,7 +781,6 @@ function prepFaceDots() {
           }
         };
         for (let y = 0; y < rows; y++) row(y, y, 0, 1);
-        for (let g = 0; g < 3; g++) row(Math.min(RW - 1, rows + g * 3), rows + g, (Math.random() * 8 - 4) | 0, .55 - g * .15);
         FACE_DOTS[face] = cv.toDataURL('image/png');
       } catch (e) { /* napr. file:// bez servera: podobenka sa nevytlačí */ }
       if (--left === 0 && U && !$('#scr-dash').classList.contains('hidden')) printMain(false);
@@ -804,6 +822,27 @@ NELZE NACIST CELY OBRAZEK.`;
   };
   img.src = ph.src;
 }
+// vstupenka do kina pre spárovanú dvojicu, dar od výpočtového strediska a MNV
+function cinemaTicket(m) {
+  const t = m.ticket, f = fromN(m.date);
+  return `<div class="kino" aria-label="Vstupenka do kina na první rande">
+      <div class="kino-main">
+        <div class="kino-top"><span class="kino-name">KINO MÍR</span><span class="kino-no">Č. ${t.no}</span></div>
+        <div class="kino-kind">VSTUPENKA · 2 OSOBY · PRVNÍ RANDE</div>
+        <div class="kino-film">„${esc(t.film)}“</div>
+        <div class="kino-grid">
+          <div><small>Den</small><b>${esc(fmtLongCz(m.date))}</b></div>
+          <div><small>Začátek</small><b>${t.time}</b></div>
+          <div><small>Řada</small><b>${t.row}</b></div>
+          <div><small>Sedadla</small><b>${t.seat}, ${t.seat + 1}</b></div>
+        </div>
+        <div class="kino-price">Cena: 2 × ${t.price},– Kčs = <b>${t.price * 2},– Kčs</b></div>
+        <div class="kino-note">Den vybral samočinný počítač: citová ani fyzická křivka nebude mít u nikoho z vás kritický ani ošidný den.</div>
+        <div class="kino-stamp">UHRADÍ<br>VÝPOČETNÍ STŘEDISKO<br>A MNV<small>dar za nalezenou shodu</small></div>
+      </div>
+      <div class="kino-stub"><span>KONTROLNÍ ÚSTŘIŽEK</span><b>${f.d}. ${f.m + 1}.</b><b>${t.time}</b><span>ŘADA ${t.row}</span><span>Č. ${t.no}</span></div>
+    </div>`;
+}
 function renderMatch() {
   if (!U) return;
   const sex = $('#mSex').value, m = matchData(U, sex), out = $('#mOut');
@@ -814,12 +853,7 @@ function renderMatch() {
   const cj = String(fnv('P' + nameSeed(U.name) + U.birth) % 1000000).padStart(6, '0');
   out.innerHTML = `<div class="sz-form">
       <div class="sz-head"><span>SEZNAMOVACÍ SLUŽBA SPC-74</span><span>Č. j. ${cj}/74</span></div>
-      <div class="sz-top">
-        <div class="sz-photo">
-          <span class="sz-clip" aria-hidden="true"></span>
-          <div class="ph-box" title="Podobenka z pásky"><canvas width="64" height="72"></canvas><div class="ph-err"></div></div>
-          <div class="sz-cap">fotografie 3×4</div>
-        </div>
+      <div class="sz-top one">
         <div class="sz-name">
           <div class="sz-lbl">Jméno a příjmení</div><div class="sz-val big">${esc(m.name)}</div>
           <div class="sz-lbl">Narozen${m.sex === 'f' ? 'a' : ''}</div><div class="sz-val">${fmt(m.c.b)} · ${m.age} ${yearsCz(m.age)} · ${zodiac(m.c.b)}</div>
@@ -840,10 +874,9 @@ function renderMatch() {
         ${CH.map(ch => `<div class="seg-row"><span class="seg-lbl">${CH_NAME_CZ[ch]}</span><span class="segs">${segs(m.c.p[ch])}</span><span class="seg-val">${m.c.p[ch]} %</span></div>`).join('')}
         <div class="sz-small">rozdíl v datech narození: ${nf(m.diff)} dní</div>
       </div>
-      ${m.date != null ? `<div class="sz-ticket"><div class="t-stub">VSTU<br>PEN<br>KA</div><div class="t-body"><div class="t-lbl">Ideální první rande</div><b>${fmtLongCz(m.date)}</b><small>Citová ani fyzická křivka nebude mít u nikoho z vás kritický ani ošidný den.</small></div></div>` : ''}
+      ${m.date != null ? cinemaTicket(m) : ''}
       <div class="robot-box"><div class="robot-lbl">Hlášení stroje</div>${m.robot.map(x => `<div>&gt; ${esc(x)}</div>`).join('')}</div>
     </div>`;
-  drawPhoto(out.querySelector('.ph-box'), m.photo);
 }
 $('#mSex').addEventListener('change', () => {
   U.sex = $('#mSex').value;
@@ -868,9 +901,8 @@ function partnerLines(u, width) {
   if (m && m.minor) { L.push('OSOBA MLADSI 18 LET.', 'STROJ PARUJE JEN PLNOLETE OSOBY.', 'VRATTE SE, AZ VAM BUDE 18 LET.'); return L; }
   if (!m) { L.push('ZADNY PROTEJSEK V ROZSAHU 18 AZ 90 LET.'); return L; }
   L.push('PODOBENKA:');
-  if (FACE_DOTS[m.photo.face]) L.push({ cls: 'dm-line', h: `<img class="dm-photo" src="${FACE_DOTS[m.photo.face]}" alt="Podobenka vytištěná jen po obočí">` });
-  wrap('', `NACTENO ${m.photo.bytes} BAJTU. ${m.photo.err}`, 0);
-  L.push('NELZE NACIST CELY OBRAZEK.', '');
+  if (FACE_DOTS[m.photo.face]) L.push({ cls: 'dm-line', h: `<img class="dm-photo" src="${FACE_DOTS[m.photo.face]}" alt="Podobenka osudového protějšku">` });
+  L.push('');
   wrap('JMENO', ascii(m.name));
   wrap('NAROZEN', `${fmt(m.c.b)}  (${m.age} ${ascii(yearsCz(m.age)).toUpperCase()}, ${ascii(zodiac(m.c.b))})`);
   wrap('BYDLISTE', ascii(m.city));
@@ -879,7 +911,11 @@ function partnerLines(u, width) {
   wrap('MILOSTNY ZIVOT', ascii(m.love));
   wrap('INZERAT', '"' + ascii(m.ad).replace(/[„“]/g, '"') + '"');
   wrap('SHODA', `F ${m.c.p.F} %  C ${m.c.p.C} %  I ${m.c.p.I} %  CELKEM ${m.c.p.T} %`);
-  if (m.date != null) wrap('RANDE', ascii(fmtLongCz(m.date)));
+  if (m.date != null) {
+    wrap('RANDE', ascii(fmtLongCz(m.date)) + ', ' + m.ticket.time + ', KINO MIR');
+    wrap('FILM', '"' + ascii(m.ticket.film).toUpperCase() + '"');
+    wrap('VSTUPENKA', `RADA ${m.ticket.row}, SEDADLA ${m.ticket.seat} A ${m.ticket.seat + 1}, ${m.ticket.price * 2},- KCS - HRADI VYPOCETNI STREDISKO A MNV`);
+  }
   L.push('');
   L.push('HLASENI STROJE:');
   m.robot.forEach(x => wrap('  >', x, 4));
