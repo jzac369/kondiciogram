@@ -760,3 +760,27 @@ input::-webkit-input-placeholder{color:#c9b89c;opacity:1;font-style:italic}
   .sz-stamp{bottom:auto;top:56px;right:6px;font-size:1.2rem}
   .sz-photo .ph-box{width:88px}
 }
+
+/* ---- horný riadok: preklápacie hodiny vľavo, tabuľa „STROJ HLÁSÍ“ až po pravý okraj ---- */
+.top-info{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:12px;margin:0 8px}
+.top-info .ticker{flex:1 1 auto;max-width:none;margin:0}
+.flipclock{flex:none;display:flex;align-items:center;gap:4px;height:44px;padding:4px 8px;
+  background:linear-gradient(#e46d2e,#b8471c);border:3px solid #1d1510;border-radius:12px;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.25),0 2px 0 3px #2d190b}
+.fc-card{position:relative;display:inline-block;min-width:2.05em;padding:4px 4px 3px;text-align:center;
+  font:700 1.45rem/1 "Oswald",sans-serif;color:#f3ead6;letter-spacing:.02em;border-radius:5px;
+  background:linear-gradient(#2e2a27 0 50%,#211e1c 50%);box-shadow:inset 0 0 0 1px #000,0 2px 0 #120c08;perspective:200px}
+.fc-card::after{content:"";position:absolute;left:0;right:0;top:calc(50% - 1px);height:2px;background:#0b0907;box-shadow:0 1px 0 rgba(255,255,255,.08)}
+.fc-card.flip{animation:fcFlip .45s ease-in-out}
+@keyframes fcFlip{0%{transform:rotateX(0)}50%{transform:rotateX(-80deg);filter:brightness(.6)}100%{transform:rotateX(0)}}
+.fc-colon{font:700 1.3rem/1 "Oswald";color:#2a160a;animation:blink2 1s steps(1) infinite}
+.fc-date{margin-left:4px;font:1rem/1 "VT323",monospace;color:#2a160a;text-align:center;letter-spacing:.06em}
+@media (max-width:980px){
+  .top-info{order:3;flex:1 1 100%;margin:2px 0 0}
+}
+@media (max-width:680px){
+  .flipclock{height:38px;padding:3px 6px}
+  .fc-card{font-size:1.2rem}
+  .fc-date{display:none}
+}
+@media (prefers-reduced-motion:reduce){ .fc-card.flip,.fc-colon{animation:none} }

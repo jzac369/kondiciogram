@@ -1249,6 +1249,22 @@ $('#editBtn').addEventListener('click', () => startReg(true));
 
 $('#refeedBtn').addEventListener('click', () => runMachine(() => showDash(false)));
 
+/* ================= PREKLÁPACIE HODINY V HORNOM PRUHU ================= */
+(function flipClock() {
+  const h = $('#fcH'), m = $('#fcM'), d = $('#fcD');
+  if (!h || !m) return;
+  const DAYS = ['NE', 'PO', 'UT', 'ST', 'CT', 'PA', 'SO'];
+  const set = (el, v) => { if (el.textContent === v) return; el.textContent = v; el.classList.remove('flip'); void el.offsetWidth; el.classList.add('flip'); };
+  const tick = () => {
+    const n = new Date();
+    set(h, pad2(n.getHours())); set(m, pad2(n.getMinutes()));
+    if (d) d.innerHTML = `${DAYS[n.getDay()]}<br>${n.getDate()}.${n.getMonth() + 1}.`;
+    $('#flipClock').setAttribute('aria-label', `Aktuální čas ${n.getHours()}:${pad2(n.getMinutes())}`);
+  };
+  tick();
+  setInterval(tick, 1000);
+})();
+
 /* ================= DISPLEJ V HORNOM PRUHU: HLÁŠKY STROJA ================= */
 const HLASKY = [
   'STROJ DNES POVOLUJE SPOLECENSKY KONTAKT.',

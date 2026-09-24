@@ -18,10 +18,17 @@
 <div class="stripes no-print"></div>
 <header class="topbar no-print">
   <a href="./" class="logo" id="homeLink" title="Späť na úvod" aria-label="Kondiciogram, späť na úvod"><span class="logo-mark">*•0×</span><span class="logo-txt film"><span class="film-b">Kondiciogram</span></span></a>
-  <div class="ticker" id="ticker" role="marquee" aria-label="Hlásenia stroja">
-    <span class="tk-led" aria-hidden="true"></span>
-    <span class="tk-label" aria-hidden="true">STROJ<br>HLASI</span>
-    <div class="tk-view"><span class="tk-text" id="tkText"></span></div>
+  <div class="top-info">
+    <!-- preklápacie hodiny zo 70. rokov -->
+    <div class="flipclock" id="flipClock" role="timer" aria-label="Aktuální čas">
+      <span class="fc-card" id="fcH">00</span><span class="fc-colon" aria-hidden="true">:</span><span class="fc-card" id="fcM">00</span>
+      <span class="fc-date" id="fcD"></span>
+    </div>
+    <div class="ticker" id="ticker" role="marquee" aria-label="Hlásenia stroja">
+      <span class="tk-led" aria-hidden="true"></span>
+      <span class="tk-label" aria-hidden="true">STROJ<br>HLASI</span>
+      <div class="tk-view"><span class="tk-text" id="tkText"></span></div>
+    </div>
   </div>
   <div class="top-right">
     <span id="whoami" class="chip plain hidden"></span>
