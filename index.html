@@ -63,7 +63,7 @@
           <div class="svc-body">
             <div class="svc-kick">Služba č. 2</div>
             <h3 class="svc-title">Výber partnera podľa počítača</h3>
-            <p>Stroj porovná biorytmy a nájde partnera alebo partnerku s najlepšou zhodou. Stačí meno a dátum narodenia.</p>
+            <p>Stroj porovná biorytmy a nájde vášho osudového partnera alebo partnerku. Stačí meno a dátum narodenia.</p>
             <div class="svc-btns">
               <button id="toPartner" class="btn small" type="button">Hľadať partnera</button>
             </div>
@@ -96,7 +96,7 @@
   <section id="scr-partner" class="screen hidden">
     <div class="card partner-card">
       <div class="film partner-head"><span class="film-s">Služba č. 2</span><span class="film-b">Výber partnera podľa počítača</span></div>
-      <p class="muted">Samočinný počítač prehľadá ročníky ±12 rokov okolo vás a nájde dátum narodenia, ktorého biorytmy sa s vašimi zhodujú najlepšie. Osoby sú vymyslené, zhoda je vypočítaná.</p>
+      <p class="muted">Samočinný počítač prehľadá ročníky ±12 rokov okolo vás a nájde jediný dátum narodenia, ktorého biorytmy sa s vašimi zhodujú najlepšie: vášho osudového partnera. Osoba je vymyslená, zhoda je vypočítaná.</p>
       <form id="sForm" class="s-form" novalidate>
         <label>Meno a priezvisko súdruha<input id="sName" type="text" maxlength="40" autocomplete="name" placeholder="napr. František Koudelka"></label>
         <div class="lbl-txt">Kedy ste sa narodili, súdruh?</div>
@@ -121,9 +121,8 @@
         <div class="match-head">
           <div>
             <div class="film"><span class="film-s">Stroj odporúča</span></div>
-            <h3 class="match-title">Váš partner podľa biorytmov</h3>
+            <h3 class="match-title" id="sTitle">Váš osudový partner</h3>
           </div>
-          <div class="row"><button id="sNext" class="btn small" type="button">Ďalší kandidát</button></div>
         </div>
         <div class="match-body">
           <figure class="match-photo"><img src="img/rodina.jpg" alt="Ilustrácia: šťastná rodina pri plote máva výtlačkami kondiciogramu"></figure>
@@ -293,15 +292,14 @@
       <div class="match-head">
         <div>
           <div class="film"><span class="film-s">Stroj odporúča</span></div>
-          <h3 class="match-title">Vhodný partner podľa biorytmov</h3>
-          <p class="muted small-txt">Stroj prehľadal ročníky ±12 rokov okolo vás a vybral dátum narodenia, ktorého cykly sa s vašimi zhodujú najlepšie. Osoba je vymyslená, kompatibilita je vypočítaná.</p>
+          <h3 class="match-title" id="mTitle">Váš osudový partner</h3>
+          <p class="muted small-txt">Stroj prehľadal ročníky ±12 rokov okolo vás a vybral jediný dátum narodenia, ktorého cykly sa s vašimi zhodujú najlepšie. Osoba je vymyslená, zhoda je vypočítaná.</p>
         </div>
         <div class="row">
           <select id="mSex" aria-label="Koho hľadáte">
             <option value="f">Hľadám partnerku</option>
             <option value="m">Hľadám partnera</option>
           </select>
-          <button id="mNext" class="btn small" type="button">Ďalší kandidát</button>
         </div>
       </div>
       <div class="match-body">

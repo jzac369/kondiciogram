@@ -274,19 +274,25 @@ footer p{padding:14px 16px 24px;margin:0}
 /* ---------- print ---------- */
 /* Tlač: na papier ide len samostatný hárok #printSheet (perforovaný papier s dierkami) */
 .print-sheet{display:none}
+/* Bez okrajov: papierová farba na celej strane, dierky od vrchu po spodok. Pásy s dierkami sú position:fixed,
+   takže ich prehliadač zopakuje na každej vytlačenej strane. Veľkosť písma zostáva pevná (nenaťahuje sa). */
 @media print{
-  @page{size:A4 landscape;margin:7mm}
+  @page{size:A4 landscape;margin:0}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  html,body{background:#fff!important;margin:0}
+  html,body{background:#f5f3ec!important;margin:0;padding:0}
   body > *:not(.print-sheet){display:none!important}
   .print-sheet{display:block}
-  .print-sheet .paper{box-shadow:none;margin:0 auto;max-width:none;width:100%;font-size:11.5px;line-height:1.42;
-    padding:14px 50px 18px;background:#f5f3ec;border-left:1px dashed #b9b3a6;border-right:1px dashed #b9b3a6}
-  .print-sheet .paper::before,.print-sheet .paper::after{
-    background:radial-gradient(circle at 17px 12px,#fff 0 5px,#cfc6b2 5px 6px,transparent 6.5px) 0 0/34px 24px repeat-y}
+  .print-sheet .tractor{position:fixed;top:0;bottom:0;width:13mm;
+    background:radial-gradient(circle at 6.5mm 3.2mm,#fff 0 1.9mm,#cfc6b2 1.9mm 2.2mm,transparent 2.4mm) 0 0/13mm 6.35mm repeat-y}
+  .print-sheet .tractor.l{left:0;border-right:1px dashed #b9b3a6}
+  .print-sheet .tractor.r{right:0;border-left:1px dashed #b9b3a6}
+  .print-sheet .paper{box-shadow:none;margin:0;max-width:none;width:auto;min-height:0;background:transparent;border:0;
+    font-size:11.5px;line-height:1.42;padding:11mm 19mm 10mm;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .print-sheet .paper::before,.print-sheet .paper::after{display:none}
   .print-sheet .blk{break-inside:avoid;page-break-inside:avoid}
   .print-sheet .pl{text-shadow:none}
-  .print-sheet .tear{border-top:2px dashed #b9b3a6;margin:10px -50px 0;padding-top:4px;text-align:center;font:9px "Courier Prime";color:#8c8577;letter-spacing:.3em}
+  .print-sheet .tear{border-top:2px dashed #b9b3a6;margin:10px -19mm 0;padding-top:4px;text-align:center;font:9px "Courier Prime";color:#8c8577;letter-spacing:.3em}
 }
 
 /* =========================================================

@@ -19,7 +19,7 @@ Stačí otvoriť `index.html` v prehliadači. Server ani build nie sú potrebné
 - **Dierny štítok** v Hollerithovom kóde (80 stĺpcov), ktorý sa dieruje priebežne podľa odpovedí.
 - **Stroj:** štítok zajde do stroja a z tlačiarne vyjde kondiciogram so zvukom ihličkovej tlačiarne.
 - **Tlač na papier alebo do PDF** v dizajne perforovaného papiera (A4 na šírku).
-- **Dnešný verdikt**, osciloskop biorytmov, plánovač dní, partnerská zhoda a vhodný partner alebo partnerka (fiktívna osoba).
+- **Dnešný verdikt**, osciloskop biorytmov, plánovač dní, partnerská zhoda a osudový partner alebo partnerka (fiktívna osoba).
 - **Kontrola s filmom:** pre dátum 16. 2. 1935 a rok 1973 stroj vytlačí rovnaké znaky ako originál z filmu.
 - Rozloženie pre mobil, tablet, iPad (na výšku aj na šírku) a počítač.
 

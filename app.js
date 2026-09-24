@@ -577,22 +577,21 @@ function matchCandidates(u) {
   }
   cand.sort((x, y) => y.p.T - x.p.T);
   const out = [];
-  for (const c of cand) { if (out.every(o => Math.abs(o.b - c.b) > 45)) out.push(c); if (out.length >= 20) break; }
-  return out;
+  return cand.length ? [cand[0]] : [];   // stroj odporúča jediného, osudového partnera
 }
 // Výber partnera sa zobrazuje na dvoch miestach (nástenka kondiciogramu a samostatná služba).
 // Každé miesto má vlastný stav; rovnaké meno + dátum + pohlavie dá všade rovnakých kandidátov.
 const MATCH_VIEWS = {
-  dash: { user: () => U, sex: '#mSex', out: '#mOut', key: '', list: [], idx: 0 },
-  solo: { user: () => PU, sex: '#sSex', out: '#sOut', key: '', list: [], idx: 0 }
+  dash: { user: () => U, sex: '#mSex', out: '#mOut', title: '#mTitle', key: '', list: [] },
+  solo: { user: () => PU, sex: '#sSex', out: '#sOut', title: '#sTitle', key: '', list: [] }
 };
 let PU = null;   // osoba v samostatnej službe „Výber partnera“
-function renderMatch(step, view = 'dash') {
+function renderMatch(view = 'dash') {
   const v = MATCH_VIEWS[view], u = v.user(); if (!u) return;
   const sex = $(v.sex).value, key = nameSeed(u.name) + u.birth + sex;
-  if (key !== v.key) { v.key = key; v.list = matchCandidates(u); v.idx = 0; }
-  if (step) v.idx = (v.idx + 1) % Math.max(1, v.list.length);
-  const out = $(v.out), matchList = v.list, matchIdx = v.idx, U = u;   // lokálne U = osoba tohto pohľadu
+  $(v.title).textContent = sex === 'f' ? 'Vaša osudová partnerka' : 'Váš osudový partner';
+  if (key !== v.key) { v.key = key; v.list = matchCandidates(u); }
+  const out = $(v.out), matchList = v.list, matchIdx = 0, U = u;   // lokálne U = osoba tohto pohľadu
   if (!matchList.length) { out.innerHTML = '<p>Stroj páruje ľudí od 18 do 90 rokov. Vo vašom okolí ±12 rokov nikoho takého nenašiel.</p>'; return; }
   const c = matchList[matchIdx], r = rng(fnv(key + ':' + matchIdx)), N = NAMES[sex];
   const name = `${pick(r, N.first)} ${pick(r, N.last)}`, city = pick(r, NAMES.cities), job = pick(r, N.job);
@@ -613,7 +612,7 @@ function renderMatch(step, view = 'dash') {
       <p>${icon('pin')} Žije ${esc(city)}</p>
       <p>${hob.map(h => `<span class="tag">${esc(h)}</span>`).join('')}</p>
       <p><i>„${esc(adTxt)}“</i></p>
-      <p class="muted small-txt">Kandidát ${matchIdx + 1} z ${matchList.length}. Fiktívna osoba, ktorú vygeneroval stroj.</p>
+      <p class="muted small-txt">Fiktívna osoba. Zhodu biorytmov vypočítal stroj.</p>
     </div>
     <div>
       <div class="m-total"><div class="nixie">${c.p.T}</div><div><b class="verdict-head">Zhoda biorytmov</b><div class="muted small-txt">rozdiel v dátumoch narodenia: ${nf(Math.abs(c.b - U.birthN))} dní</div></div></div>
@@ -621,8 +620,7 @@ function renderMatch(step, view = 'dash') {
       ${best ? `<div class="m-date">${icon('calendar')} Ideálne prvé rande: <b>${fmtLong(best.n)}</b>. Citová ani fyzická krivka nebude mať u nikoho z vás kritický deň.</div>` : ''}
     </div>`;
 }
-$('#mNext').addEventListener('click', () => { renderMatch(true); printerBurst(18); });
-$('#mSex').addEventListener('change', () => renderMatch(false));
+$('#mSex').addEventListener('change', () => { renderMatch(); printerBurst(18); });
 
 /* ================= SAMOSTATNÁ SLUŽBA: VÝBER PARTNERA PODĽA POČÍTAČA ================= */
 function startPartner(prefill) {
@@ -645,7 +643,7 @@ $('#sForm').addEventListener('submit', e => {
   modemSound();
   const res = $('#sResult'), tty = $('#sTty');
   res.classList.remove('hidden'); $('#sMatch').classList.add('hidden');
-  const lines = ['SAMOCINNY POCITAC - SEZNAMKA', `HLEDAM PROTEJSEK PRO: ${ascii(name)}`, `PROHLEDAVAM ROCNIKY ${fromN(PU.birthN).y - 12} - ${fromN(PU.birthN).y + 12}`, 'POROVNAVAM CYKLY 23 / 28 / 33', 'VYBER DOKONCEN.'];
+  const lines = ['SAMOCINNY POCITAC - SEZNAMKA', `HLEDAM PROTEJSEK PRO: ${ascii(name)}`, `PROHLEDAVAM ROCNIKY ${fromN(PU.birthN).y - 12} - ${fromN(PU.birthN).y + 12}`, 'POROVNAVAM CYKLY 23 / 28 / 33', 'OSUDOVY PROTEJSEK NALEZEN.'];
   let i = 0;
   tty.innerHTML = '';
   res.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -653,12 +651,11 @@ $('#sForm').addEventListener('submit', e => {
     if (i < lines.length) { tty.innerHTML = lines.slice(0, ++i).map(esc).join('<br>') + '<span class="cur">█</span>'; return; }
     clearInterval(tick);
     $('#sMatch').classList.remove('hidden');
-    renderMatch(false, 'solo');
+    renderMatch('solo');
     printerBurst(30);
   }, 550);
 });
-$('#sNext').addEventListener('click', () => { renderMatch(true, 'solo'); printerBurst(18); });
-$('#sSex').addEventListener('change', () => { if (PU) renderMatch(false, 'solo'); });
+$('#sSex').addEventListener('change', () => { if (PU) { renderMatch('solo'); printerBurst(18); } });
 $('#sToKond').addEventListener('click', () => {
   startReg(false);
   if (PU) { reg.data.name = PU.name; reg.data.birth = PU.birth; renderStep(); }
@@ -679,7 +676,7 @@ function showDash(animatePrint) {
   drawScope();
   renderRisks();
   renderCard($('#dashCard'), cardText(U));
-  renderMatch(false);
+  renderMatch();
   if (!$('#actSel').options.length) $('#actSel').innerHTML = ACTIVITIES.map((a, i) => `<option value="${i}">${esc(a.n)}</option>`).join('');
   $('#planOut').innerHTML = ''; $('#pOut').innerHTML = '';
   $('#paper2').classList.add('hidden');
@@ -882,15 +879,49 @@ function buildLines(u, months, avail) {
   const chunk = avail >= 13 + 93 ? 31 : Math.max(5, Math.floor((avail - 13) / 3));
   const width = 12 + 3 * Math.min(31, chunk);
   const multiYear = months.some(o => o.y !== months[0].y);
-  const serial = String(fnv(nameSeed(u.name) + u.birth) % 1000000).padStart(6, '0');
+  const seed = nameSeed(u.name) + u.birth, serial = String(fnv(seed) % 1000000).padStart(6, '0');
+  // najprv prejsť dni obdobia, aby sa dali spočítať technické parametre hlavičky
+  let symStr = '', critDays = 0, allDays = 0;
+  const corr = { FC: [0, 0, 0, 0, 0], CI: [0, 0, 0, 0, 0] };   // Σx, Σy, Σxy, Σx², Σy² pre koreláciu cyklov
+  const addCorr = (k, x, y) => { const c = corr[k]; c[0] += x; c[1] += y; c[2] += x * y; c[3] += x * x; c[4] += y * y; };
+  for (const { y, m } of months) {
+    for (let d = 1; d <= daysInMonth(y, m); d++) {
+      const t = dn(y, m, d) - u.birthN; if (t < 0) continue;
+      allDays++;
+      const s = CH.map(ch => sym(u, ch, t)); symStr += s.join('');
+      if (s.some(isCrit)) critDays++;
+      const v = CH.map(ch => val(u, ch, t));
+      addCorr('FC', v[0], v[1]); addCorr('CI', v[1], v[2]);
+    }
+  }
+  const pearson = k => { const [sx, sy, sxy, sxx, syy] = corr[k], n = allDays || 1, den = Math.sqrt((n * sxx - sx * sx) * (n * syy - sy * sy)); return den ? (n * sxy - sx * sy) / den : 0; };
+  const tNow = today - u.birthN, h = fnv(symStr + seed).toString(16).toUpperCase().padStart(8, '0');
+  const ans = QUESTIONS.map(q => u.answers && u.answers[q.id] != null ? u.answers[q.id] + 1 : '-').join('');
+  const params = [
+    ['VYSTAVENO', fmt(today)],
+    ['OBDOBI', `${months[0].m + 1}/${months[0].y} - ${months[months.length - 1].m + 1}/${months[months.length - 1].y}`],
+    ['PROZITO', `${tNow} DNU`],
+    ['FAZE', CH.map(ch => `${ch} ${pad2(((tNow % P[ch]) + P[ch]) % P[ch] + 1)}/${P[ch]}`).join(' ')],
+    ['KOREKCE', CH.map(ch => `${ch} ${sg(u.bias[ch])}`).join(' ')],
+    ['VAHY', CH.map(ch => `${ch} ${u.w[ch].toFixed(2)}`).join(' ')],
+    ['KORELACE', `F/C ${sg(pearson('FC'))} C/I ${sg(pearson('CI'))}`],
+    ['KRIT.DNY', `${critDays} Z ${allDays}`],
+    ['INDEX', `${overall(u, dayState(u, today))} % (DNES)`],
+    ['DOTAZNIK', /\d/.test(ans) ? ans : 'NEVYPLNEN'],
+    ['STROJ', `SPC-74 / PASKA ${1000 + fnv('P' + seed) % 9000}`],
+    ['OPERATOR', 'JACHYM'],
+    ['K.SOUCET', `${h.slice(0, 4)}-${h.slice(4)}`]
+  ].map(([k, v]) => (k.padEnd(10) + v));
+
   L.push('KONDICIOGRAM'.padEnd(Math.max(14, width - 10)) + 'C. ' + serial);
   L.push('JMENO: ' + ascii(u.name));
   L.push('');
   L.push('        NAR. ' + fmt(u.birthN));
   L.push('');
-  L.push(`VYSTAVENO ${fmt(today)}`);
-  L.push(`OBDOBI    ${months[0].m + 1}/${months[0].y} - ${months[months.length - 1].m + 1}/${months[months.length - 1].y}`);
-  if (CH.some(ch => u.bias[ch])) L.push(`KOREKCE   F ${sg(u.bias.F)} C ${sg(u.bias.C)} I ${sg(u.bias.I)}`);
+  // na širokom papieri v dvoch stĺpcoch, na úzkom pod sebou
+  const colW = Math.max(...params.map(p => p.length)) + 4;
+  if (width >= colW * 2) for (let i = 0; i < params.length; i += 2) L.push((params[i].padEnd(colW) + (params[i + 1] || '')).trimEnd());
+  else params.forEach(p => L.push(p));
   L.push({ cls: 'muted-line', h: '-'.repeat(width) });
   L.push('');
   for (const { y, m } of months) {
@@ -960,7 +991,7 @@ function buildPrintSheet(u, months) {
     blk.push(`<div class="pl${x.cls ? ' ' + x.cls : ''}">${x.h}</div>`);
   }
   flush();
-  $('#printSheet').innerHTML = `<div class="paper">${html}<div class="tear">- - - ODTRHNITE - - -</div></div>`;
+  $('#printSheet').innerHTML = `<div class="tractor l"></div><div class="tractor r"></div><div class="paper">${html}<div class="tear">- - - ODTRHNITE - - -</div></div>`;
 }
 function printKondiciogram(u, months) { printSrc = { u, months }; buildPrintSheet(u, months); setTimeout(() => window.print(), 60); }
 // aj Ctrl+P z prehliadača vytlačí kondiciogram, nie celú stránku
