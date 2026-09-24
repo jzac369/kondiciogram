@@ -612,11 +612,51 @@ const CREDITS = [
     return pool[rnd(0, pool.length - 1)];
   };
   const dots = (label, v, w) => label + ' ' + '.'.repeat(Math.max(2, w - label.length - v.length - 2)) + ' ' + v;
+  // servisné hlásenia stroja, striedajú sa s výpočtami; riadky začínajúce „!“ blikajú ako varovanie
+  const SYS = [
+    ['!!!! VAROVANI !!!!', '', 'PREHRIVANI ELEKTRONKY EP-17', dots('TEPLOTA', '87 C', 26), '', 'DOPORUCUJI VYMENIT', 'ELEKTRONKU PRI PRISTI', 'SMENE UDRZBY.'],
+    ['> AUTOTEST PAMETI...', dots('FERITOVA PAMET', '16 KB', 26), dots('VADNE BUNKY', '3', 26), dots('STAV', 'VYHOVUJE', 26), '', dots('CTECKA STITKU', 'OK', 26), dots('DERNA PASKA', '78 %', 26), '', 'SYSTEM PRIPRAVEN.'],
+    ['!POZOR: DOCHAZI PASKA', '', dots('ZBYVA', '12 M', 22), 'DOPLNTE ROLI C. 4', 'ZE SKLADU MATERIALU.', '', 'ZADANKU PODEPISE', 'VEDOUCI STREDISKA.'],
+    ['!KOLISANI NAPETI V SITI', '', dots('NAPETI', '198 V', 24), dots('STABILIZATOR', 'ZAPNUT', 24), '', 'NEZAPINEJTE VARIC', 'V KANCELARI SEFA.'],
+    ['> STATISTIKA SMENY', '', dots('ZPRACOVANO STITKU', '1 274', 27), dots('KRITICKYCH DNU', '318', 27), dots('OSUDOVYCH PAROVANI', '42', 27), dots('PLNENI PLANU', '104 %', 27), '', 'CEST PRACI!'],
+    ['!CHYBA 1F: ZASEKNUTY STITEK', '', 'OTEVRETE KRYT C. 2', 'A OPATRNE VYTAHNETE', 'STITEK PINZETOU.', '', '!NEPOUZIVAT NUZ NA CHLEBA!'],
+    ['> PLANOVANA UDRZBA...', dots('MAZANI CIVEK', 'OK', 26), dots('CISTENI HLAV', 'OK', 26), dots('KALIBRACE BIORYTMU', 'OK', 26), '', 'DALSI REVIZE ZA 30 DNI,', 'NEJLEPE V DEN S HVEZDICKOU.'],
+    ['!VAROVANI: VLHKOST 91 %', '', 'HROZI KONDENZACE', 'NA RELE K-12.', '', 'OTEVRETE OKNO.', 'ZAVRETE TERMOSKU.'],
+    ['!PREPETI NA ZDROJI Z-3', dots('POJISTKA 6,3 A', '?', 24), '', 'DOPORUCUJI VYMENIT', 'POJISTKU.', '', '!NEDRATOVAT!'],
+    ['> SPOJENI S USTREDNOU...', dots('MODEM 300 BAUD', 'OK', 26), 'DOTAZ NA DATABAZI OBCANU', 'CEKAM NA ODPOVED...', '', 'ODPOVED: NEVIM.', 'OPAKUJI DOTAZ ZITRA.'],
+    ['!PAPIR V TISKARNE DOCHAZI', '', dots('ZBYVA', '40 LISTU', 24), 'DODAVKA DO SKLADU', 'V PRISTI PETILETCE.'],
+    ['> PROVOZNI DENIK SPC-74', dots('PROVOZNI HODINY', '18 422', 26), dots('PORUCH TENTO MESIC', '7', 26), dots('Z TOHO VINOU OBSLUHY', '7', 26), '', 'OBSLUHA BYLA UPOZORNENA.'],
+    ['!VENTILATOR V-2 STOJI', '', 'CHLAZENI NEDOSTATECNE.', 'OBSLUHA AT FOUKA', 'DO MRIZKY C. 3', 'AZ DO ODVOLANI.'],
+    ['!NEOPRAVNENY PRISTUP', '', 'NEKDO VLOZIL DO CTECKY', 'LISTEK Z JIDELNY.', '', 'STITEK VRACEN.', 'KNEDLIKY VYDANY NEBUDOU.']
+  ];
+  let sysOrder = [], sysI = 0;
+  const nextSys = () => {
+    if (sysI >= sysOrder.length) { sysOrder = SYS.map((_, k) => k).sort(() => Math.random() - .5); sysI = 0; }
+    return SYS[sysOrder[sysI++]];
+  };
+  // vypíše riadky znak po znaku; riadky s „!“ na konci blikajú
+  async function typeLines(lines) {
+    let out = '';
+    for (const raw of lines) {
+      const l = raw.replace(/^!/, '');
+      for (let i = 1; i <= l.length; i++) { scr.innerHTML = esc(out + l.slice(0, i)) + '<span class="cur">█</span>'; await wait(22); }
+      out += l + '\n'; await wait(l ? 90 : 40);
+    }
+    return out;
+  }
+  async function sysScreen() {
+    const lines = nextSys();
+    await typeLines(lines);
+    scr.innerHTML = lines.map(raw => raw.startsWith('!') ? `<span class="blink">${esc(raw.slice(1))}</span>` : esc(raw)).join('\n') + '\n<span class="cur">_</span>';
+    if (lines.some(l => l.startsWith('!'))) beep(880, .12);
+    await wait(6500);
+  }
   (async function loop() {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     let first = true;
     for (;;) {
       if (document.hidden || $('#scr-login').classList.contains('hidden')) { await wait(1500); continue; }
+      if (!first && Math.random() < .55) { await sysScreen(); continue; }   // medzi výpočty vloží servisné hlásenie
       const birth = first ? parseISO(KOUDELKA_BIRTH) : dn(rnd(1935, 2004), rnd(0, 11), rnd(1, 28));
       first = false;
       const who = { birthN: birth, bias: { F: 0, C: 0, I: 0 } }, st = dayState(who, todayN()), tip = advice(st);
@@ -627,11 +667,7 @@ const CREDITS = [
         'STROJ DOPORUCUJE:'
       ];
       scr.innerHTML = ''; pap.textContent = '';
-      let out = '';
-      for (const l of lines) {
-        for (let i = 1; i <= l.length; i++) { scr.innerHTML = esc(out + l.slice(0, i)) + '<span class="cur">█</span>'; await wait(22); }
-        out += l + '\n'; await wait(l ? 90 : 40);
-      }
+      const out = await typeLines(lines);
       scr.innerHTML = esc(out) + `<span class="box">${esc(tip)}</span> <span class="cur">_</span>`;
       await wait(600);
       // tlačiareň: rovnaké údaje na papier, riadok po riadku
@@ -677,6 +713,7 @@ const matchCache = {};
 function matchData(u, sex) {
   const key = nameSeed(u.name) + u.birth + sex;
   if (matchCache[key]) return matchCache[key];
+  if (ageYears(u.birthN, todayN()) < 18) return (matchCache[key] = { minor: true });   // stroj páruje len plnoletých
   const c = bestCandidate(u);
   if (!c) return (matchCache[key] = null);
   const r = rng(fnv(key + ':0')), N = NAMES[sex];
@@ -685,7 +722,7 @@ function matchData(u, sex) {
   const ad = pick(r, NAMES.ads), love = pick(r, N.love);
   const robot = []; while (robot.length < 3) { const x = pick(r, NAMES.robot); if (!robot.includes(x)) robot.push(x); }
   const face = pick(r, sex === 'f' ? ['tvar-z1', 'tvar-z2'] : ['tvar-m1', 'tvar-m2']);
-  const photo = { src: 'img/' + face + '.jpg', cut: FACE_CUT[face], bytes: 180 + Math.floor(r() * 700), err: pick(r, PHOTO_ERR) };
+  const photo = { face, src: 'img/' + face + '.jpg', cut: FACE_CUT[face], bytes: 180 + Math.floor(r() * 700), err: pick(r, PHOTO_ERR) };
   const other = { birthN: c.b, bias: { F: 0, C: 0, I: 0 } };
   let date = null;
   for (let n = todayN(); n < todayN() + 60; n++) {
@@ -701,6 +738,38 @@ const cap = s => s[0].toUpperCase() + s.slice(1);
 const FACE_CUT = { 'tvar-z1': .35, 'tvar-z2': .28, 'tvar-m1': .35, 'tvar-m2': .30 };
 const PHOTO_ERR = ['CHYBA CTENI Z PASKY.', 'PAMET POCITACE PREKROCENA.', 'DETEKOVANO POSKOZENI DAT.', 'DATA NENALEZENA.',
   'PASKA SE ZAMOTALA. VOLEJTE UDRZBU.', 'OBRAZEK ZABAVEN KADROVYM ODDELENIM.', 'NEDOSTATEK DERNYCH STITKU.', 'PREHRATA ELEKTRONKA C. 7.'];
+const FACE_DOTS = {};
+function prepFaceDots() {
+  const faces = Object.keys(FACE_CUT); let left = faces.length;
+  const B = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+  faces.forEach(face => {
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      try {
+        const C = 60, RW = 68, cell = 5, rows = Math.round(RW * FACE_CUT[face]);
+        const off = document.createElement('canvas'); off.width = C; off.height = RW;
+        const o = off.getContext('2d'); o.drawImage(img, 0, 0, C, RW);
+        const d = o.getImageData(0, 0, C, RW).data;
+        const cv = document.createElement('canvas'); cv.width = C * cell + 40; cv.height = (rows + 3) * cell;
+        const c = cv.getContext('2d'); c.fillStyle = '#1b1b20';
+        const row = (y, drawY, shift, keep) => {
+          for (let x = 0; x < C; x++) {
+            const i = (y * C + x) * 4, lum = (d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11) / 255;
+            const l = clamp((lum - .5) * 1.5 + .52, 0, 1);
+            if (l < (B[y % 4][x % 4] + .5) / 16 && Math.random() < keep) {
+              c.beginPath(); c.arc(20 + (x + shift) * cell + cell / 2, drawY * cell + cell / 2, cell * .42, 0, 7); c.fill();
+            }
+          }
+        };
+        for (let y = 0; y < rows; y++) row(y, y, 0, 1);
+        for (let g = 0; g < 3; g++) row(Math.min(RW - 1, rows + g * 3), rows + g, (Math.random() * 8 - 4) | 0, .55 - g * .15);
+        FACE_DOTS[face] = cv.toDataURL('image/png');
+      } catch (e) { /* napr. file:// bez servera: podobenka sa nevytlačí */ }
+      if (--left === 0 && U && !$('#scr-dash').classList.contains('hidden')) printMain(false);
+    };
+    img.src = 'img/' + face + '.jpg';
+  });
+}
 let photoJob = 0;
 function drawPhoto(box, ph) {
   const cv = box.querySelector('canvas'), err = box.querySelector('.ph-err'), c = cv.getContext('2d'), W = cv.width, H = cv.height, job = ++photoJob;
@@ -739,26 +808,39 @@ function renderMatch() {
   if (!U) return;
   const sex = $('#mSex').value, m = matchData(U, sex), out = $('#mOut');
   $('#mTitle').textContent = sex === 'f' ? 'Vaše osudová partnerka' : 'Váš osudový partner';
+  if (m && m.minor) { out.innerHTML = '<p><b>Stroj páruje jen plnoleté osoby.</b> Vraťte se, až vám bude 18 let. Do té doby doporučujeme kondiciogram.</p>'; return; }
   if (!m) { out.innerHTML = '<p>Stroj páruje osoby od 18 do 90 let. Ve vašem okolí ±12 let nikoho takového nenašel.</p>'; return; }
-  out.innerHTML = `<div class="ad-clip">
-      <div class="ph-head">
-        <div class="ph-box" title="Podobenka z pásky"><canvas width="64" height="72"></canvas><div class="ph-err"></div></div>
-        <div>
-          <p class="who">${esc(m.name)}</p>
-          <p class="meta">nar. ${fmt(m.c.b)} ${esc(m.city)} · ${m.age} ${yearsCz(m.age)} · ${zodiac(m.c.b)}</p>
+  const segs = p => Array.from({ length: 20 }, (_, i) => `<i class="${i < Math.round(p / 5) ? 'on' : ''}"></i>`).join('');
+  const cj = String(fnv('P' + nameSeed(U.name) + U.birth) % 1000000).padStart(6, '0');
+  out.innerHTML = `<div class="sz-form">
+      <div class="sz-head"><span>SEZNAMOVACÍ SLUŽBA SPC-74</span><span>Č. j. ${cj}/74</span></div>
+      <div class="sz-top">
+        <div class="sz-photo">
+          <span class="sz-clip" aria-hidden="true"></span>
+          <div class="ph-box" title="Podobenka z pásky"><canvas width="64" height="72"></canvas><div class="ph-err"></div></div>
+          <div class="sz-cap">fotografie 3×4</div>
+        </div>
+        <div class="sz-name">
+          <div class="sz-lbl">Jméno a příjmení</div><div class="sz-val big">${esc(m.name)}</div>
+          <div class="sz-lbl">Narozen${m.sex === 'f' ? 'a' : ''}</div><div class="sz-val">${fmt(m.c.b)} · ${m.age} ${yearsCz(m.age)} · ${zodiac(m.c.b)}</div>
         </div>
       </div>
-      <p>${icon('stress')} ${esc(cap(m.job))}</p>
-      <p>${icon('pin')} Žije ${esc(m.city)}</p>
-      <p>${icon('love')} Milostný provoz: <b>${esc(m.love)}</b></p>
-      <p>${m.hob.map(h => `<span class="tag">${esc(h)}</span>`).join('')}</p>
-      <p><i>„${esc(m.ad)}“</i></p>
-      <p class="muted small-txt">Smyšlená osoba. Shodu biorytmů vypočítal stroj.</p>
+      <dl class="sz-fields">
+        <dt>Místo pobytu</dt><dd>${esc(m.city)}</dd>
+        <dt>Povolání</dt><dd>${esc(cap(m.job))}</dd>
+        <dt>Zájmy</dt><dd>${esc(m.hob.join(', '))}</dd>
+        <dt>Milostný život</dt><dd><b>${esc(m.love)}</b></dd>
+        <dt>Inzerát</dt><dd>„${esc(m.ad)}“</dd>
+      </dl>
+      <div class="sz-stamp" aria-hidden="true">${m.sex === 'f' ? 'OSUDOVÁ' : 'OSUDOVÝ'}<small>SCHVÁLENO · SPC-74</small></div>
     </div>
-    <div>
-      <div class="m-total"><div class="nixie">${m.c.p.T}</div><div><b class="verdict-head">Shoda biorytmů</b><div class="muted small-txt">rozdíl v datech narození: ${nf(m.diff)} dní</div></div></div>
-      ${CH.map(ch => `<div class="bar-lbl"><span>${CH_NAME_CZ[ch]}</span><span>${m.c.p[ch]} %</span></div><div class="bar"><i style="width:${m.c.p[ch]}%"></i></div>`).join('')}
-      ${m.date != null ? `<div class="m-date">${icon('calendar')} Ideální první rande: <b>${fmtLongCz(m.date)}</b>. Citová ani fyzická křivka nebude mít u nikoho z vás kritický ani ošidný den.</div>` : ''}
+    <div class="sz-side">
+      <div class="sz-meter">
+        <div class="sz-meter-head"><span>SHODA<br>BIORYTMŮ</span><span class="nixie">${m.c.p.T}</span></div>
+        ${CH.map(ch => `<div class="seg-row"><span class="seg-lbl">${CH_NAME_CZ[ch]}</span><span class="segs">${segs(m.c.p[ch])}</span><span class="seg-val">${m.c.p[ch]} %</span></div>`).join('')}
+        <div class="sz-small">rozdíl v datech narození: ${nf(m.diff)} dní</div>
+      </div>
+      ${m.date != null ? `<div class="sz-ticket"><div class="t-stub">VSTU<br>PEN<br>KA</div><div class="t-body"><div class="t-lbl">Ideální první rande</div><b>${fmtLongCz(m.date)}</b><small>Citová ani fyzická křivka nebude mít u nikoho z vás kritický ani ošidný den.</small></div></div>` : ''}
       <div class="robot-box"><div class="robot-lbl">Hlášení stroje</div>${m.robot.map(x => `<div>&gt; ${esc(x)}</div>`).join('')}</div>
     </div>`;
   drawPhoto(out.querySelector('.ph-box'), m.photo);
@@ -772,7 +854,7 @@ $('#mSex').addEventListener('change', () => {
 // časť výtlačku s osudovým partnerom (česky, veľkými písmenami bez diakritiky ako zvyšok výpisu)
 function partnerLines(u, width) {
   const m = matchData(u, u.sex || 'f'), L = [], W = Math.max(34, width);
-  const wrap = (label, text, lw = 11) => {
+  const wrap = (label, text, lw = 16) => {
     const words = text.split(' '), pad = ' '.repeat(lw); let line = label.padEnd(lw);
     for (const w of words) {
       if (line.trim().length && (line + w).length > W) { L.push(line.trimEnd()); line = pad; }
@@ -781,16 +863,20 @@ function partnerLines(u, width) {
     L.push(line.trimEnd());
   };
   L.push((u.sex === 'm' ? 'VYBER OSUDOVEHO PARTNERA' : 'VYBER OSUDOVE PARTNERKY').padEnd(Math.max(26, W - 10)) + 'C. ' + String(fnv('P' + nameSeed(u.name) + u.birth) % 1000000).padStart(6, '0'));
-  L.push('PRO:      ' + ascii(u.name) + ', NAR. ' + fmt(u.birthN));
+  L.push('PRO:'.padEnd(16) + ascii(u.name) + ', NAR. ' + fmt(u.birthN));
   L.push({ cls: 'muted-line', h: '-'.repeat(W) });
+  if (m && m.minor) { L.push('OSOBA MLADSI 18 LET.', 'STROJ PARUJE JEN PLNOLETE OSOBY.', 'VRATTE SE, AZ VAM BUDE 18 LET.'); return L; }
   if (!m) { L.push('ZADNY PROTEJSEK V ROZSAHU 18 AZ 90 LET.'); return L; }
+  L.push('PODOBENKA:');
+  if (FACE_DOTS[m.photo.face]) L.push({ cls: 'dm-line', h: `<img class="dm-photo" src="${FACE_DOTS[m.photo.face]}" alt="Podobenka vytištěná jen po obočí">` });
+  wrap('', `NACTENO ${m.photo.bytes} BAJTU. ${m.photo.err}`, 0);
+  L.push('NELZE NACIST CELY OBRAZEK.', '');
   wrap('JMENO', ascii(m.name));
   wrap('NAROZEN', `${fmt(m.c.b)}  (${m.age} ${ascii(yearsCz(m.age)).toUpperCase()}, ${ascii(zodiac(m.c.b))})`);
   wrap('BYDLISTE', ascii(m.city));
   wrap('POVOLANI', ascii(m.job));
   wrap('ZALIBY', ascii(m.hob.join(', ')));
-  wrap('MIL.PROVOZ', ascii(m.love));
-  wrap('FOTO', `NACTENO ${m.photo.bytes} BAJTU. ${m.photo.err} NELZE NACIST CELY OBRAZEK.`);
+  wrap('MILOSTNY ZIVOT', ascii(m.love));
   wrap('INZERAT', '"' + ascii(m.ad).replace(/[„“]/g, '"') + '"');
   wrap('SHODA', `F ${m.c.p.F} %  C ${m.c.p.C} %  I ${m.c.p.I} %  CELKEM ${m.c.p.T} %`);
   if (m.date != null) wrap('RANDE', ascii(fmtLongCz(m.date)));
@@ -822,7 +908,6 @@ function showDash(animatePrint) {
   if (U.services.p) renderMatch();
   if (!$('#actSel').options.length) $('#actSel').innerHTML = ACTIVITIES.map((a, i) => `<option value="${i}">${esc(a.n)}</option>`).join('');
   $('#planOut').innerHTML = ''; $('#pOut').innerHTML = '';
-  $('#paper2').classList.add('hidden');
   if (!$('#yearInp').value) $('#yearInp').value = fromN(today).y;
   if (U.demo) { $('#rangeSel').value = 'year'; $('#yearInp').value = 1973; $('#yearInp').classList.remove('hidden'); }
   printMain(animatePrint);
@@ -1053,6 +1138,8 @@ function buildLines(u, months, avail) {
     ['INDEX', `${overall(u, dayState(u, today))} % (DNES)`],
     ['DOTAZNIK', /\d/.test(ans) ? ans : 'NEVYPLNEN'],
     ['STROJ', `SPC-74 / PASKA ${1000 + fnv('P' + seed) % 9000}`],
+    // príkon elektrónkového modulu počas výpočtu: 0,70 až 2,60 kW, rovnaký pre rovnaký štítok
+    ['PRIKON', `${(0.7 + (fnv('W' + seed) % 1901) / 1000).toFixed(2)} KW / MODUL ZDA-19B`],
     ['OPERATOR', 'JACHYM'],
     ['K.SOUCET', `${h.slice(0, 4)}-${h.slice(4)}`]
   ].map(([k, v]) => (k.padEnd(10) + v));
@@ -1158,11 +1245,6 @@ window.addEventListener('beforeprint', () => {
 window.addEventListener('afterprint', () => { printSrc = null; });
 $('#paperBtn').addEventListener('click', () => printKondiciogram(U, monthsForRange()));
 $('#machPrint').addEventListener('click', () => printKondiciogram(U, U.demo ? [0, 1, 2, 3].map(m => ({ y: 1973, m })) : nextMonths(3)));
-function printProof(anim) {
-  const k = derive({ name: 'Koudelka František', birth: KOUDELKA_BIRTH, answers: {} });
-  printTo($('#paper2'), k, [0, 1, 2, 3].map(m => ({ y: 1973, m })), anim);
-}
-$('#proofBtn').addEventListener('click', () => printProof(true));
 $('#editBtn').addEventListener('click', () => startReg(true));
 
 $('#refeedBtn').addEventListener('click', () => runMachine(() => showDash(false)));
@@ -1266,7 +1348,6 @@ window.addEventListener('resize', () => {
   rT = setTimeout(() => {
     if (!U || $('#scr-dash').classList.contains('hidden')) return;
     drawScope(); printMain(false);
-    if (!$('#paper2').classList.contains('hidden')) printProof(false);
   }, 200);
 });
 // po polnoci sa stroj sám prepočíta
@@ -1285,6 +1366,7 @@ function initAds() {
 
 (function init() {
   initAds();
+  prepFaceDots();
   $('#pBirthBox').innerHTML = datePicker('pBirth', '');
   const last = store.get(K_LAST, null);
   if (last && last.name && last.birth) { U = derive(last); showDash(false); }
