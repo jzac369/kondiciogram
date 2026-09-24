@@ -28,7 +28,7 @@ const store = {
   set(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } },
   del(k) { delete mem[k]; try { localStorage.removeItem(k); } catch (e) { } }
 };
-const K_USERS = 'kg.users', K_SESSION = 'kg.session', K_SOUND = 'kg.sound';
+const K_LAST = 'kg.last', K_SOUND = 'kg.sound';   // posledný vyplnený štítok (bez prihlasovania), zvuk
 
 /* ---------------- dátumy (celé dni v UTC) ---------------- */
 const dn = (y, m, d) => Math.round(Date.UTC(y, m, d) / MS);
@@ -45,6 +45,8 @@ const nf = x => x.toLocaleString('sk-SK');
 function fnv(str) { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return h >>> 0; }
 const ascii = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
 const keyOf = name => ascii(name.trim()).replace(/\s+/g, ' ');
+// rovnaké meno v ľubovoľnom poradí, veľkosti písmen a s/bez diakritiky dá rovnaký výsledok
+const nameSeed = name => keyOf(name).split(' ').sort().join(' ');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 
@@ -60,17 +62,17 @@ const QUESTIONS = [
     { t: 'Iba k chladničke a späť', e: { F: -.2 } },
     { t: 'Prechádzka so psom, nákup, schody', e: { F: .03 } },
     { t: '2 až 3-krát týždenne si zacvičím', e: { F: .15, C: .03 } },
-    { t: 'Trénujem, ako keby prišla spartakiáda', e: { F: .25, C: .05, I: -.03 } }] },
-  { id: 'coffee', kick: 'Otázka o káve', title: 'Koľko šálok kávy (turka sa počíta) vypijete denne?', opts: [
+    { t: 'Trénujem, ako keby som išiel na spartakiádu', e: { F: .25, C: .05, I: -.03 } }] },
+  { id: 'coffee', kick: 'Otázka o káve', title: 'Koľko šálok kávy (turek sa tiež počíta) vypijete denne?', opts: [
     { t: 'Ani jednu', e: { C: .03 } },
     { t: '1 až 2', e: { I: .1 } },
     { t: '3 až 4', e: { I: .12, C: -.05 } },
-    { t: '5 a viac, srdce mi búši do rytmu', e: { I: .02, C: -.15, F: -.05 } }] },
+    { t: '5 a viac, srdce sa mi ide zblázniť', e: { I: .02, C: -.15, F: -.05 } }] },
   { id: 'beer', kick: 'Otázka o pive', title: 'Koľko pív vypijete za týždeň?', opts: [
     { t: 'Ani jedno', e: { F: .05 } },
     { t: '1 až 3, na zdravie', e: { C: .08 } },
     { t: '4 až 10, veď sme u nás', e: { F: -.08, C: .05, I: -.05 } },
-    { t: 'Výčapník ma volá krstným menom', e: { F: -.2, C: -.05, I: -.15 } }] },
+    { t: 'Krčmárka ma volá krstným menom', e: { F: -.2, C: -.05, I: -.15 } }] },
   { id: 'stress', kick: 'Otázka o práci', title: 'Ako vás zaťažuje práca alebo škola?', opts: [
     { t: 'Pohodička, ako na chate', e: { C: .15 } },
     { t: 'Normálne, dá sa to', e: { C: .03 } },
@@ -86,7 +88,7 @@ const QUESTIONS = [
     { t: 'Občas krížovka v novinách', e: { I: .02 } },
     { t: 'Pravidelne čítam', e: { I: .12 } },
     { t: 'Každý deň, doma som šachový veľmajster', e: { I: .2, C: -.03 } }] },
-  { id: 'chrono', kick: 'Otázka o dennom rytme', title: 'Kedy ste najviac pri sebe?', opts: [
+  { id: 'chrono', kick: 'Otázka o dennom rytme', title: 'Kedy najviac žijete?', opts: [
     { t: 'Ráno, som ranné vtáča', chrono: 'Najlepšie vám to dnes pôjde medzi 7:00 a 10:00.' },
     { t: 'Po obede, keď strávim knedľu', chrono: 'Najlepšie vám to dnes pôjde medzi 13:00 a 15:30.' },
     { t: 'Večer, som sova', chrono: 'Najlepšie vám to dnes pôjde medzi 19:00 a 23:00.' },
@@ -226,87 +228,78 @@ function overall(u, st) {
 }
 
 /* ---------------- zvuk ihličkovej tlačiarne (WebAudio) ---------------- */
-let soundOn = store.get(K_SOUND, true), AC = null;
-function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } } return AC; }
+// Prehliadače povolia zvuk až po prvom kliknutí/dotyku. Preto sa AudioContext „odomkne“ pri prvej interakcii
+// a všetko ide cez jeden hlavný zosilňovač s kompresorom (hlasné, ale bez skreslenia).
+let soundOn = store.get(K_SOUND, true), AC = null, MASTER = null;
+function ac() {
+  if (!AC) {
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      const comp = AC.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.ratio.value = 4;
+      MASTER = AC.createGain(); MASTER.gain.value = 1;
+      MASTER.connect(comp).connect(AC.destination);
+    } catch (e) { AC = null; }
+  }
+  if (AC && AC.state === 'suspended') AC.resume();
+  return AC && AC.state !== 'closed' ? AC : null;
+}
+function unlockAudio() {
+  const a = ac(); if (!a) return;
+  const s = a.createBufferSource(); s.buffer = a.createBuffer(1, 1, 22050); s.connect(a.destination); s.start(0); // iOS
+}
+['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, unlockAudio, { passive: true }));
+
+// jeden riadok ihličkovej tlačiarne: rýchle údery ihiel (ra-ta-ta-ta) a posun papiera
 function printerBurst(chars) {
   if (!soundOn) return;
-  const a = ac(); if (!a) return;
-  if (a.state === 'suspended') a.resume();
-  const step = .011, len = Math.max(.05, Math.min(.3, chars * step * .35));
-  const buf = a.createBuffer(1, Math.floor(a.sampleRate * len), a.sampleRate), d = buf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) {
-    const ph = ((i / a.sampleRate) % step) / step;
-    d[i] = (Math.random() * 2 - 1) * (ph < .3 ? 1 : .06);
+  const a = ac(); if (!a || a.state !== 'running') return;
+  const hits = Math.max(6, Math.min(48, Math.round(chars * .9))), sr = a.sampleRate;
+  const len = hits * .0105 + .03, buf = a.createBuffer(1, Math.ceil(sr * len), sr), d = buf.getChannelData(0);
+  let t = 0;
+  for (let h = 0; h < hits; h++) {
+    const start = Math.floor(t * sr), amp = .75 + Math.random() * .25, dec = sr * .0022;
+    for (let i = 0; i < sr * .006 && start + i < d.length; i++) d[start + i] += (Math.random() * 2 - 1) * amp * Math.exp(-i / dec);
+    t += .0085 + Math.random() * .004;
   }
   const src = a.createBufferSource(); src.buffer = buf;
-  const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2400; bp.Q.value = .8;
-  const g = a.createGain(); g.gain.value = .16;
-  src.connect(bp).connect(g).connect(a.destination); src.start();
-  // posun papiera
-  const o = a.createOscillator(), og = a.createGain(), t0 = a.currentTime + len;
-  o.type = 'square'; o.frequency.value = 70;
-  og.gain.setValueAtTime(.0001, t0); og.gain.exponentialRampToValueAtTime(.05, t0 + .01); og.gain.exponentialRampToValueAtTime(.0001, t0 + .06);
-  o.connect(og).connect(a.destination); o.start(t0); o.stop(t0 + .07);
+  const hp = a.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 700;
+  const pk = a.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 3200; pk.Q.value = 1.2; pk.gain.value = 8;
+  const g = a.createGain(); g.gain.value = .9;
+  src.connect(hp).connect(pk).connect(g).connect(MASTER); src.start();
+  // posun papiera: tupé „vrrrm“
+  const t0 = a.currentTime + len, o = a.createOscillator(), og = a.createGain();
+  o.type = 'sawtooth'; o.frequency.setValueAtTime(95, t0); o.frequency.linearRampToValueAtTime(60, t0 + .07);
+  og.gain.setValueAtTime(.0001, t0); og.gain.exponentialRampToValueAtTime(.35, t0 + .01); og.gain.exponentialRampToValueAtTime(.0001, t0 + .09);
+  o.connect(og).connect(MASTER); o.start(t0); o.stop(t0 + .1);
 }
 function beep(f = 880, d = .06) {
   if (!soundOn) return;
-  const a = ac(); if (!a) return;
+  const a = ac(); if (!a || a.state !== 'running') return;
   const o = a.createOscillator(), g = a.createGain(), t0 = a.currentTime;
   o.type = 'square'; o.frequency.value = f;
-  g.gain.setValueAtTime(.04, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + d);
-  o.connect(g).connect(a.destination); o.start(); o.stop(t0 + d);
+  g.gain.setValueAtTime(.18, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + d);
+  o.connect(g).connect(MASTER); o.start(); o.stop(t0 + d + .01);
 }
 function updSoundBtn() { $('#soundBtn').innerHTML = soundOn ? icon('soundOn') + ' Zvuk' : icon('soundOff') + ' Ticho'; }
 
 /* ---------------- stav aplikácie ---------------- */
-let users = store.get(K_USERS, {});
-let U = null;               // odvodený aktuálny používateľ
-let reg = null;             // stav registrácie
+let U = null;               // odvodený aktuálny štítok
+let reg = null;             // stav dotazníka
 
 function show(id) {
   for (const s of document.querySelectorAll('.screen')) s.classList.toggle('hidden', s.id !== id);
-  const logged = id === 'scr-dash' || id === 'scr-machine' || (id === 'scr-reg' && reg && reg.editing);
-  $('#logoutBtn').classList.toggle('hidden', !logged);
-  $('#whoami').classList.toggle('hidden', !logged || !U);
+  const has = !!U && (id === 'scr-dash' || id === 'scr-machine' || (id === 'scr-reg' && reg && reg.editing));
+  $('#newBtn').classList.toggle('hidden', !has);
+  $('#whoami').classList.toggle('hidden', !has);
   if (U) $('#whoami').innerHTML = icon('card') + ' ' + esc(U.name);
   window.scrollTo(0, 0);
 }
 
-/* ================= PRIHLÁSENIE ================= */
-function renderSaved() {
-  const list = Object.values(users);
-  $('#savedWrap').classList.toggle('hidden', !list.length);
-  $('#savedCards').innerHTML = list.map(u =>
-    `<span class="pcard" data-k="${esc(u.key)}" role="button" tabindex="0">${esc(ascii(u.name))}<button class="del" data-del="${esc(u.key)}" title="Zmazať štítok" aria-label="Zmazať štítok">×</button></span>`).join('');
-}
-$('#savedCards').addEventListener('click', e => {
-  const del = e.target.closest('[data-del]');
-  if (del) {
-    e.stopPropagation();
-    const k = del.dataset.del;
-    if (confirm(`Naozaj skartovať štítok ${users[k].name}? Údaje sa z tohto prehliadača zmažú.`)) {
-      delete users[k]; store.set(K_USERS, users); renderSaved();
-    }
-    return;
-  }
-  const c = e.target.closest('.pcard');
-  if (c) { $('#loginName').value = users[c.dataset.k].name; $('#loginPin').focus(); }
-});
-$('#loginForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const k = keyOf($('#loginName').value), pin = $('#loginPin').value.trim();
-  const u = users[k];
-  if (!u) { $('#loginErr').textContent = 'Takýto štítok stroj nepozná. Zaregistrujte sa.'; beep(220, .25); return; }
-  if (u.pin !== fnv(k + ':' + pin)) { $('#loginErr').textContent = 'Nesprávne osobné číslo. Stroj sa mračí.'; beep(220, .25); return; }
-  $('#loginErr').textContent = '';
-  $('#loginPin').value = '';
-  store.set(K_SESSION, k);
-  U = derive(u);
-  showDash(true);
-});
+/* ================= ÚVOD (bez prihlasovania) ================= */
 $('#toRegister').addEventListener('click', () => startReg(false));
 $('#demoBtn').addEventListener('click', () => {
-  U = derive({ key: '__demo', name: 'Koudelka František', birth: KOUDELKA_BIRTH, answers: {}, demo: true });
+  U = derive({ name: 'Koudelka František', birth: KOUDELKA_BIRTH, answers: {}, demo: true });
   runMachine(() => showDash(false));
 });
 
@@ -315,7 +308,7 @@ function startReg(editing) {
   reg = {
     editing,
     step: 0,
-    data: editing ? { name: U.name, birth: U.birth, answers: { ...(U.answers || {}) } } : { name: '', pin: '', birth: '', answers: {} },
+    data: editing ? { name: U.name, birth: U.birth, answers: { ...(U.answers || {}) } } : { name: '', birth: '', answers: {} },
     steps: [...(editing ? [] : ['account']), 'birth', ...QUESTIONS.map(q => q.id)]
   };
   show('scr-reg');
@@ -325,14 +318,13 @@ function renderStep() {
   const id = reg.steps[reg.step], box = $('#regStep');
   $('#regErr').textContent = '';
   updRegCard();
-  $('#regBack').textContent = reg.step === 0 ? (reg.editing ? 'Zrušiť' : 'Späť na prihlásenie') : 'Späť';
+  $('#regBack').textContent = reg.step === 0 ? (reg.editing ? 'Zrušiť' : 'Späť na úvod') : 'Späť';
   $('#regNext').textContent = reg.step === reg.steps.length - 1 ? 'Hoď ho do stroja!' : 'Ďalej';
 
   if (id === 'account') {
-    box.innerHTML = `<div class="q-kicker">Nový štítok</div><h2 class="q-title">Kto ste, súdruh používateľ?</h2>
-      <label>Priezvisko a meno<input id="rName" type="text" maxlength="40" placeholder="napr. Koudelka František" value="${esc(reg.data.name)}"></label>
-      <label>Osobné číslo, 4 číslice (PIN)<input id="rPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" value="${esc(reg.data.pin)}"></label>
-      <p class="muted small-txt">Štítok sa uloží len v tomto prehliadači. PIN chráni pred zvedavým kolegom, nie pred rozviedkou.</p>`;
+    box.innerHTML = `<div class="q-kicker">Nový štítok</div><h2 class="q-title">Kto ste, súdruh občan?</h2>
+      <label>Priezvisko a meno<input id="rName" type="text" maxlength="40" autocomplete="name" placeholder="napr. Koudelka František" value="${esc(reg.data.name)}"></label>
+      <p class="muted small-txt">Rovnaké meno, dátum narodenia a odpovede dajú vždy rovnaký kondiciogram. Nič sa neposiela na server.</p>`;
     $('#rName').focus();
     $('#rName').addEventListener('input', () => { reg.data.name = $('#rName').value; updRegCard(); });
   } else if (id === 'birth') {
@@ -365,11 +357,9 @@ function updRegCard() { if (reg) renderCard($('#regCard'), cardText(reg.data)); 
 function nextStep() {
   const id = reg.steps[reg.step], err = m => { $('#regErr').textContent = m; beep(220, .25); };
   if (id === 'account') {
-    const name = $('#rName').value.trim(), pin = $('#rPin').value.trim();
+    const name = $('#rName').value.trim().replace(/\s+/g, ' ');
     if (name.length < 2) return err('Zadajte meno, aspoň 2 znaky.');
-    if (!/^\d{4}$/.test(pin)) return err('Osobné číslo musí mať presne 4 číslice.');
-    if (users[keyOf(name)]) return err('Tento štítok už existuje. Prihláste sa alebo zvoľte iné meno.');
-    reg.data.name = name; reg.data.pin = pin;
+    reg.data.name = name;
   } else if (id === 'birth') {
     const v = $('#rBirth').value;
     if (!v) return err('Bez dátumu narodenia stroj nepočíta.');
@@ -383,17 +373,11 @@ function nextStep() {
   finishReg();
 }
 function finishReg() {
-  const d = reg.data;
-  if (reg.editing) {
-    const base = { ...U, birth: d.birth, answers: d.answers };
-    if (!U.demo) { users[U.key] = { ...users[U.key], birth: d.birth, answers: d.answers }; store.set(K_USERS, users); }
-    U = derive(base);
-  } else {
-    const key = keyOf(d.name);
-    users[key] = { key, name: d.name, pin: fnv(key + ':' + d.pin), birth: d.birth, answers: d.answers, created: Date.now() };
-    store.set(K_USERS, users); store.set(K_SESSION, key);
-    U = derive(users[key]);
-  }
+  const d = reg.data, demo = reg.editing && U.demo;
+  const card = { name: d.name, birth: d.birth, answers: d.answers };
+  U = derive(demo ? { ...card, demo: true } : card);
+  // len aby sa výsledok nestratil po obnovení stránky; žiadne účty ani heslá
+  if (!demo) store.set(K_LAST, card);
   reg = null;
   runMachine(() => showDash(false));
 }
@@ -437,7 +421,7 @@ function runMachine(done) {
   $('#cardIn').classList.remove('feeding', 'gone');
   $('#paperOut').classList.remove('feed'); $('#paper0').innerHTML = '';
   $('#feedBtn').disabled = false;
-  $('#toDash').classList.add('hidden'); $('#machPrint').classList.add('hidden');
+  $('#toDash').classList.add('hidden'); $('#machPrint').classList.add('hidden'); $('#skipMachine').classList.remove('hidden');
   ttyShow(['SAMOCINNY POCITAC - PRIPRAVEN', `STITEK: ${ascii(U.name)}`, '', 'VLOZTE STITEK DO STROJE.', 'STISKNETE VELKE TLACITKO.']);
   machineDone = () => { const f = done; machineDone = null; machineStop(); f(); };
 }
@@ -471,7 +455,7 @@ $('#feedBtn').addEventListener('click', () => {
         onDone: () => {
           mach.classList.remove('busy');
           ttyShow([...msgs.slice(-3), 'HOTOVO. ODTRHNETE PAPIR.']);
-          $('#toDash').classList.remove('hidden'); $('#machPrint').classList.remove('hidden');
+          $('#toDash').classList.remove('hidden'); $('#machPrint').classList.remove('hidden'); $('#skipMachine').classList.add('hidden');
           $('#toDash').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
       });
@@ -494,35 +478,20 @@ setInterval(() => {
 }, 2800);
 
 /* ================= VHODNÝ PARTNER / PARTNERKA ================= */
-const NAMES = {
-  f: {
-    first: ['Zuzana', 'Katarína', 'Lucia', 'Martina', 'Jana', 'Veronika', 'Monika', 'Andrea', 'Simona', 'Petra', 'Barbora', 'Michaela', 'Dominika', 'Ivana', 'Eva', 'Kristína', 'Lenka', 'Alžbeta', 'Silvia', 'Adriana', 'Natália', 'Soňa', 'Beáta', 'Viera', 'Helena', 'Gabriela', 'Daniela', 'Miroslava'],
-    last: ['Horváthová', 'Kováčová', 'Vargová', 'Tóthová', 'Baloghová', 'Lukáčová', 'Hudáková', 'Šimková', 'Mikulová', 'Benková', 'Poláková', 'Krajčírová', 'Oravcová', 'Blahová', 'Kučerová', 'Štefanková', 'Jurčová', 'Hrušková', 'Gajdošová', 'Balážová', 'Pekárová', 'Ďuricová', 'Chovancová', 'Matušková', 'Záhorská', 'Kollárová'],
-    job: ['učiteľka na základnej škole', 'zdravotná sestra', 'účtovníčka v stavebnej firme', 'knihovníčka', 'kaderníčka s vlastným salónom', 'architektka', 'lekárnička', 'programátorka', 'cukrárka', 'veterinárka', 'sprievodkyňa vo vlaku', 'fotografka', 'referentka na mestskom úrade', 'fyzioterapeutka'],
-    ad: ['Hľadá muža, s ktorým sa dá rozprávať aj mlčať.', 'Rada spozná niekoho, kto neutečie pred prvou túrou.', 'Hľadá partnera, ktorý vie, kde je v kuchyni linka.', 'Ozvi sa, ak máš rád nedeľné obedy a dlhé prechádzky.', 'Hľadá gavaliera, ktorý otvorí dvere aj fľašu vína.']
-  },
-  m: {
-    first: ['Peter', 'Martin', 'Tomáš', 'Michal', 'Juraj', 'Marek', 'Ján', 'Jozef', 'Lukáš', 'Milan', 'Róbert', 'Pavol', 'Miroslav', 'Stanislav', 'Dušan', 'Igor', 'Rastislav', 'Matej', 'Vladimír', 'Ondrej', 'Branislav', 'Radovan', 'Ľubomír', 'Viliam', 'Roman', 'Daniel'],
-    last: ['Horváth', 'Kováč', 'Varga', 'Tóth', 'Balogh', 'Lukáč', 'Hudák', 'Šimko', 'Mikula', 'Benko', 'Polák', 'Krajčír', 'Oravec', 'Blaho', 'Kučera', 'Štefanko', 'Jurčo', 'Hruška', 'Gajdoš', 'Baláž', 'Pekár', 'Ďurica', 'Chovanec', 'Matuška', 'Záhorský', 'Kollár'],
-    job: ['učiteľ telesnej výchovy', 'záchranár', 'účtovník', 'automechanik', 'architekt', 'lekárnik', 'programátor', 'kuchár', 'veterinár', 'rušňovodič', 'fotograf', 'elektrikár', 'stolár s vlastnou dielňou', 'geodet'],
-    ad: ['Hľadá ženu, s ktorou sa dá rozprávať aj mlčať.', 'Rád spozná niekoho, kto sa nebojí stanu a dažďa.', 'Vie uvariť halušky aj opraviť kvapkajúci kohútik.', 'Ozvi sa, ak máš rada výlety a večery pri platniach.', 'Hľadá dámu, ktorá sa smeje aj na jeho vtipoch.']
-  },
-  cities: ['Bratislave', 'Košiciach', 'Prešove', 'Žiline', 'Nitre', 'Banskej Bystrici', 'Trnave', 'Trenčíne', 'Martine', 'Poprade', 'Prievidzi', 'Zvolene', 'Považskej Bystrici', 'Michalovciach', 'Nových Zámkoch', 'Spišskej Novej Vsi', 'Komárne', 'Leviciach', 'Humennom', 'Bardejove', 'Liptovskom Mikuláši', 'Ružomberku', 'Piešťanoch', 'Topoľčanoch', 'Lučenci', 'Rožňave', 'Dolnom Kubíne', 'Senici', 'Skalici', 'Banskej Štiavnici', 'Kežmarku', 'Levoči', 'Pezinku', 'Malackách'],
-  hobby: ['turistika v Tatrách', 'záhradka na chate', 'volejbal', 'tanečné kurzy', 'krížovky', 'huby a les', 'platne zo 70. rokov', 'plávanie', 'bežky', 'šach', 'rybačka', 'divadlo', 'motorky Jawa', 'bicykel', 'pečenie koláčov', 'kino']
-};
+// zoznamy mien, miest, povolaní, záľub a inzerátov sú v names.js
 const ZODIAC = [[120, 'Kozorožec'], [219, 'Vodnár'], [321, 'Ryby'], [420, 'Baran'], [521, 'Býk'], [621, 'Blíženci'], [723, 'Rak'], [823, 'Lev'], [923, 'Panna'], [1023, 'Váhy'], [1122, 'Škorpión'], [1222, 'Strelec'], [1300, 'Kozorožec']];
 const zodiac = n => { const f = fromN(n), k = (f.m + 1) * 100 + f.d; return ZODIAC.find(z => k < z[0])[1]; };
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const pick = (r, arr) => arr[Math.floor(r() * arr.length)];
 const compatPct = d => { const p = {}; for (const ch of CH) p[ch] = Math.round((Math.cos(2 * Math.PI * d / P[ch]) + 1) / 2 * 100); p.T = Math.round((p.F + p.C + p.I) / 3); return p; };
 let matchIdx = 0, matchList = [], matchKey = '';
-// kandidáti: dátumy narodenia ±12 rokov (min. 18-roční), zoradené podľa zhody cyklov
+// kandidáti: dátumy narodenia ±12 rokov (vek 18 až 90), zoradené podľa zhody cyklov
 function matchCandidates() {
-  const adult = todayN() - 18 * 365.25, cand = [];
+  const adult = todayN() - 18 * 365.25, oldest = todayN() - 90 * 365.25, cand = [];
   for (let d = -4383; d <= 4383; d++) {
     if (Math.abs(d) < 200) continue;
     const b = U.birthN + d;
-    if (b > adult || b < dn(1900, 0, 1)) continue;
+    if (b > adult || b < oldest) continue;
     cand.push({ b, p: compatPct(d) });
   }
   cand.sort((x, y) => y.p.T - x.p.T);
@@ -531,15 +500,15 @@ function matchCandidates() {
   return out;
 }
 function renderMatch(step) {
-  const sex = $('#mSex').value, key = U.key + U.birth + sex;
+  const sex = $('#mSex').value, key = nameSeed(U.name) + U.birth + sex;
   if (key !== matchKey) { matchKey = key; matchList = matchCandidates(); matchIdx = 0; }
   if (step) matchIdx = (matchIdx + 1) % Math.max(1, matchList.length);
   const out = $('#mOut');
-  if (!matchList.length) { out.innerHTML = '<p>Stroj páruje len dospelých. Vráťte sa, keď budete mať 18 rokov.</p>'; return; }
+  if (!matchList.length) { out.innerHTML = '<p>Stroj páruje ľudí od 18 do 90 rokov. Vo vašom okolí ±12 rokov nikoho takého nenašiel.</p>'; return; }
   const c = matchList[matchIdx], r = rng(fnv(key + ':' + matchIdx)), N = NAMES[sex];
   const name = `${pick(r, N.first)} ${pick(r, N.last)}`, city = pick(r, NAMES.cities), job = pick(r, N.job);
   const hob = [pick(r, NAMES.hobby)], h2 = pick(r, NAMES.hobby); if (h2 !== hob[0]) hob.push(h2);
-  const age = ageYears(c.b, todayN()), adTxt = pick(r, N.ad);
+  const age = ageYears(c.b, todayN()), adTxt = pick(r, NAMES.ads);
   const other = { birthN: c.b, bias: { F: 0, C: 0, I: 0 } };
   let best = null;
   for (let n = todayN(); n < todayN() + 60; n++) {
@@ -550,9 +519,9 @@ function renderMatch(step) {
   }
   out.innerHTML = `<div class="ad-clip">
       <p class="who">${esc(name)}</p>
-      <p class="meta">nar. ${fmt(c.b)} v ${esc(city)} · ${age} ${yearsWord(age)} · ${zodiac(c.b)}</p>
+      <p class="meta">nar. ${fmt(c.b)} ${esc(city)} · ${age} ${yearsWord(age)} · ${zodiac(c.b)}</p>
       <p>${icon('stress')} ${esc(job[0].toUpperCase() + job.slice(1))}</p>
-      <p>${icon('pin')} Žije v ${esc(city)}</p>
+      <p>${icon('pin')} Žije ${esc(city)}</p>
       <p>${hob.map(h => `<span class="tag">${esc(h)}</span>`).join('')}</p>
       <p><i>„${esc(adTxt)}“</i></p>
       <p class="muted small-txt">Kandidát ${matchIdx + 1} z ${matchList.length}. Fiktívna osoba, ktorú vygeneroval stroj.</p>
@@ -781,7 +750,7 @@ function buildLines(u, months, avail) {
   const chunk = avail >= 13 + 93 ? 31 : Math.max(5, Math.floor((avail - 13) / 3));
   const width = 12 + 3 * Math.min(31, chunk);
   const multiYear = months.some(o => o.y !== months[0].y);
-  const serial = String(fnv(u.name + u.birth) % 1000000).padStart(6, '0');
+  const serial = String(fnv(nameSeed(u.name) + u.birth) % 1000000).padStart(6, '0');
   L.push('KONDICIOGRAM'.padEnd(Math.max(14, width - 10)) + 'C. ' + serial);
   L.push('JMENO: ' + ascii(u.name));
   L.push('');
@@ -880,11 +849,12 @@ $('#editBtn').addEventListener('click', () => startReg(true));
 $('#refeedBtn').addEventListener('click', () => runMachine(() => showDash(false)));
 
 /* ================= VŠEOBECNÉ ================= */
-$('#soundBtn').addEventListener('click', () => { soundOn = !soundOn; store.set(K_SOUND, soundOn); updSoundBtn(); beep(880, .05); });
-$('#logoutBtn').addEventListener('click', () => {
-  store.del(K_SESSION); U = null; reg = null;
-  if (machineTimer) { clearInterval(machineTimer); machineTimer = null; machineDone = null; }
-  renderSaved(); show('scr-login');
+$('#soundBtn').addEventListener('click', () => { soundOn = !soundOn; store.set(K_SOUND, soundOn); updSoundBtn(); if (soundOn) { unlockAudio(); printerBurst(24); } });
+// „Nový kondiciogram“: zahodí posledný štítok a začne odznova
+$('#newBtn').addEventListener('click', () => {
+  store.del(K_LAST); U = null; reg = null;
+  machineStop(); machineDone = null;
+  startReg(false);
 });
 let rT = null;
 window.addEventListener('resize', () => {
@@ -912,8 +882,7 @@ function initAds() {
 (function init() {
   initAds();
   updSoundBtn();
-  renderSaved();
-  const k = store.get(K_SESSION, null);
-  if (k && users[k]) { U = derive(users[k]); showDash(false); }
+  const last = store.get(K_LAST, null);
+  if (last && last.name && last.birth) { U = derive(last); showDash(false); }
   else show('scr-login');
 })();

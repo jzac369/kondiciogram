@@ -17,16 +17,16 @@
 <body>
 <div class="stripes no-print"></div>
 <header class="topbar no-print">
-  <div class="logo"><span class="logo-mark">*•0×</span><span>KONDICIOGRAM</span></div>
+  <div class="logo"><span class="logo-mark">*•0×</span><span class="logo-txt film"><span class="film-b">Kondiciogram</span></span></div>
   <div class="top-right">
     <button id="soundBtn" class="chip" type="button" title="Zvuk tlačiarne">Zvuk</button>
     <span id="whoami" class="chip plain hidden"></span>
-    <button id="logoutBtn" class="chip hidden" type="button">Odhlásiť</button>
+    <button id="newBtn" class="chip hidden" type="button">Nový kondiciogram</button>
   </div>
 </header>
 
 <main>
-  <!-- ============ PRIHLÁSENIE ============ -->
+  <!-- ============ ÚVOD ============ -->
   <section id="scr-login" class="screen">
     <div class="hero">
       <div class="poster">
@@ -43,23 +43,14 @@
 
       <div class="card login-card">
         <h2>Výpočtové stredisko</h2>
-        <p class="muted">Vložte svoj štítok, teda meno a štvormiestne osobné číslo.</p>
-        <form id="loginForm" autocomplete="off">
-          <label>Priezvisko a meno
-            <input id="loginName" type="text" maxlength="40" placeholder="napr. Koudelka František" required>
-          </label>
-          <label>Osobné číslo (PIN)
-            <input id="loginPin" type="password" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="••••" required>
-          </label>
-          <div id="loginErr" class="err" role="alert"></div>
-          <button class="btn" type="submit">Vložiť štítok do stroja</button>
-        </form>
-        <div id="savedWrap" class="saved hidden">
-          <h3>Štítky uložené v tomto počítači</h3>
-          <div id="savedCards" class="saved-cards"></div>
-        </div>
+        <p>Vyplňte dierny štítok: meno, dátum narodenia a 9 krátkych otázok. Stroj ho spracuje a vytlačí váš osobný kondiciogram.</p>
+        <ul class="intro-list">
+          <li>bez registrácie a bez hesiel</li>
+          <li>trvá asi minútu</li>
+          <li>rovnaké údaje dajú vždy rovnaký výsledok</li>
+        </ul>
         <div class="login-alt">
-          <button id="toRegister" class="btn ghost" type="button">Nový štítok (registrácia)</button>
+          <button id="toRegister" class="btn" type="button">Vyplniť štítok</button>
           <button id="demoBtn" class="btn ghost" type="button">Skúsiť ako Fr. Koudelka</button>
         </div>
       </div>
@@ -124,6 +115,13 @@
         <button id="toDash" class="btn hidden" type="button">Pokračovať na nástenku</button>
         <button id="skipMachine" class="btn ghost small" type="button">Preskočiť</button>
       </div>
+      <aside class="ad-slot" aria-label="Reklama">
+        <div class="ad-label">Reklama · Inzercia</div>
+        <div class="ad-body">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="0000000002" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <div class="ad-ph">Tu môže byť vaša reklama.<br><small>Priestor pre Google AdSense</small></div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -301,6 +299,7 @@
   <p>Fanúšikovská hračka k filmu <i>Jáchyme, hoď ho do stroje!</i> (1974). Všetky údaje zostávajú iba v tomto prehliadači.</p>
 </footer>
 <div id="printSheet" class="print-sheet" aria-hidden="true"></div>
+<script src="names.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -490,7 +490,7 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 /* malé telefóny (do 380) */
 @media (max-width:380px){
   .title .film-b{font-size:2.6rem}
-  .logo span:last-child{display:none}
+  .logo-txt{font-size:1.3rem}
   .film-btn{font-size:1.3rem}
 }
 
@@ -502,3 +502,19 @@ footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 }
 .kbd-hint{display:none;margin:10px 0 0;font:.8rem "Courier Prime";color:#86603f}
 @media (hover:hover) and (pointer:fine){ .kbd-hint{display:block} }
+
+/* ---- úvod bez prihlasovania ---- */
+.intro-list{list-style:none;padding:0;margin:0 0 6px}
+.intro-list li{position:relative;padding:4px 0 4px 26px;font-weight:500}
+.intro-list li::before{content:"*";position:absolute;left:4px;top:2px;font:700 1.2rem "Courier Prime";color:var(--orange)}
+.login-card{display:flex;flex-direction:column}
+.login-card .login-alt{margin-top:auto;padding-top:16px}
+.login-card .login-alt .btn{width:100%}
+
+/* ---- logo v štýle filmových titulkov ---- */
+.logo-txt{font-size:1.9rem;letter-spacing:.05em;transform:rotate(-2deg);display:inline-block;margin-top:-2px}
+.logo-txt .film-b{text-shadow:-2px -2px 0 #111,2px -2px 0 #111,-2px 2px 0 #111,2px 2px 0 #111,0 3px 0 #111,3px 0 0 #111,-3px 0 0 #111,0 -3px 0 #111,4px 4px 0 rgba(0,0,0,.45)}
+
+/* ---- reklama pod strojom ---- */
+.mach-wrap .ad-slot{margin-top:30px}
+@media (max-width:680px){ .logo-txt{font-size:1.5rem} }

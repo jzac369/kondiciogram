@@ -10,7 +10,7 @@ Stačí otvoriť `index.html` v prehliadači. Server ani build nie sú potrebné
 
 ## Čo stránka vie
 
-- **Prihlásenie** menom a štvormiestnym PIN-om. Účty sú uložené iba v prehliadači (localStorage).
+- **Bez registrácie a hesiel.** Stačí vyplniť štítok. Rovnaké meno, dátum narodenia a odpovede dajú vždy rovnaký kondiciogram. Posledný štítok si prehliadač zapamätá, aby sa výsledok nestratil po obnovení stránky.
 - **Dotazník** s 9 otázkami: spánok, pohyb, káva, pivo, stres, láska, tréning hlavy, denný rytmus a povolanie.
 - **Dierny štítok** v Hollerithovom kóde (80 stĺpcov), ktorý sa dieruje priebežne podľa odpovedí.
 - **Stroj:** štítok zajde do stroja a z tlačiarne vyjde kondiciogram so zvukom ihličkovej tlačiarne.
