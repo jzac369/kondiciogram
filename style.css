@@ -1,0 +1,504 @@
+:root{
+  --cream:#f3e2bf;
+  --cream2:#ead4a6;
+  --card:#fbf3e1;
+  --brown:#4a2a14;
+  --brown2:#7b4623;
+  --orange:#d65a24;
+  --mustard:#e3a21c;
+  --olive:#6d7526;
+  --teal:#1f6a62;
+  --red:#b8241b;
+  --ink:#2c2b33;
+  --paper:#f5f3ec;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--brown);
+  font:16px/1.5 "Rubik",system-ui,sans-serif;
+  background-color:var(--cream);
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(214,90,36,.07) 0 22px, transparent 23px),
+    radial-gradient(circle at 75% 75%, rgba(227,162,28,.09) 0 22px, transparent 23px);
+  background-size:96px 96px;
+}
+.hidden{display:none!important}
+h1,h2,h3{font-family:"Righteous",sans-serif;font-weight:400;margin:0 0 .5em;letter-spacing:.01em}
+h2{font-size:1.6rem}
+h3{font-size:1.25rem}
+p{margin:0 0 .8em}
+.muted{color:#86603f}
+.small-txt{font-size:.85rem}
+.err{color:var(--red);font-weight:500;min-height:1.4em;margin:.3em 0}
+img{max-width:100%;display:block}
+
+.stripes{height:18px;background:linear-gradient(to bottom,var(--orange) 0 33%,var(--mustard) 33% 66%,var(--brown2) 66%)}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:12px 24px;background:var(--brown);color:var(--cream)}
+.logo{display:flex;align-items:center;gap:12px;font-family:"Righteous";font-size:1.35rem;letter-spacing:.08em}
+.logo-mark{font-family:"Courier Prime";font-weight:700;background:var(--mustard);color:var(--brown);
+  padding:2px 10px;border-radius:8px;letter-spacing:.15em}
+.top-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font:500 .9rem "Rubik";background:transparent;color:var(--cream);border:2px solid var(--cream2);
+  border-radius:999px;padding:4px 14px;cursor:pointer}
+.chip:hover{background:rgba(243,226,191,.12)}
+.chip.plain{cursor:default;border-color:var(--mustard);color:var(--mustard)}
+
+main{max-width:1180px;margin:0 auto;padding:28px 16px 40px}
+
+/* ---------- common ---------- */
+.card{background:var(--card);border:3px solid var(--brown);border-radius:20px;
+  box-shadow:7px 7px 0 var(--brown);padding:22px}
+.btn{font:1rem "Righteous";letter-spacing:.03em;cursor:pointer;
+  background:var(--orange);color:#fff7e6;border:3px solid var(--brown);border-radius:999px;
+  padding:.65em 1.4em;box-shadow:3px 3px 0 var(--brown);transition:transform .08s,box-shadow .08s}
+.btn:hover{background:#e56a30}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--brown)}
+.btn.ghost{background:var(--cream);color:var(--brown)}
+.btn.ghost:hover{background:var(--mustard)}
+.btn.small{font-size:.9rem;padding:.45em 1em}
+label{display:block;font-weight:500;margin:.6em 0;font-size:.95rem}
+input,select{display:block;width:100%;margin-top:4px;font:1.05rem "Courier Prime",monospace;color:var(--ink);
+  background:#fffdf5;border:2px solid var(--brown);border-radius:10px;padding:.55em .7em}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--mustard);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:.6em 0}
+
+/* ---------- login / hero ---------- */
+.hero{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:stretch}
+.poster{position:relative;overflow:hidden;border-radius:26px;border:3px solid var(--brown);
+  box-shadow:7px 7px 0 var(--brown);background:var(--brown2);min-height:480px}
+.sunburst{position:absolute;inset:-50%;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,var(--orange) 0 9deg,var(--mustard) 9deg 18deg);
+  opacity:.9;animation:spin 120s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.poster-inner{position:relative;padding:28px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;height:100%}
+.tv{margin:0;background:#5b3319;padding:14px 14px 10px;border-radius:30px;border:3px solid var(--brown);
+  box-shadow:inset 0 0 0 4px #8a5a2f,5px 5px 0 var(--brown);transform:rotate(-3deg)}
+.tv img{width:220px;height:250px;object-fit:cover;object-position:74% 36%;border-radius:22px;
+  filter:saturate(1.05)}
+.tv figcaption{font:.75rem "Courier Prime";color:var(--cream);text-align:center;margin-top:6px}
+.title{font-size:3.3rem;line-height:1.02;color:#fff4dc;
+  text-shadow:3px 3px 0 var(--orange),6px 6px 0 var(--brown)}
+.tagline{grid-column:1/-1;background:rgba(74,42,20,.88);color:var(--cream);padding:12px 16px;border-radius:14px;margin:0}
+.login-card h2{margin-bottom:.2em}
+.login-card form .btn{width:100%;margin-top:.4em}
+.login-alt{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.saved{margin-top:18px}
+.saved h3{font-size:1rem}
+.saved-cards{display:flex;flex-wrap:wrap;gap:8px}
+.pcard{position:relative;font:700 .85rem "Courier Prime";color:var(--brown);cursor:pointer;
+  background:#f1e4b8 repeating-linear-gradient(90deg,transparent 0 9px,rgba(74,42,20,.12) 9px 10px);
+  border:2px solid var(--brown);padding:6px 30px 6px 14px;
+  clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px)}
+.pcard:hover{background-color:var(--mustard)}
+.pcard .del{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:none;
+  font:700 1rem "Rubik";color:var(--red);cursor:pointer;padding:0 6px}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px}
+.how-step{background:var(--brown);color:var(--cream);border-radius:20px;padding:20px;position:relative}
+.how-step .num{position:absolute;top:-14px;right:16px;width:44px;height:44px;border-radius:50%;
+  background:var(--mustard);color:var(--brown);font:1.5rem/44px "Righteous";text-align:center;border:3px solid var(--brown)}
+.how-step h3{color:var(--mustard)}
+.how-step p{margin:0}
+
+/* ---------- registration ---------- */
+.reg-card{max-width:680px;margin:0 auto}
+.punch{display:flex;gap:6px;flex-wrap:wrap;padding:12px 14px 12px 26px;margin:-6px 0 18px;
+  background:#efe1b3;border:2px solid var(--brown);
+  clip-path:polygon(16px 0,100% 0,100% 100%,0 100%,0 16px)}
+.punch span{width:12px;height:22px;border:1.5px solid rgba(74,42,20,.5);border-radius:2px}
+.punch span.on{background:var(--brown);border-color:var(--brown)}
+.q-kicker{font:700 .8rem "Courier Prime";letter-spacing:.14em;color:var(--orange);text-transform:uppercase}
+.q-title{font-size:1.5rem}
+.opts{display:grid;gap:10px;margin-top:12px}
+.opt{text-align:left;font:500 1rem "Rubik";color:var(--brown);cursor:pointer;
+  background:#fffaf0;border:2px solid var(--brown);border-radius:14px;padding:12px 16px;display:flex;gap:12px;align-items:center}
+.opt:hover{background:#fbe6b0}
+.opt .ico{font-size:1.4rem;width:1.6em;text-align:center}
+.opt.sel{background:var(--orange);color:#fff7e6;box-shadow:3px 3px 0 var(--brown)}
+.reg-nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.birth-hint{font:1rem "Courier Prime";color:var(--teal);min-height:1.5em;margin-top:6px}
+
+/* ---------- machine ---------- */
+.machine{max-width:760px;margin:0 auto;background:#3b3a36;border:4px solid #1d1c1a;border-radius:22px;
+  padding:22px;box-shadow:8px 8px 0 var(--brown);text-align:center;color:#e9e4d4}
+.machine-panel{display:flex;gap:22px;align-items:center;justify-content:center;flex-wrap:wrap;
+  background:linear-gradient(#6f6b61,#57544c);border-radius:14px;padding:18px;border:3px solid #1d1c1a}
+.reels{display:flex;gap:18px}
+.reel{width:92px;height:92px;border-radius:50%;border:6px solid #cfc9b8;position:relative;
+  background:
+   radial-gradient(circle,#2a2a28 0 12px,transparent 13px),
+   conic-gradient(#8b8676 0 20deg,#3a3935 20deg 120deg,#8b8676 120deg 140deg,#3a3935 140deg 240deg,#8b8676 240deg 260deg,#3a3935 260deg 360deg);
+  animation:spin 1.6s linear infinite}
+.reel.r2{animation-duration:1.1s;animation-direction:reverse}
+.lamps{display:grid;grid-template-columns:repeat(8,16px);gap:8px}
+.lamps i{width:16px;height:16px;border-radius:50%;background:#5a1c10;animation:blink 1s steps(1) infinite}
+.lamps i.g{background:#244a1e;animation-name:blinkg}
+@keyframes blink{50%{background:#ff6b3a;box-shadow:0 0 10px #ff6b3a}}
+@keyframes blinkg{50%{background:#8dff6b;box-shadow:0 0 10px #8dff6b}}
+.tty{margin:18px 0;background:#08140b;color:#8dff9f;text-align:left;font:1.35rem/1.25 "VT323",monospace;
+  border-radius:12px;padding:16px;min-height:230px;border:3px solid #1d1c1a;text-shadow:0 0 6px rgba(141,255,159,.6)}
+.tty .cur{animation:blink2 .7s steps(1) infinite}
+@keyframes blink2{50%{opacity:0}}
+.shout{font-size:2.3rem;color:var(--mustard);text-shadow:3px 3px 0 var(--orange);opacity:0;transform:scale(.6);transition:all .4s cubic-bezier(.2,1.6,.4,1)}
+.shout.on{opacity:1;transform:none}
+
+/* ---------- dashboard ---------- */
+#scr-dash > *{margin-bottom:26px}
+.dash-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  background:var(--brown);color:var(--cream)}
+.dash-head h2{color:var(--mustard);margin-bottom:.2em}
+.facts{margin:0;max-width:760px}
+.facts b{color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.card-title{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.stamp{font:700 .85rem "Courier Prime";color:var(--red);border:2px solid var(--red);border-radius:6px;padding:1px 8px;transform:rotate(-2deg)}
+.meters{display:flex;justify-content:space-around;gap:6px;flex-wrap:wrap;margin:8px 0}
+.meter{text-align:center;flex:1 1 0;min-width:88px;max-width:150px}
+.meter svg{width:100%;height:auto}
+.meter .lbl{font:700 .85rem "Courier Prime";letter-spacing:.06em}
+.meter .val{font:1.3rem "VT323"}
+.meter .needle{transition:transform 1.2s cubic-bezier(.3,1.5,.5,1);transform-origin:75px 82px}
+.overall{display:flex;gap:16px;align-items:center;margin:10px 0 6px}
+.nixie{font:3rem/1 "VT323";color:#ffb347;background:#1d120b;border:3px solid var(--brown);border-radius:12px;
+  padding:6px 14px;min-width:96px;text-align:center;text-shadow:0 0 8px #ff8a1f,0 0 18px #ff6a00}
+.verdict-head{font:1.35rem "Righteous"}
+.verdict-head.crit{color:var(--red)}
+.verdict-list{list-style:none;padding:0;margin:10px 0}
+.verdict-list li{padding:8px 0 8px 36px;border-top:1px dashed rgba(74,42,20,.35);position:relative}
+.verdict-list li b{font-family:"Courier Prime"}
+.verdict-list li .s{position:absolute;left:4px;top:6px;width:24px;height:24px;border-radius:6px;text-align:center;
+  font:700 1rem/24px "Courier Prime";background:var(--brown);color:var(--cream)}
+.verdict-list li.crit .s{background:var(--red)}
+.best-hour{margin:0;font-weight:500;color:var(--teal)}
+.alarm{background:var(--red);color:#fff;padding:10px 14px;border-radius:12px;font-weight:500;margin:8px 0;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(184,36,27,.25)}}
+
+.crt{background:#06140b;border:12px solid #3b3a36;border-radius:22px;position:relative;overflow:hidden;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.9),0 0 0 3px var(--brown)}
+.crt::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,rgba(0,0,0,.25) 0 1px,transparent 1px 3px),
+             radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.55))}
+#scope{display:block;width:100%;height:240px}
+.scope-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:.9rem}
+.scope-legend i{display:inline-block;width:18px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* ---------- printer & paper ---------- */
+.printer-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.printer-head h3{margin:0}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.controls select,.controls input{width:auto;margin:0;font-size:.95rem;padding:.4em .6em}
+.controls input{width:6.5em}
+.printer-slot{background:linear-gradient(#58564f,#2f2e2a);color:#d9d3c0;font:1rem "VT323";letter-spacing:.1em;
+  border-radius:14px 14px 4px 4px;padding:10px 16px;border:3px solid #1d1c1a;display:flex;align-items:center;gap:10px}
+.led{width:10px;height:10px;border-radius:50%;background:#7dff6b;box-shadow:0 0 8px #7dff6b}
+.printer.busy .led{animation:blink2 .25s steps(1) infinite}
+.paper-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.paper{position:relative;margin:0 auto;padding:22px 52px 30px;min-height:120px;
+  background:linear-gradient(90deg,rgba(0,0,0,.07),transparent 18%,transparent 82%,rgba(0,0,0,.05)),var(--paper);
+  color:var(--ink);font:15px/1.5 "Courier Prime",monospace;
+  box-shadow:0 6px 14px rgba(0,0,0,.18);border-left:1px dashed #cfcac0;border-right:1px dashed #cfcac0}
+.paper::before,.paper::after{content:"";position:absolute;top:0;bottom:0;width:34px;
+  background:radial-gradient(circle at 17px 12px,#d9cdb4 0 5px,transparent 6px) 0 0/34px 24px repeat-y;
+  border-right:1px dashed #cfcac0}
+.paper::before{left:0}
+.paper::after{right:0;border-right:0;border-left:1px dashed #cfcac0}
+#paper2{margin-top:18px}
+.pl{white-space:pre;min-height:1.5em;text-shadow:0 0 .7px rgba(20,20,30,.75)}
+.pl.new{animation:head .28s steps(28) both}
+@keyframes head{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.pl .td,.pl .tdn{position:relative;color:var(--red)}
+.pl .tdn::after{content:"";position:absolute;left:-7px;right:-7px;top:-4px;bottom:-4px;border:2px solid var(--red);
+  border-radius:50%;transform:rotate(-9deg);opacity:.85}
+.pl.muted-line{color:#6b6a73}
+
+/* ---------- side cards ---------- */
+.grid3 .card > select{margin:.3em 0 .6em}
+.plan-out{padding-left:1.3em;margin:.8em 0 0}
+.plan-out li{margin:.45em 0}
+.plan-out .syms{font:700 .9rem "Courier Prime";color:var(--teal);letter-spacing:.2em}
+.bar{height:14px;background:#e7d4a9;border:2px solid var(--brown);border-radius:8px;overflow:hidden;margin:3px 0 8px}
+.bar i{display:block;height:100%;background:var(--orange);transition:width .9s ease}
+.bar-lbl{display:flex;justify-content:space-between;font-size:.9rem}
+.p-total{font:1.2rem "Righteous";margin:.6em 0 .2em}
+.risk-out{list-style:none;padding:0;margin:0 0 12px}
+.risk-out li{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed rgba(74,42,20,.3);font-size:.95rem}
+.risk-out .d{font:700 .9rem "Courier Prime";min-width:6.4em}
+.risk-out .x{color:var(--red);font-weight:700;font-family:"Courier Prime"}
+.milestones{background:var(--brown);color:var(--cream);border-radius:14px;padding:12px 14px;font-size:.93rem}
+.milestones b{color:var(--mustard)}
+.milestones p{margin:.3em 0}
+
+/* ---------- legend ---------- */
+.legend-grid{display:grid;grid-template-columns:260px 1fr;gap:26px;align-items:start}
+.legend-photo{margin:0;background:var(--brown);padding:10px;border-radius:16px;transform:rotate(2deg)}
+.legend-photo img{width:100%;border-radius:10px;filter:sepia(.25) saturate(1.2)}
+.legend-photo figcaption,.orig figcaption{color:var(--cream);font:.8rem "Courier Prime";text-align:center;margin-top:6px}
+.signs{display:grid;grid-template-columns:40px 1fr;gap:8px 12px;margin:0 0 14px}
+.signs dt{font:700 1.4rem/1.2 "Courier Prime";background:var(--brown);color:var(--cream);border-radius:8px;text-align:center;height:34px;line-height:34px}
+.signs dd{margin:0;align-self:center}
+.proof{display:grid;grid-template-columns:1fr 200px;gap:22px;align-items:center;margin-top:22px;padding-top:20px;border-top:3px dotted var(--brown)}
+.orig{margin:0;background:var(--brown);padding:8px;border-radius:14px;transform:rotate(-2deg)}
+.orig img{border-radius:8px;max-height:260px;object-fit:cover;width:100%}
+
+footer{text-align:center;font-size:.9rem;color:var(--brown2)}
+footer p{padding:14px 16px 24px;margin:0}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .hero,.grid2{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+}
+@media (max-width:680px){
+  .grid3,.how,.legend-grid,.proof{grid-template-columns:1fr}
+  .poster-inner{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .tv img{width:200px;height:220px}
+  .title{font-size:2.5rem}
+  .poster{min-height:0}
+  .paper{padding:16px 30px 22px;font-size:12px}
+  .printer-card{padding:16px 10px}
+  .paper::before,.paper::after{width:26px;background-size:26px 24px;background-position:-4px 0}
+  .legend-photo{max-width:320px}
+  .orig{max-width:240px}
+  .shout{font-size:1.7rem}
+  .topbar{padding:10px 16px}
+  .logo{font-size:1.05rem}
+  .chip{font-size:.8rem;padding:3px 10px}
+  .meter .lbl{font-size:.7rem}
+  .card{padding:18px 16px}
+}
+
+/* ---------- print ---------- */
+/* Tlač: na papier ide len samostatný hárok #printSheet (perforovaný papier s dierkami) */
+.print-sheet{display:none}
+@media print{
+  @page{size:A4 landscape;margin:7mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{background:#fff!important;margin:0}
+  body > *:not(.print-sheet){display:none!important}
+  .print-sheet{display:block}
+  .print-sheet .paper{box-shadow:none;margin:0 auto;max-width:none;width:100%;font-size:11.5px;line-height:1.42;
+    padding:14px 50px 18px;background:#f5f3ec;border-left:1px dashed #b9b3a6;border-right:1px dashed #b9b3a6}
+  .print-sheet .paper::before,.print-sheet .paper::after{
+    background:radial-gradient(circle at 17px 12px,#fff 0 5px,#cfc6b2 5px 6px,transparent 6.5px) 0 0/34px 24px repeat-y}
+  .print-sheet .blk{break-inside:avoid;page-break-inside:avoid}
+  .print-sheet .pl{text-shadow:none}
+  .print-sheet .tear{border-top:2px dashed #b9b3a6;margin:10px -50px 0;padding-top:4px;text-align:center;font:9px "Courier Prime";color:#8c8577;letter-spacing:.3em}
+}
+
+/* =========================================================
+   FILMOVÉ PÍSMO (titulky), DIERNY ŠTÍTOK, STROJ, ZOZNAMKA, REKLAMA
+   ========================================================= */
+.film{font-family:"Bangers",cursive;letter-spacing:.04em;line-height:1}
+.film-s,.film-b{display:block;
+  text-shadow:-2px -2px 0 #111,2px -2px 0 #111,-2px 2px 0 #111,2px 2px 0 #111,0 3px 0 #111,3px 0 0 #111,-3px 0 0 #111,0 -3px 0 #111}
+.film-s{color:#7fb3ae}
+.film-b{color:#e2472b}
+.title.film{font-family:"Bangers";text-shadow:none;transform:rotate(-2deg)}
+.title .film-s{font-size:2.6rem}
+.title .film-b{font-size:4rem;line-height:.95;margin-top:.1em}
+
+.credits{margin:30px auto 0;max-width:760px;text-align:center;padding:34px 16px;border-radius:18px;
+  background:#dcdad0;border:3px solid var(--brown);box-shadow:7px 7px 0 var(--brown);position:relative;overflow:hidden}
+.credits::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.18)),
+  repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0 2px,transparent 2px 4px)}
+.credits .film-s{font-size:2.1rem;margin-bottom:.15em}
+.credits .film-b{font-size:3.2rem}
+.credits .film-s,.credits .film-b{transition:opacity .45s,transform .45s}
+.credits.out .film-s,.credits.out .film-b{opacity:0;transform:translateY(8px) scale(.97)}
+
+/* ---- dierny štítok ---- */
+.pc-cap{font:700 .78rem "Courier Prime";letter-spacing:.14em;text-transform:uppercase;color:var(--brown2);margin:0 0 6px}
+.pc-wrap{position:relative}
+.pc{display:block;width:100%;height:auto;filter:drop-shadow(3px 4px 0 rgba(74,42,20,.35))}
+.pc-body{fill:#efe2bb;stroke:#b39d68;stroke-width:1.2}
+.pc-band{fill:#d9cfa9}
+.pc-dig{font:600 6.3px "Courier Prime",monospace;fill:#9c8a5a;text-anchor:middle}
+.pc-int{font:700 9.5px "Courier Prime",monospace;fill:#2c2b33;text-anchor:middle}
+.pc-capt{font:700 7px "Courier Prime",monospace;fill:#b0452a;text-anchor:middle;letter-spacing:.06em}
+.pc-sep{stroke:#c9b98c;stroke-width:.8;stroke-dasharray:2 2}
+.pc-foot{font:700 7px "Courier Prime",monospace;fill:#9c8a5a}
+.hole{fill:#2a1a0f}
+.hole.new{animation:punch .35s ease-out both;transform-box:fill-box;transform-origin:center}
+@keyframes punch{0%{transform:scale(2.2);fill:#e2472b}100%{transform:scale(1)}}
+.reg-card .pc-wrap{margin-bottom:18px}
+
+/* ---- stroj so vstupom štítku a výstupom papiera ---- */
+.mach-wrap{max-width:1140px;margin:0 auto;position:relative}
+.card-in{position:relative;z-index:1;max-width:640px;margin:0 auto -34px;padding:0 10px;
+  transition:transform 1.5s cubic-bezier(.55,0,.75,.45)}
+.card-in.feeding{transform:translateY(420px)}
+.card-in.gone{visibility:hidden}
+.machine{position:relative;z-index:2;max-width:none}
+.card-slot{height:16px;width:min(660px,86%);margin:-4px auto 18px;border-radius:0 0 10px 10px;
+  background:#0d0c0b;box-shadow:inset 0 5px 8px rgba(0,0,0,.9),0 2px 0 #6f6b61}
+.machine-row{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:stretch}
+.machine-row .tty{margin:0;min-height:200px}
+.film-btn{margin:20px auto 8px;display:block;cursor:pointer;background:#dcdad0;border:4px solid #111;border-radius:16px;
+  padding:14px 26px;box-shadow:5px 5px 0 #111;font-size:2.1rem;transition:transform .08s,box-shadow .08s}
+.film-btn:hover{background:#ece9dd}
+.film-btn:active{transform:translate(4px,4px);box-shadow:1px 1px 0 #111}
+.film-btn:disabled{cursor:default;opacity:.55;transform:none;box-shadow:5px 5px 0 #111}
+.paper-slot{height:14px;width:min(1000px,94%);margin:16px auto -22px;border-radius:10px 10px 0 0;
+  background:#0d0c0b;box-shadow:inset 0 -5px 8px rgba(0,0,0,.9)}
+.paper-out{position:relative;z-index:1;margin:0 24px}
+.paper-out .paper{min-height:0;padding-top:14px;transform:translateY(-100%);opacity:0}
+.paper-out.feed .paper{animation:emerge .9s ease-out forwards}
+@keyframes emerge{0%{transform:translateY(-100%);opacity:1}100%{transform:none;opacity:1}}
+.machine.busy .reel{animation-duration:.5s}
+.machine.shake{animation:shake .12s linear infinite}
+@keyframes shake{25%{transform:translate(1px,-1px)}75%{transform:translate(-1px,1px)}}
+.mach-after{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px}
+
+/* ---- zoznamka ---- */
+.match{background:#fbf3e1 repeating-linear-gradient(0deg,transparent 0 27px,rgba(74,42,20,.06) 27px 28px)}
+.match-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.match-head .film-s{font-size:1.5rem}
+.match-title{margin:.3em 0 .2em}
+.match-head .row select{width:auto;margin:0}
+.match-out{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;margin-top:14px}
+.ad-clip{background:#fffaf0;border:2px dashed var(--brown);padding:16px 18px;transform:rotate(-.6deg);box-shadow:4px 4px 0 rgba(74,42,20,.25)}
+.ad-clip .who{font:1.6rem "Righteous";margin:0}
+.ad-clip .meta{font:700 .95rem "Courier Prime";color:var(--brown2);margin:.2em 0 .6em}
+.ad-clip p{margin:.35em 0}
+.ad-clip .tag{display:inline-block;background:var(--mustard);color:var(--brown);font:700 .8rem "Courier Prime";padding:2px 8px;border-radius:6px;margin:0 4px 4px 0}
+.m-total{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.m-total .nixie{font-size:2.4rem;min-width:0}
+.m-date{background:var(--brown);color:var(--cream);border-radius:12px;padding:10px 14px;margin-top:10px;font-size:.95rem}
+.m-date b{color:var(--mustard)}
+
+/* ---- reklama ---- */
+.ad-slot{margin:30px auto 0;max-width:970px;background:#f7efd9;border:2px solid var(--brown);border-radius:6px;
+  padding:6px 10px 10px;position:relative}
+#scr-dash .ad-slot{margin:0 auto 26px}
+.ad-label{font:700 .7rem "Courier Prime";letter-spacing:.2em;text-transform:uppercase;color:#8d6b48;
+  border-bottom:1px solid rgba(74,42,20,.35);padding-bottom:4px;margin-bottom:8px;text-align:center}
+.ad-body{position:relative;min-height:90px}
+.ad-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  font:1rem "Courier Prime";color:#9b7e5a;border:1px dashed rgba(74,42,20,.3);border-radius:4px;pointer-events:none}
+.ad-ph small{font-size:.75rem;opacity:.8}
+.ad-body ins.adsbygoogle[data-ad-status="filled"] + .ad-ph{display:none}
+
+/* ---- päta: upozornenie ---- */
+.disclaimer{text-align:center;padding:30px 16px 6px}
+.disclaimer .film-s{font-size:1.5rem}
+.disclaimer .film-b{font-size:2.4rem;margin:.1em 0}
+.disclaimer .maybe{font-size:1.4rem;opacity:0;animation:maybe 1s 1.5s forwards}
+@keyframes maybe{to{opacity:1}}
+
+@media (max-width:980px){ .match-out{grid-template-columns:1fr} }
+@media (max-width:680px){
+  .title .film-s{font-size:2rem}
+  .title .film-b{font-size:3rem}
+  .credits .film-s{font-size:1.5rem}
+  .credits .film-b{font-size:2.1rem}
+  .machine-row{grid-template-columns:1fr}
+  .film-btn{font-size:1.5rem;padding:10px 16px}
+  .paper-out{margin:0 6px}
+  .disclaimer .film-b{font-size:1.8rem}
+  .card-in{margin-bottom:-20px}
+  .film-s,.film-b{text-shadow:-1.5px -1.5px 0 #111,1.5px -1.5px 0 #111,-1.5px 1.5px 0 #111,1.5px 1.5px 0 #111,0 2px 0 #111,2px 0 0 #111,-2px 0 0 #111,0 -2px 0 #111}
+}
+
+/* ---- ikony a kódy odpovedí ---- */
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.chip .ic{margin-right:2px}
+.q-title .q-ic{width:1.1em;height:1.1em;margin-right:.35em;color:var(--orange);vertical-align:-.15em}
+.opt .code{flex:none;width:30px;height:36px;display:grid;place-items:center;font:700 1.1rem "Courier Prime";
+  background:#efe2bb;color:var(--brown);border:2px solid var(--brown);border-radius:3px;
+  clip-path:polygon(8px 0,100% 0,100% 100%,0 100%,0 8px)}
+.opt.sel .code{background:var(--brown);color:var(--mustard)}
+.verdict-list li .s .ic{width:15px;height:15px;vertical-align:-2px;stroke-width:2.2}
+.milestones p .ic,.best-hour .ic,.ad-clip .ic,.m-date .ic{color:var(--mustard);margin-right:4px}
+.best-hour .ic,.ad-clip .ic{color:var(--orange)}
+footer .inspired{font:700 .95rem "Courier Prime";color:var(--brown);padding-bottom:0;letter-spacing:.03em}
+
+/* ---- ilustrácie ---- */
+.match-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;align-items:start;margin-top:14px}
+.match-body .match-out{margin-top:0}
+.match-photo{margin:0;background:var(--brown);padding:9px 9px 8px;border-radius:14px;transform:rotate(-1.5deg);box-shadow:5px 5px 0 rgba(74,42,20,.3)}
+.match-photo img{border-radius:8px;width:100%}
+.match-photo figcaption{color:var(--cream);font:.78rem "Courier Prime";text-align:center;margin-top:6px}
+.legend-photo img{filter:none}
+@media (max-width:980px){ .match-body{grid-template-columns:200px minmax(0,1fr)} }
+@media (max-width:680px){ .match-body{grid-template-columns:1fr} .match-photo{max-width:260px;margin:0 auto} }
+
+/* =========================================================
+   ZARIADENIA: mobil, tablet, iPad (na výšku aj na šírku), PC
+   ========================================================= */
+button,.opt,.pcard{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.topbar{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+main{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+footer p{padding-bottom:max(24px,env(safe-area-inset-bottom))}
+@media (hover:none){ .btn:hover{background:var(--orange)} .btn.ghost:hover{background:var(--cream)} .opt:hover{background:#fffaf0} .opt.sel:hover{background:var(--orange)} }
+
+/* veľké PC */
+@media (min-width:1400px){ main{max-width:1280px} .mach-wrap{max-width:1220px} }
+
+/* iPad na šírku a menšie notebooky (1024–1199) */
+@media (max-width:1199px) and (min-width:981px){
+  .title .film-b{font-size:3.4rem}
+  .tv img{width:190px;height:220px}
+  .grid3{gap:18px}
+}
+
+/* tablety a iPad na výšku (681–980) */
+@media (max-width:980px){
+  input,select{font-size:16px}              /* iOS nepribližuje stránku pri písaní */
+  .controls select,.controls input{font-size:16px}
+  .poster{min-height:0}
+  .poster-inner{grid-template-columns:auto 1fr}
+  .grid2,.grid3,#scr-dash > *{margin-bottom:22px}
+  .machine-row .tty{font-size:1.2rem}
+
+}
+@media (max-width:980px) and (min-width:681px){
+  .grid3 > :last-child{grid-column:1/-1}
+  .legend-grid{grid-template-columns:220px 1fr}
+  .how{gap:16px}
+}
+
+/* mobil (do 680) */
+@media (max-width:680px){
+  main{padding-top:18px}
+  .poster-inner{grid-template-columns:1fr}
+  .login-card,.card{border-radius:16px;box-shadow:5px 5px 0 var(--brown)}
+  .how{gap:22px}
+  .credits{padding:24px 10px}
+  .dash-head{flex-direction:column;align-items:flex-start}
+  .card-title{flex-direction:column;align-items:flex-start;gap:6px}
+  .printer-head .controls{width:100%}
+  .printer-head .controls select{flex:1 1 100%}
+  .printer-head .controls .btn{flex:1 1 auto}
+  .reg-nav .btn{flex:1}
+  .machine{padding:14px}
+  .reels .reel{width:70px;height:70px}
+  .lamps{grid-template-columns:repeat(8,12px);gap:6px}
+  .lamps i{width:12px;height:12px}
+  .machine-row .tty{min-height:150px;font-size:1.05rem;padding:12px}
+  .mach-after .btn{flex:1 1 100%}
+  .match-head .row{width:100%}
+  .match-head .row select{flex:1}
+  .ad-slot{margin-left:0;margin-right:0}
+  .q-title{font-size:1.3rem}
+}
+
+/* malé telefóny (do 380) */
+@media (max-width:380px){
+  .title .film-b{font-size:2.6rem}
+  .logo span:last-child{display:none}
+  .film-btn{font-size:1.3rem}
+}
+
+/* telefón na šírku: nízka obrazovka */
+@media (max-height:500px) and (orientation:landscape){
+  .poster-inner{grid-template-columns:auto 1fr}
+  .tv img{width:150px;height:170px}
+  .machine-row{grid-template-columns:auto 1fr}
+}
+.kbd-hint{display:none;margin:10px 0 0;font:.8rem "Courier Prime";color:#86603f}
+@media (hover:hover) and (pointer:fine){ .kbd-hint{display:block} }

@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4a2a14">
+<meta name="description" content="Kondiciogram ako vo filme Jáchyme, hoď ho do stroje! Zadajte dátum narodenia a samočinný počítač vám vytlačí biorytmy na perforovaný papier.">
+<title>Kondiciogram Koudelka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Courier+Prime:wght@400;700&family=Righteous&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- Google AdSense: odkomentujte a doplňte svoje ID vydavateľa, keď bude web verejný a schválený
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+-->
+</head>
+<body>
+<div class="stripes no-print"></div>
+<header class="topbar no-print">
+  <div class="logo"><span class="logo-mark">*•0×</span><span>KONDICIOGRAM</span></div>
+  <div class="top-right">
+    <button id="soundBtn" class="chip" type="button" title="Zvuk tlačiarne">Zvuk</button>
+    <span id="whoami" class="chip plain hidden"></span>
+    <button id="logoutBtn" class="chip hidden" type="button">Odhlásiť</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ PRIHLÁSENIE ============ -->
+  <section id="scr-login" class="screen">
+    <div class="hero">
+      <div class="poster">
+        <div class="sunburst"></div>
+        <div class="poster-inner">
+          <figure class="tv">
+            <img src="img/koudelka.jpg" alt="Ilustrácia: muž v barete s nádejou hľadí hore na tabuľu so znakmi">
+            <figcaption>Fr. Koudelka, držiteľ kondiciogramu</figcaption>
+          </figure>
+          <h1 class="title film"><span class="film-s">Jáchyme,</span><span class="film-b">hoď ho<br>do stroje!</span></h1>
+          <p class="tagline">Samočinný počítač vám vypočíta kondíciu na každý deň v roku. Vedecky, presne a na perforovanom papieri, ako v roku 1974.</p>
+        </div>
+      </div>
+
+      <div class="card login-card">
+        <h2>Výpočtové stredisko</h2>
+        <p class="muted">Vložte svoj štítok, teda meno a štvormiestne osobné číslo.</p>
+        <form id="loginForm" autocomplete="off">
+          <label>Priezvisko a meno
+            <input id="loginName" type="text" maxlength="40" placeholder="napr. Koudelka František" required>
+          </label>
+          <label>Osobné číslo (PIN)
+            <input id="loginPin" type="password" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="••••" required>
+          </label>
+          <div id="loginErr" class="err" role="alert"></div>
+          <button class="btn" type="submit">Vložiť štítok do stroja</button>
+        </form>
+        <div id="savedWrap" class="saved hidden">
+          <h3>Štítky uložené v tomto počítači</h3>
+          <div id="savedCards" class="saved-cards"></div>
+        </div>
+        <div class="login-alt">
+          <button id="toRegister" class="btn ghost" type="button">Nový štítok (registrácia)</button>
+          <button id="demoBtn" class="btn ghost" type="button">Skúsiť ako Fr. Koudelka</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="credits film" aria-hidden="true">
+      <div class="film-s" id="crS">HUDBA</div>
+      <div class="film-b" id="crB">IHLIČKOVÁ TLAČIAREŇ</div>
+    </div>
+
+    <div class="how">
+      <div class="how-step"><span class="num">1</span><h3>Dátum narodenia</h3><p>Stroj spočíta každý váš prežitý deň, až po dnešok.</p></div>
+      <div class="how-step"><span class="num">2</span><h3>Doplňujúce otázky</h3><p>Spánok, káva, pivo, šéf, láska. Každá odpoveď trochu posunie vaše krivky.</p></div>
+      <div class="how-step"><span class="num">3</span><h3>Výtlačok</h3><p>Ihličková tlačiareň vytlačí kondiciogram: <b>*</b> dobre, <b>.</b> slabšie, <b>X</b> a <b>0</b> kritické dni.</p></div>
+    </div>
+
+    <aside class="ad-slot" aria-label="Reklama">
+      <div class="ad-label">Reklama · Inzercia</div>
+      <div class="ad-body">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="0000000001" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <div class="ad-ph">Tu môže byť vaša reklama.<br><small>Priestor pre Google AdSense</small></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ============ REGISTRÁCIA / DOTAZNÍK ============ -->
+  <section id="scr-reg" class="screen hidden">
+    <div class="card reg-card">
+      <div class="pc-cap">Vstupný dierny štítok · dieruje sa priebežne podľa vašich odpovedí</div>
+      <div id="regCard" class="pc-wrap"></div>
+      <div id="regStep"></div>
+      <div id="regErr" class="err" role="alert"></div>
+      <div class="reg-nav">
+        <button id="regBack" class="btn ghost" type="button">Späť</button>
+        <button id="regNext" class="btn" type="button">Ďalej</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STROJ POČÍTA ============ -->
+  <section id="scr-machine" class="screen hidden">
+    <div class="mach-wrap">
+      <div class="card-in" id="cardIn">
+        <div class="pc-cap">Vstupný dierny štítok</div>
+        <div id="machCard" class="pc-wrap"></div>
+      </div>
+      <div class="machine" id="machine">
+        <div class="card-slot" aria-hidden="true"></div>
+        <div class="machine-row">
+          <div class="machine-panel">
+            <div class="reels"><div class="reel"></div><div class="reel r2"></div></div>
+            <div class="lamps" id="lamps"></div>
+          </div>
+          <div class="tty" id="tty"></div>
+        </div>
+        <button id="feedBtn" class="film-btn film" type="button"><span class="film-b">Jáchyme, hoď ho do stroje!</span></button>
+        <div class="paper-slot" aria-hidden="true"></div>
+      </div>
+      <div class="paper-out" id="paperOut"><div class="paper-scroll"><div class="paper" id="paper0"></div></div></div>
+      <div class="mach-after">
+        <button id="machPrint" class="btn ghost hidden" type="button">Vytlačiť na papier / PDF</button>
+        <button id="toDash" class="btn hidden" type="button">Pokračovať na nástenku</button>
+        <button id="skipMachine" class="btn ghost small" type="button">Preskočiť</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NÁSTENKA ============ -->
+  <section id="scr-dash" class="screen hidden">
+    <div class="card dash-head no-print">
+      <div>
+        <h2 id="dGreeting"></h2>
+        <p id="dFacts" class="facts"></p>
+      </div>
+      <button id="editBtn" class="btn ghost" type="button">Upraviť odpovede</button>
+    </div>
+
+    <article class="card no-print">
+      <div class="card-title">
+        <h3>Váš vstupný dierny štítok</h3>
+        <button id="refeedBtn" class="btn small ghost" type="button">Hodiť štítok znova do stroja</button>
+      </div>
+      <div id="dashCard" class="pc-wrap"></div>
+      <p class="muted small-txt">Štítok je dierovaný v Hollerithovom kóde: jeden stĺpec je jeden znak. Písmeno alebo číslicu prečítate podľa dierok v riadkoch 12, 11 a 0 až 9.</p>
+    </article>
+
+    <div class="grid2 no-print">
+      <article class="card verdict">
+        <div class="card-title"><h3>Dnešný verdikt stroja</h3><span id="todayStamp" class="stamp"></span></div>
+        <div class="meters" id="meters"></div>
+        <div class="overall">
+          <div class="nixie" id="nixie">--</div>
+          <div>
+            <div id="verdictHead" class="verdict-head"></div>
+            <div class="muted small-txt">Celkový index, vážený podľa vášho povolania</div>
+          </div>
+        </div>
+        <ul id="verdictList" class="verdict-list"></ul>
+        <p id="bestHour" class="best-hour"></p>
+      </article>
+
+      <article class="card">
+        <div class="card-title"><h3>Osciloskop biorytmov</h3><span class="muted small-txt">±15 dní okolo dneška</span></div>
+        <div class="crt"><canvas id="scope" height="240"></canvas></div>
+        <div class="scope-legend">
+          <span><i style="background:#ff7a45"></i>Fyzický · 23 dní</span>
+          <span><i style="background:#7dff9a"></i>Citový · 28 dní</span>
+          <span><i style="background:#ffd23f"></i>Intelektový · 33 dní</span>
+        </div>
+      </article>
+    </div>
+
+    <article class="card printer-card" id="printerCard">
+      <div class="printer-head">
+        <h3>Váš kondiciogram</h3>
+        <div class="controls">
+          <select id="rangeSel" aria-label="Obdobie">
+            <option value="1">Tento mesiac</option>
+            <option value="3" selected>3 mesiace od dneška</option>
+            <option value="6">6 mesiacov od dneška</option>
+            <option value="12">12 mesiacov od dneška</option>
+            <option value="year">Celý rok…</option>
+          </select>
+          <input id="yearInp" class="hidden" type="number" min="1900" max="2100" aria-label="Rok">
+          <button id="reprintBtn" class="btn small" type="button">Tlačiť</button>
+          <button id="paperBtn" class="btn small ghost" type="button">Vytlačiť na papier / PDF</button>
+        </div>
+      </div>
+      <div class="printer">
+        <div class="printer-slot no-print"><span class="led"></span>RIADKOVÁ TLAČIAREŇ · ON LINE</div>
+        <div class="paper-scroll"><div class="paper" id="paper"></div></div>
+      </div>
+    </article>
+
+    <div class="grid3 no-print">
+      <article class="card">
+        <h3>Plánovač dní</h3>
+        <p class="muted small-txt">Stroj prehľadá najbližších 60 dní a nájde najvhodnejší termín.</p>
+        <select id="actSel" aria-label="Činnosť"></select>
+        <button id="planBtn" class="btn small" type="button">Nájsť termín</button>
+        <ol id="planOut" class="plan-out"></ol>
+      </article>
+
+      <article class="card">
+        <h3>Partnerská zhoda</h3>
+        <p class="muted small-txt">Nakoľko sa vaše cykly zhodujú s niekým iným.</p>
+        <label>Meno <input id="pName" type="text" maxlength="30" placeholder="napr. Jarmila"></label>
+        <label>Dátum narodenia <input id="pBirth" type="date"></label>
+        <div class="row">
+          <button id="pBtn" class="btn small" type="button">Porovnať</button>
+          <button id="pKoud" class="btn small ghost" type="button">S Koudelkom</button>
+        </div>
+        <div id="pOut"></div>
+      </article>
+
+      <article class="card">
+        <h3>Kalendár rizík a jubileí</h3>
+        <ul id="riskOut" class="risk-out"></ul>
+        <div id="milestones" class="milestones"></div>
+      </article>
+    </div>
+
+    <article class="card match no-print">
+      <div class="match-head">
+        <div>
+          <div class="film"><span class="film-s">Stroj odporúča</span></div>
+          <h3 class="match-title">Vhodný partner podľa biorytmov</h3>
+          <p class="muted small-txt">Stroj prehľadal ročníky ±12 rokov okolo vás a vybral dátum narodenia, ktorého cykly sa s vašimi zhodujú najlepšie. Osoba je vymyslená, kompatibilita je vypočítaná.</p>
+        </div>
+        <div class="row">
+          <select id="mSex" aria-label="Koho hľadáte">
+            <option value="f">Hľadám partnerku</option>
+            <option value="m">Hľadám partnera</option>
+          </select>
+          <button id="mNext" class="btn small" type="button">Ďalší kandidát</button>
+        </div>
+      </div>
+      <div class="match-body">
+        <figure class="match-photo">
+          <img src="img/rodina.jpg" alt="Ilustrácia: šťastná rodina pri plote máva výtlačkami kondiciogramu">
+          <figcaption>Takto dopadnú tí, ktorí poslúchli stroj</figcaption>
+        </figure>
+        <div id="mOut" class="match-out"></div>
+      </div>
+    </article>
+
+    <aside class="ad-slot no-print" aria-label="Reklama">
+      <div class="ad-label">Reklama · Inzercia</div>
+      <div class="ad-body">
+        <!-- Google AdSense: po schválení webu doplňte data-ad-client a data-ad-slot a odkomentujte skript v <head> -->
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <div class="ad-ph">Tu môže byť vaša reklama.<br><small>Priestor pre Google AdSense</small></div>
+      </div>
+    </aside>
+
+    <article class="card legend no-print">
+      <div class="legend-grid">
+        <figure class="legend-photo">
+          <img src="img/tabula.jpg" alt="Ilustrácia: muž na žltom lešení drží tabuľu so znakmi * • 0 ×">
+          <figcaption>Znaky, podľa ktorých sa riadi celé mesto</figcaption>
+        </figure>
+        <div>
+          <h3>Ako stroj počíta</h3>
+          <dl class="signs">
+            <dt>*</dt><dd>Plusová fáza. Krivka je nad nulou, máte silu, náladu či bystrú hlavu.</dd>
+            <dt>.</dt><dd>Mínusová fáza, čas na regeneráciu. Nič tragické, len menej výkonu.</dd>
+            <dt>X</dt><dd>Kritický deň, krivka v ten deň <b>klesá</b> cez nulu. Pozor na úrazy a hádky.</dd>
+            <dt>0</dt><dd>Kritický deň, krivka v ten deň <b>stúpa</b> cez nulu. Nestabilné, ale smer je dobrý.</dd>
+          </dl>
+          <p>Tri sínusové cykly sa počítajú od dňa narodenia: fyzický (23 dní), citový (28 dní) a intelektový (33 dní). Kritický deň je ten, počas ktorého krivka pretne nulu. Vaše odpovede v dotazníku posunú každú krivku hore alebo dole najviac o 0,4. Plusové fázy sa tak predĺžia alebo skrátia a kritické dni sa môžu posunúť. Povolanie určuje, ktorý cyklus má najväčšiu váhu v celkovom indexe.</p>
+          <p class="muted small-txt">Biorytmy nemajú vedecké potvrdenie. Berte ich s humorom, rovnako ako film.</p>
+        </div>
+      </div>
+
+      <div class="proof">
+        <div>
+          <h3>Kontrola s filmovým originálom</h3>
+          <p>Zadajte stroju dátum <b>NAR. 16. 2. 1935</b> bez korekcií a nechajte ho tlačiť rok 1973. Znaky za január až apríl sa zhodujú s výtlačkom z filmu, všetkých 12 riadkov.</p>
+          <button id="proofBtn" class="btn small" type="button">Vytlačiť Koudelkov kondiciogram 1973</button>
+        </div>
+        <figure class="orig">
+          <img src="img/original.png" alt="Originálny kondiciogram z filmu">
+          <figcaption>Originál z filmu</figcaption>
+        </figure>
+      </div>
+      <div class="paper-scroll"><div class="paper hidden" id="paper2"></div></div>
+    </article>
+  </section>
+</main>
+
+<footer class="no-print">
+  <div class="stripes"></div>
+  <div class="disclaimer film">
+    <div class="film-s">Upozornenie</div>
+    <div class="film-b">Tento kondiciogram je len sranda.</div>
+    <div class="film-s maybe">…a možno nie.</div>
+  </div>
+  <p class="inspired">Voľne inšpirované fenoménom kondiciogramov zo 70. rokov.</p>
+  <p>Fanúšikovská hračka k filmu <i>Jáchyme, hoď ho do stroje!</i> (1974). Všetky údaje zostávajú iba v tomto prehliadači.</p>
+</footer>
+<div id="printSheet" class="print-sheet" aria-hidden="true"></div>
+<script src="app.js"></script>
+</body>
+</html>
