@@ -18,8 +18,12 @@
 <div class="stripes no-print"></div>
 <header class="topbar no-print">
   <div class="logo"><span class="logo-mark">*•0×</span><span class="logo-txt film"><span class="film-b">Kondiciogram</span></span></div>
+  <div class="ticker" id="ticker" role="marquee" aria-label="Hlásenia stroja">
+    <span class="tk-led" aria-hidden="true"></span>
+    <span class="tk-label" aria-hidden="true">STROJ<br>HLASI</span>
+    <div class="tk-view"><span class="tk-text" id="tkText"></span></div>
+  </div>
   <div class="top-right">
-    <button id="soundBtn" class="chip" type="button" title="Zvuk tlačiarne">Zvuk</button>
     <span id="whoami" class="chip plain hidden"></span>
     <button id="newBtn" class="chip hidden" type="button">Nový kondiciogram</button>
   </div>
@@ -34,24 +38,36 @@
         <div class="poster-inner">
           <figure class="tv">
             <img src="img/koudelka.jpg" alt="Ilustrácia: muž v barete s nádejou hľadí hore na tabuľu so znakmi">
-            <figcaption>Fr. Koudelka, držiteľ kondiciogramu</figcaption>
           </figure>
           <h1 class="title film"><span class="film-s">Jáchyme,</span><span class="film-b">hoď ho<br>do stroje!</span></h1>
           <p class="tagline">Samočinný počítač vám vypočíta kondíciu na každý deň v roku. Vedecky, presne a na perforovanom papieri, ako v roku 1974.</p>
         </div>
       </div>
 
-      <div class="card login-card">
-        <h2>Výpočtové stredisko</h2>
-        <p>Vyplňte dierny štítok: meno, dátum narodenia a 9 krátkych otázok. Stroj ho spracuje a vytlačí váš osobný kondiciogram.</p>
-        <ul class="intro-list">
-          <li>bez registrácie a bez hesiel</li>
-          <li>trvá asi minútu</li>
-          <li>rovnaké údaje dajú vždy rovnaký výsledok</li>
-        </ul>
-        <div class="login-alt">
-          <button id="toRegister" class="btn" type="button">Vyplniť štítok</button>
-          <button id="demoBtn" class="btn ghost" type="button">Skúsiť ako Fr. Koudelka</button>
+      <div class="card login-card crossroad">
+        <h2>Výpočtové stredisko ponúka</h2>
+        <div class="svc">
+          <img class="svc-img" src="img/tabula.jpg" alt="" aria-hidden="true">
+          <div class="svc-body">
+            <div class="svc-kick">Služba č. 1</div>
+            <h3 class="svc-title">Kondiciogram</h3>
+            <p>Meno, dátum narodenia a 9 krátkych otázok. Stroj vytlačí vašu kondíciu na každý deň.</p>
+            <div class="svc-btns">
+              <button id="toRegister" class="btn small" type="button">Vyplniť štítok</button>
+              <button id="demoBtn" class="btn small ghost" type="button">Skúsiť ako Fr. Koudelka</button>
+            </div>
+          </div>
+        </div>
+        <div class="svc">
+          <img class="svc-img" src="img/rodina.jpg" alt="" aria-hidden="true">
+          <div class="svc-body">
+            <div class="svc-kick">Služba č. 2</div>
+            <h3 class="svc-title">Výber partnera podľa počítača</h3>
+            <p>Stroj porovná biorytmy a nájde partnera alebo partnerku s najlepšou zhodou. Stačí meno a dátum narodenia.</p>
+            <div class="svc-btns">
+              <button id="toPartner" class="btn small" type="button">Hľadať partnera</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -74,6 +90,58 @@
         <div class="ad-ph">Tu môže byť vaša reklama.<br><small>Priestor pre Google AdSense</small></div>
       </div>
     </aside>
+  </section>
+
+  <!-- ============ SLUŽBA Č. 2: VÝBER PARTNERA PODĽA POČÍTAČA ============ -->
+  <section id="scr-partner" class="screen hidden">
+    <div class="card partner-card">
+      <div class="film partner-head"><span class="film-s">Služba č. 2</span><span class="film-b">Výber partnera podľa počítača</span></div>
+      <p class="muted">Samočinný počítač prehľadá ročníky ±12 rokov okolo vás a nájde dátum narodenia, ktorého biorytmy sa s vašimi zhodujú najlepšie. Osoby sú vymyslené, zhoda je vypočítaná.</p>
+      <form id="sForm" class="s-form" novalidate>
+        <label>Meno a priezvisko súdruha<input id="sName" type="text" maxlength="40" autocomplete="name" placeholder="napr. František Koudelka"></label>
+        <div class="lbl-txt">Kedy ste sa narodili, súdruh?</div>
+        <div id="sBirthBox"></div>
+        <label>Koho hľadáte?
+          <select id="sSex">
+            <option value="f">Hľadám partnerku</option>
+            <option value="m">Hľadám partnera</option>
+          </select>
+        </label>
+        <div id="sErr" class="err" role="alert"></div>
+        <div class="row">
+          <button class="btn" type="submit">Nájsť partnera</button>
+          <button id="sBack" class="btn ghost" type="button">Späť na úvod</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="sResult" class="hidden">
+      <div class="tty s-tty" id="sTty"></div>
+      <article class="card match" id="sMatch">
+        <div class="match-head">
+          <div>
+            <div class="film"><span class="film-s">Stroj odporúča</span></div>
+            <h3 class="match-title">Váš partner podľa biorytmov</h3>
+          </div>
+          <div class="row"><button id="sNext" class="btn small" type="button">Ďalší kandidát</button></div>
+        </div>
+        <div class="match-body">
+          <figure class="match-photo"><img src="img/rodina.jpg" alt="Ilustrácia: šťastná rodina pri plote máva výtlačkami kondiciogramu"></figure>
+          <div id="sOut" class="match-out"></div>
+        </div>
+        <div class="s-cta">
+          <p>Chcete vedieť aj to, kedy máte vy sami dobrý deň?</p>
+          <button id="sToKond" class="btn ghost small" type="button">Vytlačiť aj môj kondiciogram</button>
+        </div>
+      </article>
+      <aside class="ad-slot" aria-label="Reklama">
+        <div class="ad-label">Reklama · Inzercia</div>
+        <div class="ad-body">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="0000000003" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <div class="ad-ph">Tu môže byť vaša reklama.<br><small>Priestor pre Google AdSense</small></div>
+        </div>
+      </aside>
+    </div>
   </section>
 
   <!-- ============ REGISTRÁCIA / DOTAZNÍK ============ -->
@@ -205,7 +273,8 @@
         <h3>Partnerská zhoda</h3>
         <p class="muted small-txt">Nakoľko sa vaše cykly zhodujú s niekým iným.</p>
         <label>Meno <input id="pName" type="text" maxlength="30" placeholder="napr. Jarmila"></label>
-        <label>Dátum narodenia <input id="pBirth" type="date"></label>
+        <div class="lbl-txt">Dátum narodenia</div>
+        <div id="pBirthBox"></div>
         <div class="row">
           <button id="pBtn" class="btn small" type="button">Porovnať</button>
           <button id="pKoud" class="btn small ghost" type="button">S Koudelkom</button>
@@ -238,7 +307,6 @@
       <div class="match-body">
         <figure class="match-photo">
           <img src="img/rodina.jpg" alt="Ilustrácia: šťastná rodina pri plote máva výtlačkami kondiciogramu">
-          <figcaption>Takto dopadnú tí, ktorí poslúchli stroj</figcaption>
         </figure>
         <div id="mOut" class="match-out"></div>
       </div>
@@ -257,7 +325,6 @@
       <div class="legend-grid">
         <figure class="legend-photo">
           <img src="img/tabula.jpg" alt="Ilustrácia: muž na žltom lešení drží tabuľu so znakmi * • 0 ×">
-          <figcaption>Znaky, podľa ktorých sa riadi celé mesto</figcaption>
         </figure>
         <div>
           <h3>Ako stroj počíta</h3>
@@ -280,7 +347,6 @@
         </div>
         <figure class="orig">
           <img src="img/original.png" alt="Originálny kondiciogram z filmu">
-          <figcaption>Originál z filmu</figcaption>
         </figure>
       </div>
       <div class="paper-scroll"><div class="paper hidden" id="paper2"></div></div>

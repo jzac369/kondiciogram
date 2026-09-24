@@ -28,7 +28,7 @@ const store = {
   set(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } },
   del(k) { delete mem[k]; try { localStorage.removeItem(k); } catch (e) { } }
 };
-const K_LAST = 'kg.last', K_SOUND = 'kg.sound';   // posledný vyplnený štítok (bez prihlasovania), zvuk
+const K_LAST = 'kg.last';   // posledný vyplnený štítok (bez prihlasovania)
 
 /* ---------------- dátumy (celé dni v UTC) ---------------- */
 const dn = (y, m, d) => Math.round(Date.UTC(y, m, d) / MS);
@@ -230,7 +230,8 @@ function overall(u, st) {
 /* ---------------- zvuk ihličkovej tlačiarne (WebAudio) ---------------- */
 // Prehliadače povolia zvuk až po prvom kliknutí/dotyku. Preto sa AudioContext „odomkne“ pri prvej interakcii
 // a všetko ide cez jeden hlavný zosilňovač s kompresorom (hlasné, ale bez skreslenia).
-let soundOn = store.get(K_SOUND, true), AC = null, MASTER = null;
+const soundOn = true;   // zvuk je vždy zapnutý
+let AC = null, MASTER = null;
 function ac() {
   if (!AC) {
     try {
@@ -281,7 +282,59 @@ function beep(f = 880, d = .06) {
   g.gain.setValueAtTime(.18, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + d);
   o.connect(g).connect(MASTER); o.start(); o.stop(t0 + d + .01);
 }
-function updSoundBtn() { $('#soundBtn').innerHTML = soundOn ? icon('soundOn') + ' Zvuk' : icon('soundOff') + ' Ticho'; }
+// Vloženie štítku do stroja: spojenie ako cez vytáčaný modem.
+// Tónová voľba → tón ústredne 2100 Hz → prepínanie tónov (FSK) → „bong“ → šum a škrípanie pri dohadovaní rýchlosti → dátový šum.
+function modemSound() {
+  const a = ac(); if (!a) return;
+  const go = () => {
+    const t0 = a.currentTime + .05, sr = a.sampleRate, out = a.createGain();
+    out.gain.value = .55; out.connect(MASTER);
+    const tone = (f, s, e, g = .3, type = 'sine') => {
+      const o = a.createOscillator(), v = a.createGain();
+      o.type = type; o.frequency.value = f;
+      v.gain.setValueAtTime(0, s); v.gain.linearRampToValueAtTime(g, s + .005); v.gain.setValueAtTime(g, e - .005); v.gain.linearRampToValueAtTime(0, e);
+      o.connect(v).connect(out); o.start(s); o.stop(e + .01); return o;
+    };
+    const noise = (s, e, f, q, g) => {
+      const b = a.createBuffer(1, Math.ceil(sr * (e - s)), sr), d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const n = a.createBufferSource(); n.buffer = b;
+      const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = q;
+      const v = a.createGain(); v.gain.setValueAtTime(g, s); v.gain.setValueAtTime(g, e - .02); v.gain.linearRampToValueAtTime(0, e);
+      n.connect(bp).connect(v).connect(out); n.start(s); return { bp, v };
+    };
+    // 1) tónová voľba (DTMF), 7 číslic
+    const DTMF = [[941, 1336], [697, 1209], [770, 1336], [852, 1477], [697, 1336], [770, 1209], [852, 1336]];
+    let t = t0;
+    for (const [lo, hi] of DTMF) { tone(lo, t, t + .07, .22); tone(hi, t, t + .07, .22); t += .11; }
+    // 2) tón ústredne / odpoveď protistrany 2100 Hz s preklopením fázy
+    t += .12; tone(2100, t, t + .42, .25); tone(2100, t + .45, t + .8, .25); t += .85;
+    // 3) FSK: rýchle prepínanie dvoch dvojíc tónov (V.21)
+    const f1 = a.createOscillator(), f2 = a.createOscillator(), fv = a.createGain();
+    f1.type = f2.type = 'sine'; fv.gain.setValueAtTime(0, t); fv.gain.linearRampToValueAtTime(.16, t + .01);
+    for (let k = 0; k < 110; k++) {
+      const tk = t + k * .0045;
+      f1.frequency.setValueAtTime(Math.random() < .5 ? 980 : 1180, tk);
+      f2.frequency.setValueAtTime(Math.random() < .5 ? 1650 : 1850, tk);
+    }
+    const fe = t + .5; fv.gain.setValueAtTime(.16, fe - .01); fv.gain.linearRampToValueAtTime(0, fe);
+    f1.connect(fv); f2.connect(fv); fv.connect(out); f1.start(t); f2.start(t); f1.stop(fe + .02); f2.stop(fe + .02); t = fe;
+    // 4) „bong“
+    tone(1200, t, t + .16, .22); tone(2400, t, t + .16, .1); t += .2;
+    // 5) škrípanie: šum s posuvným filtrom a pulzujúcou hlasitosťou
+    const sc = noise(t, t + 1.15, 1800, 3, .9);
+    sc.bp.frequency.setValueAtTime(1800, t); sc.bp.frequency.linearRampToValueAtTime(2600, t + .4);
+    sc.bp.frequency.setValueAtTime(1000, t + .45); sc.bp.frequency.linearRampToValueAtTime(3000, t + 1.1);
+    const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = 28; lg.gain.value = .45;
+    lfo.connect(lg).connect(sc.v.gain); lfo.start(t); lfo.stop(t + 1.15);
+    tone(1800, t + .1, t + .45, .08, 'square'); tone(600, t + .55, t + .9, .07, 'square');
+    t += 1.15;
+    // 6) dátový šum (zhasína)
+    const hiss = noise(t, t + .7, 2200, .7, .35);
+    hiss.v.gain.setValueAtTime(.35, t); hiss.v.gain.linearRampToValueAtTime(0, t + .7);
+  };
+  if (a.state === 'running') go(); else a.resume().then(go).catch(() => { });
+}
 
 /* ---------------- stav aplikácie ---------------- */
 let U = null;               // odvodený aktuálny štítok
@@ -323,21 +376,22 @@ function renderStep() {
 
   if (id === 'account') {
     box.innerHTML = `<div class="q-kicker">Nový štítok</div><h2 class="q-title">Kto ste, súdruh občan?</h2>
-      <label>Priezvisko a meno<input id="rName" type="text" maxlength="40" autocomplete="name" placeholder="napr. Koudelka František" value="${esc(reg.data.name)}"></label>
-      <p class="muted small-txt">Rovnaké meno, dátum narodenia a odpovede dajú vždy rovnaký kondiciogram. Nič sa neposiela na server.</p>`;
+      <label>Meno a priezvisko súdruha<input id="rName" type="text" maxlength="40" autocomplete="name" placeholder="napr. František Koudelka" value="${esc(reg.data.name)}"></label>`;
     $('#rName').focus();
     $('#rName').addEventListener('input', () => { reg.data.name = $('#rName').value; updRegCard(); });
   } else if (id === 'birth') {
-    const max = isoN(todayN());
-    box.innerHTML = `<div class="q-kicker">Základný údaj</div><h2 class="q-title">Kedy ste sa narodili?</h2>
-      <label>Dátum narodenia<input id="rBirth" type="date" min="1900-01-01" max="${max}" value="${esc(reg.data.birth)}"></label>
+    box.innerHTML = `<div class="q-kicker">Základný údaj</div><h2 class="q-title">Kedy ste sa narodili, súdruh?</h2>
+      ${datePicker('rBirth', reg.data.birth)}
       <div id="birthHint" class="birth-hint"></div>`;
     const upd = () => {
-      const v = $('#rBirth').value; if (!v) { $('#birthHint').textContent = ''; return; }
+      const v = dateValue('rBirth');
+      if (!v) { $('#birthHint').textContent = ''; return; }
+      if (v === 'invalid') { $('#birthHint').textContent = '> CHYBA: TAKY DEN V KALENDARI NENI'; return; }
       const n = parseISO(v), t = todayN() - n;
       $('#birthHint').textContent = t >= 0 ? `> NARODENÝ ${DOW_LOC[fromN(n).w].toUpperCase()}, DNES ${nf(t)}. DEŇ ŽIVOTA` : '> CHYBA: BUDÚCNOSŤ ZATIAĽ NEPOČÍTAME';
+      if (t >= 0) { reg.data.birth = v; updRegCard(); }
     };
-    $('#rBirth').addEventListener('input', () => { upd(); const v = $('#rBirth').value; if (v && parseISO(v) <= todayN() && parseISO(v) >= dn(1900, 0, 1)) { reg.data.birth = v; updRegCard(); } }); upd();
+    $('#rBirth').addEventListener('change', upd); upd();
   } else {
     const q = QUESTIONS.find(x => x.id === id), cur = reg.data.answers[id];
     box.innerHTML = `<div class="q-kicker">${esc(q.kick)} · ${reg.step + 1}/${reg.steps.length}</div><h2 class="q-title">${icon(q.id, 'q-ic')}${esc(q.title)}</h2>
@@ -354,6 +408,33 @@ function renderStep() {
   }
 }
 function updRegCard() { if (reg) renderCard($('#regCard'), cardText(reg.data)); }
+
+// výber dátumu po slovensky: deň / mesiac slovom / rok (namiesto „dd/mm/yyyy“ z prehliadača)
+function datePicker(id, iso) {
+  const [y, m, d] = iso ? iso.split('-').map(Number) : [0, 0, 0], maxY = fromN(todayN()).y;
+  const opt = (v, t, sel) => `<option value="${v}"${sel ? ' selected' : ''}>${t}</option>`;
+  let days = '', months = '', years = '';
+  for (let i = 1; i <= 31; i++) days += opt(i, i + '.', i === d);
+  MONTHS_SK.forEach((n, i) => { months += opt(i + 1, n, i + 1 === m); });
+  for (let i = maxY; i >= 1900; i--) years += opt(i, i, i === y);
+  return `<div class="date3" id="${id}" role="group" aria-label="Dátum narodenia">
+    <label>Deň<select data-p="d">${opt('', 'deň', !d)}${days}</select></label>
+    <label>Mesiac<select data-p="m">${opt('', 'mesiac', !m)}${months}</select></label>
+    <label>Rok<select data-p="y">${opt('', 'rok', !y)}${years}</select></label>
+  </div>`;
+}
+// '' = nevyplnené, 'invalid' = neexistujúci deň (napr. 31. február), inak RRRR-MM-DD
+function dateValue(id) {
+  const box = $('#' + id), g = p => +box.querySelector(`[data-p="${p}"]`).value;
+  const d = g('d'), m = g('m'), y = g('y');
+  if (!d || !m || !y) return '';
+  if (new Date(Date.UTC(y, m - 1, d)).getUTCDate() !== d) return 'invalid';
+  return `${y}-${pad2(m)}-${pad2(d)}`;
+}
+function setDate(id, iso) {
+  const [y, m, d] = iso.split('-').map(Number), box = $('#' + id);
+  box.querySelector('[data-p="d"]').value = d; box.querySelector('[data-p="m"]').value = m; box.querySelector('[data-p="y"]').value = y;
+}
 function nextStep() {
   const id = reg.steps[reg.step], err = m => { $('#regErr').textContent = m; beep(220, .25); };
   if (id === 'account') {
@@ -361,8 +442,9 @@ function nextStep() {
     if (name.length < 2) return err('Zadajte meno, aspoň 2 znaky.');
     reg.data.name = name;
   } else if (id === 'birth') {
-    const v = $('#rBirth').value;
-    if (!v) return err('Bez dátumu narodenia stroj nepočíta.');
+    const v = dateValue('rBirth');
+    if (!v) return err('Vyberte deň, mesiac aj rok narodenia.');
+    if (v === 'invalid') return err('Taký dátum neexistuje, skontrolujte deň a mesiac.');
     const n = parseISO(v);
     if (n > todayN()) return err('Ešte ste sa nenarodili? Stroj to neberie.');
     if (n < dn(1900, 0, 1)) return err('Stroj počíta od roku 1900.');
@@ -428,7 +510,7 @@ function runMachine(done) {
 $('#feedBtn').addEventListener('click', () => {
   if (!machineDone) return;
   const btn = $('#feedBtn'), mach = $('#machine');
-  btn.disabled = true; beep(1200, .12);
+  btn.disabled = true; modemSound();
   $('#cardIn').classList.add('feeding');
   mach.classList.add('busy', 'shake');
   machineTO.push(setTimeout(() => { $('#cardIn').classList.add('gone'); mach.classList.remove('shake'); printerBurst(30); }, 1500));
@@ -446,7 +528,7 @@ $('#feedBtn').addEventListener('click', () => {
   let i = 0;
   machineTO.push(setTimeout(() => {
     machineTimer = setInterval(() => {
-      if (i < msgs.length) { ttyShow(msgs.slice(0, ++i)); beep(500 + Math.random() * 900, .03); return; }
+      if (i < msgs.length) { ttyShow(msgs.slice(0, ++i)); return; }   // počas hlásení znie modem
       clearInterval(machineTimer); machineTimer = null;
       $('#paperOut').classList.add('feed');
       const months = U.demo ? [0, 1, 2, 3].map(m => ({ y: 1973, m })) : nextMonths(3);
@@ -484,13 +566,12 @@ const zodiac = n => { const f = fromN(n), k = (f.m + 1) * 100 + f.d; return ZODI
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const pick = (r, arr) => arr[Math.floor(r() * arr.length)];
 const compatPct = d => { const p = {}; for (const ch of CH) p[ch] = Math.round((Math.cos(2 * Math.PI * d / P[ch]) + 1) / 2 * 100); p.T = Math.round((p.F + p.C + p.I) / 3); return p; };
-let matchIdx = 0, matchList = [], matchKey = '';
 // kandidáti: dátumy narodenia ±12 rokov (vek 18 až 90), zoradené podľa zhody cyklov
-function matchCandidates() {
+function matchCandidates(u) {
   const adult = todayN() - 18 * 365.25, oldest = todayN() - 90 * 365.25, cand = [];
   for (let d = -4383; d <= 4383; d++) {
     if (Math.abs(d) < 200) continue;
-    const b = U.birthN + d;
+    const b = u.birthN + d;
     if (b > adult || b < oldest) continue;
     cand.push({ b, p: compatPct(d) });
   }
@@ -499,11 +580,19 @@ function matchCandidates() {
   for (const c of cand) { if (out.every(o => Math.abs(o.b - c.b) > 45)) out.push(c); if (out.length >= 20) break; }
   return out;
 }
-function renderMatch(step) {
-  const sex = $('#mSex').value, key = nameSeed(U.name) + U.birth + sex;
-  if (key !== matchKey) { matchKey = key; matchList = matchCandidates(); matchIdx = 0; }
-  if (step) matchIdx = (matchIdx + 1) % Math.max(1, matchList.length);
-  const out = $('#mOut');
+// Výber partnera sa zobrazuje na dvoch miestach (nástenka kondiciogramu a samostatná služba).
+// Každé miesto má vlastný stav; rovnaké meno + dátum + pohlavie dá všade rovnakých kandidátov.
+const MATCH_VIEWS = {
+  dash: { user: () => U, sex: '#mSex', out: '#mOut', key: '', list: [], idx: 0 },
+  solo: { user: () => PU, sex: '#sSex', out: '#sOut', key: '', list: [], idx: 0 }
+};
+let PU = null;   // osoba v samostatnej službe „Výber partnera“
+function renderMatch(step, view = 'dash') {
+  const v = MATCH_VIEWS[view], u = v.user(); if (!u) return;
+  const sex = $(v.sex).value, key = nameSeed(u.name) + u.birth + sex;
+  if (key !== v.key) { v.key = key; v.list = matchCandidates(u); v.idx = 0; }
+  if (step) v.idx = (v.idx + 1) % Math.max(1, v.list.length);
+  const out = $(v.out), matchList = v.list, matchIdx = v.idx, U = u;   // lokálne U = osoba tohto pohľadu
   if (!matchList.length) { out.innerHTML = '<p>Stroj páruje ľudí od 18 do 90 rokov. Vo vašom okolí ±12 rokov nikoho takého nenašiel.</p>'; return; }
   const c = matchList[matchIdx], r = rng(fnv(key + ':' + matchIdx)), N = NAMES[sex];
   const name = `${pick(r, N.first)} ${pick(r, N.last)}`, city = pick(r, NAMES.cities), job = pick(r, N.job);
@@ -534,6 +623,48 @@ function renderMatch(step) {
 }
 $('#mNext').addEventListener('click', () => { renderMatch(true); printerBurst(18); });
 $('#mSex').addEventListener('change', () => renderMatch(false));
+
+/* ================= SAMOSTATNÁ SLUŽBA: VÝBER PARTNERA PODĽA POČÍTAČA ================= */
+function startPartner(prefill) {
+  PU = null;
+  $('#sName').value = prefill ? prefill.name : '';
+  $('#sBirthBox').innerHTML = datePicker('sBirth', prefill ? prefill.birth : '');
+  $('#sErr').textContent = '';
+  $('#sResult').classList.add('hidden');
+  show('scr-partner');
+}
+$('#sForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#sName').value.trim().replace(/\s+/g, ' '), b = dateValue('sBirth'), err = m => { $('#sErr').textContent = m; };
+  if (name.length < 2) return err('Zadajte meno a priezvisko, aspoň 2 znaky.');
+  if (!b) return err('Vyberte deň, mesiac aj rok narodenia.');
+  if (b === 'invalid') return err('Taký dátum neexistuje, skontrolujte deň a mesiac.');
+  if (parseISO(b) > todayN()) return err('Ešte ste sa nenarodili? Stroj to neberie.');
+  err('');
+  PU = derive({ name, birth: b, answers: {} });
+  modemSound();
+  const res = $('#sResult'), tty = $('#sTty');
+  res.classList.remove('hidden'); $('#sMatch').classList.add('hidden');
+  const lines = ['SAMOCINNY POCITAC - SEZNAMKA', `HLEDAM PROTEJSEK PRO: ${ascii(name)}`, `PROHLEDAVAM ROCNIKY ${fromN(PU.birthN).y - 12} - ${fromN(PU.birthN).y + 12}`, 'POROVNAVAM CYKLY 23 / 28 / 33', 'VYBER DOKONCEN.'];
+  let i = 0;
+  tty.innerHTML = '';
+  res.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  const tick = setInterval(() => {
+    if (i < lines.length) { tty.innerHTML = lines.slice(0, ++i).map(esc).join('<br>') + '<span class="cur">█</span>'; return; }
+    clearInterval(tick);
+    $('#sMatch').classList.remove('hidden');
+    renderMatch(false, 'solo');
+    printerBurst(30);
+  }, 550);
+});
+$('#sNext').addEventListener('click', () => { renderMatch(true, 'solo'); printerBurst(18); });
+$('#sSex').addEventListener('change', () => { if (PU) renderMatch(false, 'solo'); });
+$('#sToKond').addEventListener('click', () => {
+  startReg(false);
+  if (PU) { reg.data.name = PU.name; reg.data.birth = PU.birth; renderStep(); }
+});
+$('#toPartner').addEventListener('click', () => startPartner(null));
+$('#sBack').addEventListener('click', () => show('scr-login'));
 
 /* ================= NÁSTENKA ================= */
 let lastDay = todayN();
@@ -720,11 +851,12 @@ function compat(name, birthISO) {
   requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll('#pOut .bar i').forEach(b => b.style.width = b.dataset.w + '%')));
 }
 $('#pBtn').addEventListener('click', () => {
-  const b = $('#pBirth').value;
-  if (!b) { $('#pOut').innerHTML = '<p class="err">Zadajte dátum narodenia.</p>'; return; }
+  const b = dateValue('pBirth');
+  if (!b) { $('#pOut').innerHTML = '<p class="err">Vyberte deň, mesiac aj rok narodenia.</p>'; return; }
+  if (b === 'invalid') { $('#pOut').innerHTML = '<p class="err">Taký dátum neexistuje.</p>'; return; }
   compat($('#pName').value.trim(), b);
 });
-$('#pKoud').addEventListener('click', () => { $('#pName').value = 'František Koudelka'; $('#pBirth').value = KOUDELKA_BIRTH; compat('František Koudelka', KOUDELKA_BIRTH); });
+$('#pKoud').addEventListener('click', () => { $('#pName').value = 'František Koudelka'; setDate('pBirth', KOUDELKA_BIRTH); compat('František Koudelka', KOUDELKA_BIRTH); });
 
 /* ================= TLAČ KONDICIOGRAMU ================= */
 const printJobs = new WeakMap();
@@ -848,8 +980,93 @@ $('#editBtn').addEventListener('click', () => startReg(true));
 
 $('#refeedBtn').addEventListener('click', () => runMachine(() => showDash(false)));
 
+/* ================= DISPLEJ V HORNOM PRUHU: HLÁŠKY STROJA ================= */
+const HLASKY = [
+  'STROJ DNES POVOLUJE SPOLECENSKY KONTAKT.',
+  'INTELEKT V NORME. NEPREKRACOVAT!',
+  'POUZITI OBCANA DNES BEZ OMEZENI.',
+  'NORMA SPLNENA. KONDICE OTAZNA.',
+  'UPOZORNENI: DNES PO 21:00 MUZE DOJIT KE ZTRATE USUDKU.',
+  'OSOBA ZPUSOBILA K LEHKYM SPOLECENSKYM UKONUM.',
+  'STROJ VAS ZARADIL MEZI OSOBY S PERSPEKTIVOU.',
+  'OBCAN VYKAZUJE ZNAMKY PROVOZUSCHOPNOSTI.',
+  'STROJ ZAZNAMENAL ZVYSENY VYSKYT POCHYBNOSTI.',
+  'INTELEKT SE DOSTAVI PO OBEDE.',
+  'STROJ DOPORUCUJE VYHNOUT SE KONTAKTU S VEDOUCIM PRACOVNIKEM.',
+  'VASE INICIATIVA PREKROCILA POVOLENOU NORMU.',
+  'OSOBA ZPUSOBILA KE SPOLECENSKEMU STYKU DO 14:20.',
+  'VYSLEDEK JE PRIZNIVY. DUVOD NEZNAMY.',
+  'STROJ PREDPOKLADA USPECH PRI MINIMALNIM USILI.',
+  'DNESEK JE VHODNY K PLNENI NENAROCNYCH UKOLU.',
+  'POCET SPRAVNYCH ROZHODNUTI JE DNES OMEZEN NA DVE.',
+  'DNES SE VYHYBEJTE TECHNICE, DETEM A AUTORITAM.',
+  'VASE PRACOVNI MORALKA BYLA ODESLANA DO SERVISNIHO STREDISKA.',
+  'DNES FUNGUJETE V REZIMU "HLAVNE NEVYCNIVAT".',
+  'VYPOCETNI STREDISKO DOPORUCUJE ODLOZIT VASI ODVAHU NA ZITREK.',
+  'DNES JSTE VHODNY K ADMINISTRATIVNIMU PREDSTIRANI CINNOSTI.',
+  'VASE ROZHODNOST SE NACHAZI MIMO PRACOVISTE.',
+  'PO 17:00 LZE OCEKAVAT SPONTANNI UBYTEK ODPOVEDNOSTI.',
+  'STROJ POVOLUJE JEDNU HADKU. POUZIJTE ROZUMNE.',
+  'DNES JE POVOLENO DOKONCE I MIRNE PREHANENI.',
+  'DNES SE NEDOPORUCUJE RIKAT "JA TO ZARIDIM".',
+  'VASE SEBEDUVERA BYLA SCHVALENA V NEPRIMERENEM ROZSAHU.',
+  'KOLEKTIV VAS DNES PRAVDEPODOBNE SNESE.',
+  'DNES SE MUZETE MYLIT. STAV BUDE MIT JEN MIRNE NASLEDKY.',
+  'VASE VYKONNOST ODPOVIDA STAVU PO OBEDE.',
+  'STROJ VYHODNOTIL DNESEK JAKO SNESITELNY.',
+  'PRI KOMPLIKACICH SE TVARTE, ZE JDE O PLANOVANY STAV.',
+  'DNES DOPORUCUJEME POUZIVAT JEDNODUCHE VETY.',
+  'NADMERNE PREMYSLENI MUZE VEST K NEZADOUCIM VYSLEDKUM.',
+  'VASE PRODUKTIVITA BYLA OMYLEM ZAPOCITANA DVAKRAT.',
+  'DNES JSTE KOMPATIBILNI S VETSINOU BEZNYCH SITUACI.',
+  'DNES VAM PATRI 63 % VASEHO POTENCIALU.',
+  'ERROR 206. NACITAM...',
+  'DNES NIC NEBERTE OSOBNE. ANI SVUJ KONDICIOGRAM.',
+  'VASE PERSPEKTIVA JE PRIZNIVA, POKUD SE NIC NESTANE.',
+  'DNES MUZETE JEDNAT SPONTANNE PO PREDCHOZIM SCHVALENI.',
+  'NAHLE PROJEVY ORIGINALITY HLASTE NADRIZENEMU.',
+  'V PRIPADE USPECHU ZACHOVEJTE KLID.',
+  'DNES SE NEDOPORUCUJE KONTAKT S REALITOU PRED 9:30.',
+  'VASE EGO BYLO PREKROCENO O 18 %.',
+  'KONDICE DOBRA. CHARAKTER SE NEPOSUZOVAL.',
+  'VYSLEDEK BYL VYHODNOCEN JAKO "NEJAK BUDE".'
+];
+// hláška sa vypisuje znak po znaku ako na termináli; dlhší text pri písaní roluje doľava, potom chvíľu svieti a zhasne
+(function ticker() {
+  const view = document.querySelector('.tk-view'), el = $('#tkText');
+  if (!view || !el) return;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let order = [], i = 0;
+  const next = () => {
+    if (i >= order.length) {
+      order = HLASKY.map((_, k) => k);
+      for (let k = order.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [order[k], order[j]] = [order[j], order[k]]; }
+      i = 0;
+    }
+    return HLASKY[order[i++]];
+  };
+  const shift = () => { const over = el.scrollWidth - view.clientWidth; el.style.transform = `translateX(${over > 0 ? -over : 0}px)`; };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  (async function loop() {
+    for (;;) {
+      if (document.hidden) { await wait(1000); continue; }
+      const msg = next();
+      el.classList.remove('off');
+      el.style.transform = 'translateX(0)';
+      if (reduce) { el.textContent = msg; shift(); await wait(6000); continue; }
+      for (let n = 1; n <= msg.length; n++) {
+        el.textContent = msg.slice(0, n); shift();
+        await wait(msg[n - 1] === ' ' ? 25 : 45 + Math.random() * 30);
+      }
+      await wait(msg.startsWith('ERROR') ? 1800 : 3200);
+      el.classList.add('off');
+      await wait(450);
+      el.textContent = '';
+    }
+  })();
+})();
+
 /* ================= VŠEOBECNÉ ================= */
-$('#soundBtn').addEventListener('click', () => { soundOn = !soundOn; store.set(K_SOUND, soundOn); updSoundBtn(); if (soundOn) { unlockAudio(); printerBurst(24); } });
 // „Nový kondiciogram“: zahodí posledný štítok a začne odznova
 $('#newBtn').addEventListener('click', () => {
   store.del(K_LAST); U = null; reg = null;
@@ -881,7 +1098,7 @@ function initAds() {
 
 (function init() {
   initAds();
-  updSoundBtn();
+  $('#pBirthBox').innerHTML = datePicker('pBirth', '');
   const last = store.get(K_LAST, null);
   if (last && last.name && last.birth) { U = derive(last); showDash(false); }
   else show('scr-login');

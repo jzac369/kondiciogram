@@ -11,6 +11,10 @@ Stačí otvoriť `index.html` v prehliadači. Server ani build nie sú potrebné
 ## Čo stránka vie
 
 - **Bez registrácie a hesiel.** Stačí vyplniť štítok. Rovnaké meno, dátum narodenia a odpovede dajú vždy rovnaký kondiciogram. Posledný štítok si prehliadač zapamätá, aby sa výsledok nestratil po obnovení stránky.
+- **Dve služby na rozcestníku:** Kondiciogram a Výber partnera podľa počítača (stačí meno a dátum narodenia).
+- **Displej v hornom pruhu** vypisuje 48 hlášok stroja (česky, veľkými písmenami, bez diakritiky).
+- **Zvuk:** pri vložení štítku do stroja zaznie vytáčaný modem, pri tlači ihličková tlačiareň. Zvuk je vždy zapnutý.
+- **Dátum** sa vyberá po slovensky: deň, mesiac slovom, rok.
 - **Dotazník** s 9 otázkami: spánok, pohyb, káva, pivo, stres, láska, tréning hlavy, denný rytmus a povolanie.
 - **Dierny štítok** v Hollerithovom kóde (80 stĺpcov), ktorý sa dieruje priebežne podľa odpovedí.
 - **Stroj:** štítok zajde do stroja a z tlačiarne vyjde kondiciogram so zvukom ihličkovej tlačiarne.
