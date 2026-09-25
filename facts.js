@@ -20,54 +20,16 @@ const MENINY = [
 ];
 const MENINY_SVIATOK = { '0-1': 'Deň vzniku Slovenskej republiky', '4-1': 'Sviatok práce', '10-2': 'Pamiatka zosnulých', '11-25': 'Prvý sviatok vianočný' };
 
-// ---------- vybrané osobnosti zo Slovenska a Česka: [deň, mesiac (1–12), rok, meno, kto] ----------
-const OSOBNOSTI = [
-  [28, 3, 1592, 'Ján Amos Komenský', 'učiteľ národov'], [14, 5, 1316, 'Karol IV.', 'rímsky cisár a český kráľ'], [13, 5, 1717, 'Mária Terézia', 'panovníčka'],
-  [15, 5, 1720, 'Maximilián Hell', 'astronóm'], [23, 1, 1734, 'Wolfgang Kempelen', 'vynálezca šachového automatu'], [27, 12, 1566, 'Ján Jesenius', 'lekár'],
-  [25, 1, 1688, 'Juraj Jánošík', 'zbojník'], [29, 7, 1793, 'Ján Kollár', 'básnik'], [13, 5, 1795, 'Pavol Jozef Šafárik', 'jazykovedec'],
-  [28, 10, 1815, 'Ľudovít Štúr', 'kodifikátor spisovnej slovenčiny'], [24, 4, 1822, 'Janko Kráľ', 'básnik'], [20, 7, 1822, 'Gregor Mendel', 'otec genetiky'],
-  [2, 3, 1824, 'Bedřich Smetana', 'skladateľ'], [4, 2, 1820, 'Božena Němcová', 'spisovateľka'], [8, 9, 1841, 'Antonín Dvořák', 'skladateľ'],
-  [2, 2, 1849, 'Pavol Országh Hviezdoslav', 'básnik'], [7, 3, 1850, 'Tomáš Garrigue Masaryk', 'prvý prezident ČSR'], [3, 7, 1854, 'Leoš Janáček', 'skladateľ'],
-  [6, 5, 1856, 'Sigmund Freud', 'zakladateľ psychoanalýzy, rodák z Příbora'], [10, 5, 1859, 'Aurel Stodola', 'konštruktér turbín'], [24, 7, 1860, 'Alfons Mucha', 'maliar'],
-  [17, 5, 1860, 'Martin Kukučín', 'spisovateľ'], [17, 2, 1864, 'Jozef Murgaš', 'priekopník rádia'], [23, 8, 1868, 'Dušan Jurkovič', 'architekt'],
-  [18, 10, 1874, 'Jozef Gregor Tajovský', 'spisovateľ'], [3, 9, 1875, 'Ferdinand Porsche', 'konštruktér áut'], [26, 2, 1878, 'Ema Destinnová', 'operná speváčka'],
-  [21, 7, 1880, 'Milan Rastislav Štefánik', 'astronóm a generál'], [5, 7, 1880, 'Jan Kubelík', 'huslista'], [3, 7, 1883, 'Franz Kafka', 'spisovateľ'],
-  [30, 4, 1883, 'Jaroslav Hašek', 'autor Švejka'], [17, 12, 1887, 'Josef Lada', 'maliar a ilustrátor'], [21, 9, 1888, 'Martin Benka', 'maliar'],
-  [9, 1, 1890, 'Karel Čapek', 'spisovateľ, vymyslel slovo robot'], [20, 12, 1890, 'Jaroslav Heyrovský', 'nositeľ Nobelovej ceny'], [9, 4, 1891, 'Vlasta Burian', 'kráľ komikov'],
-  [25, 11, 1895, 'Ludvík Svoboda', 'generál a prezident'], [11, 12, 1900, 'Hermína Týrlová', 'animátorka'], [23, 9, 1901, 'Jaroslav Seifert', 'básnik, nositeľ Nobelovej ceny'],
-  [27, 2, 1902, 'Ľudovít Fulla', 'maliar'], [12, 12, 1902, 'Koloman Sokol', 'grafik'], [27, 12, 1904, 'Laco Novomeský', 'básnik'],
-  [6, 2, 1905, 'Jan Werich', 'herec a spisovateľ'], [19, 6, 1905, 'Jiří Voskovec', 'herec'], [28, 4, 1908, 'Oskar Schindler', 'záchranca ľudí'],
-  [3, 11, 1910, 'Karel Zeman', 'filmový režisér'], [24, 2, 1912, 'Jiří Trnka', 'animátor'], [27, 10, 1913, 'Otto Wichterle', 'vynálezca mäkkých kontaktných šošoviek'],
-  [28, 3, 1914, 'Bohumil Hrabal', 'spisovateľ'], [29, 6, 1914, 'Rafael Kubelík', 'dirigent'], [21, 2, 1921, 'Zdeněk Miler', 'autor Krtka'],
-  [27, 11, 1921, 'Alexander Dubček', 'politik'], [16, 3, 1922, 'Zdeněk Liška', 'filmový skladateľ'], [19, 9, 1922, 'Emil Zátopek', 'bežec'],
-  [20, 3, 1924, 'Jozef Kroner', 'herec'], [4, 7, 1924, 'Oldřich Lipský', 'režisér filmu Jáchyme, hoď ho do stroje!'], [6, 8, 1928, 'Andy Warhol', 'umelec s koreňmi na Slovensku'],
-  [2, 2, 1929, 'Věra Chytilová', 'režisérka'], [1, 4, 1929, 'Milan Kundera', 'spisovateľ'], [12, 6, 1930, 'Adolf Born', 'ilustrátor'],
-  [1, 10, 1931, 'Jiří Suchý', 'divadelník'], [9, 12, 1931, 'Ladislav Smoljak', 'režisér'], [18, 2, 1932, 'Miloš Forman', 'režisér'],
-  [2, 7, 1932, 'Waldemar Matuška', 'spevák'], [11, 7, 1933, 'Olga Havlová', 'prvá dáma'], [4, 9, 1934, 'Jan Švankmajer', 'animátor'],
-  [28, 3, 1936, 'Zdeněk Svěrák', 'herec a scenárista'], [5, 10, 1936, 'Václav Havel', 'dramatik a prezident'], [6, 1, 1938, 'Jozef Golonka', 'hokejista'],
-  [23, 2, 1938, 'Jiří Menzel', 'režisér'], [14, 3, 1938, 'Petr Nárožný', 'herec'], [14, 7, 1939, 'Karel Gott', 'spevák'],
-  [14, 12, 1939, 'Josef Abrhám', 'herec'], [3, 2, 1940, 'Milan Lasica', 'herec a humorista'], [20, 5, 1940, 'Stan Mikita', 'hokejista'],
-  [20, 8, 1941, 'Július Satinský', 'herec a humorista'], [3, 5, 1942, 'Věra Čáslavská', 'gymnastka'], [18, 5, 1942, 'Emília Vášáryová', 'herečka'],
-  [1, 11, 1942, 'Marta Kubišová', 'speváčka'], [22, 8, 1943, 'Luděk Sobota', 'herec, František Koudelka z filmu'], [23, 10, 1943, 'Václav Neckář', 'spevák'],
-  [12, 4, 1944, 'Karel Kryl', 'pesničkár'], [28, 10, 1944, 'Marián Labuda', 'herec'], [6, 9, 1946, 'Hana Zagorová', 'speváčka'],
-  [24, 6, 1947, 'Helena Vondráčková', 'speváčka'], [26, 8, 1948, 'Magda Vášáryová', 'herečka a diplomatka'], [7, 12, 1948, 'Pavol Hammel', 'spevák'],
-  [22, 1, 1951, 'Ondrej Nepela', 'krasokorčuliar'], [21, 10, 1952, 'Miroslav Žbirka', 'spevák'], [7, 6, 1953, 'Libuše Šafránková', 'herečka'],
-  [12, 2, 1956, 'Marika Gombitová', 'speváčka'], [18, 9, 1956, 'Peter Šťastný', 'hokejista'], [18, 10, 1956, 'Martina Navrátilová', 'tenistka'],
-  [7, 3, 1960, 'Ivan Lendl', 'tenista'], [29, 1, 1965, 'Dominik Hašek', 'hokejový brankár'], [16, 6, 1966, 'Jan Železný', 'oštepár'],
-  [15, 2, 1972, 'Jaromír Jágr', 'hokejista'], [30, 8, 1972, 'Pavel Nedvěd', 'futbalista'], [16, 1, 1976, 'Martina Moravcová', 'plavkyňa'],
-  [18, 3, 1977, 'Zdeno Chára', 'hokejista'], [12, 1, 1979, 'Marián Hossa', 'hokejista'], [20, 5, 1982, 'Petr Čech', 'futbalový brankár'],
-  [6, 5, 1989, 'Dominika Cibulková', 'tenistka'], [26, 1, 1990, 'Peter Sagan', 'cyklista'], [13, 6, 1995, 'Petra Vlhová', 'lyžiarka']
-];
-
 // ---------- orientačné ceny podľa obdobia (približne) ----------
-const CENY = [
-  { od: 1900, do: 1952, mena: 'Kčs', text: 'Z tých čias sa ceny ťažko porovnávajú: platili sa korunami, ale menová reforma v roku 1953 všetko prepočítala. Stroj odporúča neporovnávať a radšej si spomenúť na vôňu chleba z pece.' },
-  { od: 1953, do: 1969, mena: 'Kčs', polozky: [['rožok', '0,30'], ['chlieb (1 kg)', '2,60'], ['pivo desiatka (0,5 l)', '1,70'], ['lístok do kina', '2–4'], ['osobné auto Škoda', 'okolo 35 000']] },
-  { od: 1970, do: 1979, mena: 'Kčs', polozky: [['rožok', '0,30'], ['chlieb (1 kg)', '2,60'], ['pivo desiatka (0,5 l)', '1,70'], ['lístok do kina', '4–6'], ['Škoda 100', 'okolo 45 000']] },
-  { od: 1980, do: 1989, mena: 'Kčs', polozky: [['rožok', '0,40'], ['chlieb (1 kg)', '3,20'], ['pivo desiatka (0,5 l)', '2,00'], ['lístok do kina', '6–10'], ['Škoda 105', 'okolo 60 000']] },
-  { od: 1990, do: 1992, mena: 'Kčs', polozky: [['rožok', '0,60'], ['chlieb (1 kg)', '7'], ['pivo desiatka (0,5 l)', '5'], ['lístok do kina', '10–15'], ['Škoda Favorit', 'okolo 100 000']] },
-  { od: 1993, do: 2008, mena: 'Sk', polozky: [['rožok', '1,50–3'], ['chlieb (1 kg)', '25–40'], ['pivo (0,5 l v krčme)', '15–30'], ['lístok do kina', '80–150'], ['nové auto', 'od 300 000']] },
-  { od: 2009, do: 2100, mena: '€', polozky: [['rožok', '0,10–0,20'], ['chlieb (1 kg)', '1,50–3'], ['pivo (0,5 l v krčme)', '1,50–3'], ['lístok do kina', '6–10'], ['nové auto', 'od 15 000']] }
+const CENY = [   // len overené údaje: ČSÚ, ŠÚ SR, dobové cenníky
+  { od: 1900, do: 1952, text: 'Ceny z tých čias sa s dneškom porovnávajú ťažko: menová reforma v roku 1953 všetky ceny aj úspory prepočítala. Napríklad pollitrová fľaša desiatky stála v roku 1952 ešte 9 Kčs, v roku 1983 už len 1,70 Kčs.' },
+  { od: 1953, do: 1963, mena: 'Kčs', polozky: [['rožok', '0,30 – 0,40'], ['chlieb ražno-pšeničný (1 kg)', '2,60 (od konca 50. rokov)'], ['priemerná mesačná mzda', 'asi 1 200']] },
+  { od: 1964, do: 1975, mena: 'Kčs', polozky: [['rožok', '0,30'], ['chlieb ražno-pšeničný (1 kg)', '2,60'], ['kockový cukor (1 kg)', '8'], ['Škoda 1000 MB (1964)', 'asi 44 000'], ['priemerná mesačná mzda (1970)', 'asi 1 900']] },
+  { od: 1976, do: 1988, mena: 'Kčs', polozky: [['rožok', '0,30 – 0,40'], ['chlieb ražno-pšeničný (1 kg)', '2,60'], ['fľaškové pivo desiatka (0,5 l)', '1,70'], ['kockový cukor (1 kg)', '8'], ['Škoda 105 (1976)', 'asi 55 000'], ['priemerná mesačná mzda (1983)', '2 808']] },
+  { od: 1989, do: 1990, mena: 'Kčs', polozky: [['rožok', '0,40'], ['chlieb (1 kg)', '2,80'], ['polotučné mlieko (1 l)', '2'], ['tvaroh', '1,50'], ['Škoda Favorit', '84 000'], ['priemerná mesačná mzda', 'asi 3 130']] },
+  { od: 1991, do: 1992, text: 'V januári 1991 sa uvoľnili ceny a mnohé tovary za pár mesiacov výrazne zdraželi. Ešte v roku 1989 stál rožok 40 halierov a kilo chleba 2,80 Kčs.' },
+  { od: 1993, do: 2008, text: 'Platila slovenská koruna a ceny sa rok čo rok menili. Pre porovnanie: rožok stál v roku 1989 40 halierov, v roku 2018 už 6 centov (asi 1,80 Sk). Kilo chleba sa za ten čas zdražilo z 2,80 Kčs na 1,33 €.' },
+  { od: 2009, do: 2100, mena: '€', rok: 2018, polozky: [['rožok', '0,06'], ['chlieb (1 kg)', '1,33'], ['polotučné mlieko (1 l)', '0,74'], ['obedové menu', '3,82'], ['priemerná mesačná mzda', '1 013']] }
 ];
 
 // ---------- Osobná šťastena: 5 častí × 30 viet = 150 rôznych veštieb ----------
@@ -201,15 +163,6 @@ function menoMeniny(name) {   // nájde meniny podľa niektorého slova v mene
   }
   return null;
 }
-function osobnosti(bf) {
-  const same = OSOBNOSTI.filter(o => o[0] === bf.d && o[1] === bf.m + 1);
-  if (same.length) return { same: true, list: same };
-  const doy = (d, m) => Math.round(Date.UTC(2001, m - 1, d) / 864e5);
-  const me = doy(bf.d, bf.m + 1);
-  const dist = o => { const x = Math.abs(doy(o[0], o[1]) - me); return Math.min(x, 365 - x); };
-  const best = Math.min(...OSOBNOSTI.map(dist));
-  return { same: false, list: OSOBNOSTI.filter(o => dist(o) === best).slice(0, 3) };
-}
 
 // ---------- šťastné čísla Lotto (6 z 49, žrebovanie v stredu a v nedeľu) ----------
 function lottoDraw(u, today) {
@@ -287,12 +240,12 @@ function renderFacts(u) {
   out.push(tile('card', 'Meniny', big(mn || sv || '—') + `<p>${mn ? 'mali meniny v deň vášho narodenia' : 'v tento deň nemá meniny nikto, je sviatok'}${mn && sv ? ` (${sv})` : ''}.</p>${ownTxt}`));
 
   // osobnosti
-  const os = osobnosti(bf);
-  out.push(tile('film', os.same ? 'V rovnaký deň sa narodil(a)' : 'Najbližšie k vašim narodeninám', `<ul class="fact-list">${os.list.map(o => `<li><b>${o[3]}</b> (${o[0]}. ${o[1]}. ${o[2]}), ${o[4]}</li>`).join('')}</ul>`));
+  const os = (typeof OSOBNOSTI !== 'undefined' && OSOBNOSTI[`${String(bf.m + 1).padStart(2, '0')}-${String(bf.d).padStart(2, '0')}`]) || [];
+  if (os.length) out.push(tile('film', `Tiež sa narodili ${bf.d}. ${MONTHS_GEN[bf.m]}`, `<ul class="fact-list">${os.map(o => `<li><b>${o[1]}</b> (${o[0]}), ${o[2]}</li>`).join('')}</ul>`));
 
   // ceny
   const c = CENY.find(x => bf.y >= x.od && bf.y <= x.do);
-  out.push(tile('stress', `Ceny v roku ${bf.y}`, c.polozky ? `<ul class="fact-list">${c.polozky.map(([n, v]) => `<li>${n}: <b>${v} ${c.mena}</b></li>`).join('')}</ul><p class="muted small-txt">Približné ceny z tých čias.</p>` : `<p>${c.text}</p>`));
+  out.push(tile('stress', c.rok ? `Ceny dnes (${c.rok})` : `Ceny okolo roku ${bf.y}`, c.polozky ? `<ul class="fact-list">${c.polozky.map(([n, v]) => `<li>${n}: <b>${v} ${c.mena}</b></li>`).join('')}</ul><p class="muted small-txt">Zdroj: ČSÚ, ŠÚ SR, dobové cenníky.</p>` : `<p>${c.text}</p><p class="muted small-txt">Zdroj: ČSÚ, ŠÚ SR.</p>`));
 
   // osobná šťastena
   const no = fnv('stastena' + nameSeed(u.name) + u.birth) % 150;
