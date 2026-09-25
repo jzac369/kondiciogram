@@ -1292,7 +1292,7 @@ $('#yearInp').addEventListener('change', () => printMain(true));
 $('#reprintBtn').addEventListener('click', () => printMain(true));
 
 /* ---- zdieľanie (bez osobných údajov: len výsledok a odkaz na stránku) ---- */
-const SITE_URL = 'https://jzac369.github.io/kondiciogram/';
+const SITE_URL = 'https://kondiciogram.online/';
 const isMobile = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
 function shareText() {
   const parts = ['Samočinný počítač SPC-74 ma hodil do stroja!'];
