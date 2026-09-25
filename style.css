@@ -903,3 +903,12 @@ body.tracking-on .only-local{display:none}
 .opts.need .opt{border-color:var(--red);animation:needPulse 1.2s ease-in-out 2}
 @keyframes needPulse{50%{box-shadow:0 0 0 4px rgba(184,36,27,.35)}}
 @media (prefers-reduced-motion:reduce){ #regErr.shake,.opts.need .opt{animation:none} }
+
+/* ---- tabuľa STROJ HLÁSÍ na mobile: text sa zalomí, nič sa neposúva a neodreže ---- */
+@media (max-width:680px){
+  .top-info .ticker{height:auto;min-height:66px;padding:5px 10px}
+  .tk-label{display:none}
+  .tk-view{height:auto;overflow:visible}
+  .tk-text{white-space:normal;transform:none!important;font-size:1.12rem;line-height:1.08;letter-spacing:.04em}
+  .flipclock{align-self:stretch;height:auto}
+}
