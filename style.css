@@ -963,3 +963,15 @@ body.tracking-on .only-local{display:none}
 @keyframes ballIn{from{transform:translateY(-14px) scale(.6);opacity:0}}
 @media (prefers-reduced-motion:reduce){.ball{animation:none}}
 .lotto-note{font-size:.75rem;color:#cdb8d9;margin:.6em 0 0}
+
+/* ---- ďalšie reklamné miesta ---- */
+.ad-thin{max-width:760px;margin:22px auto 0;opacity:.92}
+.ad-thin .ad-body{min-height:60px}
+.facts-side{display:flex;flex-direction:column;gap:24px}
+#scr-dash .ad-side{margin:0;width:100%}
+.ad-side .ad-body{min-height:250px}
+.fact-ad{padding:0;border-style:dashed;box-shadow:none;background:none}
+.fact-ad .ad-slot{margin:0;height:100%;border:none;background:#f7efd9;border-radius:10px}
+#scr-dash .fact-ad .ad-slot{margin:0}
+.fact-ad .ad-body{min-height:150px}
+@media (max-width:900px){ .ad-side .ad-body{min-height:120px} }

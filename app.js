@@ -349,6 +349,7 @@ function show(id) {
   $('#whoami').classList.toggle('hidden', !has);
   if (U) $('#whoami').innerHTML = icon('card') + ' ' + esc(U.name);
   window.scrollTo(0, 0);
+  if (typeof initAds === 'function') requestAnimationFrame(initAds);
 }
 
 /* ================= ÚVOD (bez prihlasovania) ================= */
@@ -972,6 +973,7 @@ function showDash(animatePrint) {
   renderCard($('#dashCard'), cardText(U));
   if (U.services.p) renderMatch();
   renderFacts(U);
+  requestAnimationFrame(initAds);
   $('#shareNote').textContent = '';
   if (!$('#actSel').options.length) $('#actSel').innerHTML = ACTIVITIES.map((a, i) => `<option value="${i}">${esc(a.n)}</option>`).join('');
   $('#planOut').innerHTML = ''; $('#pOut').innerHTML = '';
@@ -1477,7 +1479,8 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if
 // Google AdSense: sloty sa aktivujú, až keď je v index.html doplnené skutočné ID vydavateľa
 function initAds() {
   document.querySelectorAll('ins.adsbygoogle').forEach(el => {
-    if ((el.dataset.adClient || '').includes('XXXX') || el.dataset.adStatus) return;
+    if ((el.dataset.adClient || '').includes('XXXX') || /^0{9}\d$/.test(el.dataset.adSlot || '') || el.dataset.adStatus || el.dataset.pushed || !el.offsetWidth) return;
+    el.dataset.pushed = '1';
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { }
   });
 }

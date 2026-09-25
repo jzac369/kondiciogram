@@ -250,6 +250,9 @@ function renderFacts(u) {
   // osobná šťastena
   const no = fnv('stastena' + nameSeed(u.name) + u.birth) % 150;
   box.innerHTML = out.join('');
+  // reklamná dlaždica medzi zaujímavosťami: ten istý uzol sa pri prekreslení len presunie (žiadne nové načítanie reklamy)
+  if (!renderFacts.ad) { const tpl = document.getElementById('factAdTpl'); if (tpl) renderFacts.ad = tpl.content.firstElementChild.cloneNode(true); }
+  if (renderFacts.ad) box.insertBefore(renderFacts.ad, box.children[6] || null);
   const lo = document.getElementById('lottoOut');
   if (lo) {
     const L = lottoDraw(u, today);
