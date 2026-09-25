@@ -895,3 +895,11 @@ input::-webkit-input-placeholder{color:#c9b89c;opacity:1;font-style:italic}
 .only-track{display:none}
 body.tracking-on .only-track{display:revert}
 body.tracking-on .only-local{display:none}
+
+/* ---- výrazné upozornenie v dotazníku (napr. nevybraná odpoveď) ---- */
+#regErr:not(:empty){background:var(--red);color:#fff;border-radius:10px;padding:8px 12px;text-align:center;font-weight:700;box-shadow:3px 3px 0 var(--brown)}
+#regErr.shake{animation:errShake .45s ease-in-out}
+@keyframes errShake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.opts.need .opt{border-color:var(--red);animation:needPulse 1.2s ease-in-out 2}
+@keyframes needPulse{50%{box-shadow:0 0 0 4px rgba(184,36,27,.35)}}
+@media (prefers-reduced-motion:reduce){ #regErr.shake,.opts.need .opt{animation:none} }

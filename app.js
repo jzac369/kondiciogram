@@ -438,6 +438,7 @@ function renderStep() {
     box.querySelector('.opts').addEventListener('click', e => {
       const b = e.target.closest('.opt'); if (!b) return;
       reg.data.answers[id] = +b.dataset.i;
+      $('#regErr').textContent = ''; box.querySelector('.opts').classList.remove('need');
       updRegCard();
       box.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x === b));
       beep(660, .04);
@@ -480,7 +481,14 @@ function setDate(id, iso) {
   box.querySelector('[data-p="d"]').value = d; box.querySelector('[data-p="m"]').value = m; box.querySelector('[data-p="y"]').value = y;
 }
 function nextStep() {
-  const id = reg.steps[reg.step], err = m => { $('#regErr').textContent = m; beep(220, .25); };
+  // chyba musí byť dobre viditeľná aj na mobile: zvýraznené hlásenie, zatrasenie, posun k otázke
+  const id = reg.steps[reg.step], err = m => {
+    const e = $('#regErr'), opts = document.querySelector('#regStep .opts');
+    e.textContent = m; e.classList.remove('shake'); void e.offsetWidth; e.classList.add('shake');
+    if (opts) { opts.classList.remove('need'); void opts.offsetWidth; opts.classList.add('need'); opts.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    if (navigator.vibrate) navigator.vibrate(120);
+    beep(220, .25);
+  };
   if (id === 'account') {
     const name = $('#rName').value.trim().replace(/\s+/g, ' ');
     if (name.length < 2) return err('Zadajte meno, aspoň 2 znaky.');
