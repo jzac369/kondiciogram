@@ -211,6 +211,14 @@ function osobnosti(bf) {
   return { same: false, list: OSOBNOSTI.filter(o => dist(o) === best).slice(0, 3) };
 }
 
+// ---------- šťastné čísla Lotto (6 z 49, žrebovanie v stredu a v nedeľu) ----------
+function lottoDraw(u, today) {
+  let n = today; while (![0, 3].includes(fromN(n).w)) n++;   // najbližšia streda alebo nedeľa (aj dnes)
+  const r = rng(fnv('lotto' + nameSeed(u.name) + u.birth + isoN(n))), pool = Array.from({ length: 49 }, (_, i) => i + 1), nums = [];
+  while (nums.length < 6) nums.push(pool.splice(Math.floor(r() * pool.length), 1)[0]);
+  return { n, nums: nums.sort((a, b) => a - b), bonus: 1 + Math.floor(r() * 10) };
+}
+
 // ---------- vykreslenie sekcie ----------
 function renderFacts(u) {
   const box = document.getElementById('factsOut'); if (!box) return;
@@ -289,6 +297,15 @@ function renderFacts(u) {
   // osobná šťastena
   const no = fnv('stastena' + nameSeed(u.name) + u.birth) % 150;
   box.innerHTML = out.join('');
+  const lo = document.getElementById('lottoOut');
+  if (lo) {
+    const L = lottoDraw(u, today);
+    lo.innerHTML = `<h4>Šťastné čísla do Lotta</h4>
+      <div class="lotto-when">žrebovanie ${L.n === today ? 'dnes, ' : ''}${datumDlhy(L.n)}</div>
+      <div class="lotto-balls">${L.nums.map(x => `<span class="ball">${x}</span>`).join('')}</div>
+      <div class="lotto-when">šťastná cifra: <b>${L.bonus - 1}</b></div>
+      <p class="lotto-note">Guľa vyberá čísla nanovo pre každé žrebovanie. Len pre zábavu, výhru nesľubuje. Hra je určená osobám nad 18 rokov.</p>`;
+  }
   const st = document.getElementById('fortuneOut');
   if (st) st.innerHTML = `<div class="fortune-no">Veštba č. ${String(no + 1).padStart(3, '0')} zo 150</div><p>${stastena(no).join(' ')}</p>`;
 }

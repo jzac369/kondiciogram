@@ -2,7 +2,7 @@
 // Prihlásenie cez Firebase Authentication (e-mail a heslo si nastaví prevádzkovateľ vo Firebase Console).
 // Dáta čítajú len prihlásení správcovia; chránia ich pravidlá vo firestore.rules.
 import { firebaseConfig, ADMIN_EMAIL, RETENTION_DAYS } from './firebase-config.js';
-import { firebase } from './tracker.js?v=20260925e';   // tracker sa načíta len raz (cez admin.js)
+import { firebase } from './tracker.js?v=20260925f';   // tracker sa načíta len raz (cez admin.js)
 
 const V = '10.12.2';
 const $a = s => document.querySelector(s);
