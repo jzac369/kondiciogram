@@ -562,7 +562,7 @@ function runMachine(done) {
   $('#cardIn').classList.remove('feeding', 'gone');
   $('#paperOut').classList.remove('feed'); $('#paper0').innerHTML = '';
   $('#feedBtn').disabled = false;
-  $('#toDash').classList.add('hidden'); $('#machPrint').classList.add('hidden'); $('#skipMachine').classList.remove('hidden');
+  $('#toDash').classList.add('hidden'); $('#machPrint').classList.add('hidden');
   ttyShow(['SAMOCINNY POCITAC - PRIPRAVEN', `STITEK: ${ascii(U.name)}`, '', 'VLOZTE STITEK DO STROJE.', 'STISKNETE VELKE TLACITKO.']);
   machineDone = () => { const f = done; machineDone = null; machineStop(); f(); };
 }
@@ -597,7 +597,7 @@ $('#feedBtn').addEventListener('click', () => {
         onDone: () => {
           mach.classList.remove('busy');
           ttyShow([...msgs.slice(-3), 'HOTOVO. ODTRHNETE PAPIR.']);
-          $('#toDash').classList.remove('hidden'); $('#machPrint').classList.remove('hidden'); $('#skipMachine').classList.add('hidden');
+          $('#toDash').classList.remove('hidden'); $('#machPrint').classList.remove('hidden');
           $('#toDash').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
       });
@@ -605,7 +605,6 @@ $('#feedBtn').addEventListener('click', () => {
   }, 1300));
 });
 $('#toDash').addEventListener('click', () => { if (machineDone) machineDone(); });
-$('#skipMachine').addEventListener('click', () => { if (machineDone) machineDone(); });
 
 /* ================= ÚVOD: REKLAMNÉ TITULKY (česky, štýl 70. rokov) ================= */
 const CREDITS = [
