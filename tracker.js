@@ -103,7 +103,7 @@ window.kgTrack = {
 
 if (firebaseConfig) {
   document.body.classList.add('tracking-on');
-  const op = document.getElementById('opName'); if (op) op.textContent = OPERATOR || '';
+  const op = document.getElementById('opName'); if (op) op.textContent = OPERATOR ? ` (${OPERATOR})` : '';
   const rs = document.getElementById('consentReset'); if (rs) rs.addEventListener('click', () => { setConsent(''); showBanner(); });
   trackVisibility();
   const c = getConsent();
