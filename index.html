@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Courier+Prime:wght@400;700&family=Doto:wght@400..900&family=Oswald:wght@600;700&family=Righteous&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20260925d">
+<link rel="stylesheet" href="style.css?v=20260925e">
 <!-- Google AdSense: odkomentujte a doplňte svoje ID vydavateľa, keď bude web verejný a schválený
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 -->
@@ -224,6 +224,18 @@
         <div class="printer-slot no-print"><span class="led"></span>RIADKOVÁ TLAČIAREŇ · ON LINE</div>
         <div class="paper-scroll"><div class="paper" id="paper"></div></div>
       </div>
+      <div class="share-row no-print" id="shareRow">
+        <span class="share-lbl">Pochváľte sa známym:</span>
+        <button type="button" class="share-btn sh-fb" data-sh="fb">Facebook</button>
+        <button type="button" class="share-btn sh-ms" data-sh="ms">Messenger</button>
+        <button type="button" class="share-btn sh-wa" data-sh="wa">WhatsApp</button>
+        <button type="button" class="share-btn sh-vb" data-sh="vb">Viber</button>
+        <button type="button" class="share-btn sh-tg" data-sh="tg">Telegram</button>
+        <button type="button" class="share-btn sh-x" data-sh="x">X</button>
+        <button type="button" class="share-btn sh-cp" data-sh="cp">Kopírovať odkaz</button>
+        <button type="button" class="share-btn sh-nt hidden" data-sh="nt">Zdieľať…</button>
+        <span class="share-note" id="shareNote" aria-live="polite"></span>
+      </div>
     </article>
 
     <article class="card match retro no-print p-only" id="matchCard">
@@ -277,6 +289,20 @@
       </article>
     </div>
 
+    <section class="facts-wrap no-print" aria-label="Zaujímavosti">
+      <article class="card fortune" id="fortuneCard">
+        <div class="film fortune-title"><span class="film-s">Osobná šťastena</span></div>
+        <div class="crystal" aria-hidden="true"><i></i></div>
+        <div id="fortuneOut" class="fortune-out"></div>
+        <p class="muted small-txt">Kedy sa to splní, guľa neprezradila. Ale splní sa.</p>
+      </article>
+      <article class="card facts-card">
+        <h3>Zaujímavosti o vás</h3>
+        <p class="muted small-txt">Stroj prepočítal váš život na čísla. Všetky údaje sú orientačné.</p>
+        <div id="factsOut" class="facts-grid"></div>
+      </article>
+    </section>
+
     <aside class="ad-slot no-print" aria-label="Reklama">
       <div class="ad-label">Reklama · Inzercia</div>
       <div class="ad-body">
@@ -329,12 +355,13 @@
   <button type="button" class="admin-btn" id="adminBtn">Vstup je pro závodní radu</button>
 </footer>
 <div id="printSheet" class="print-sheet" aria-hidden="true"></div>
-<script src="names.js?v=20260925d"></script>
+<script src="names.js?v=20260925e"></script>
 <div id="consentBar" class="consent-bar hidden" role="dialog" aria-label="Súhlas so záznamom návštevy">
   <p><b>Stroj si vedie záznamy.</b> S vaším súhlasom môžu byť dočasne uložené údaje o návšteve a zo štítku na štatistické účely. <a href="#privacy" onclick="document.getElementById('privacy').open=true">Viac informácií</a></p>
   <div class="row"><button id="consentYes" class="btn small" type="button">Súhlasím</button><button id="consentNo" class="btn small ghost" type="button">Nesúhlasím</button></div>
 </div>
-<script src="app.js?v=20260925d"></script>
-<script type="module" src="admin.js?v=20260925d"></script>
+<script src="facts.js?v=20260925e"></script>
+<script src="app.js?v=20260925e"></script>
+<script type="module" src="admin.js?v=20260925e"></script>
 </body>
 </html>

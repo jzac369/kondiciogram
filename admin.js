@@ -2,7 +2,7 @@
 // Prihlásenie cez Firebase Authentication (e-mail a heslo si nastaví prevádzkovateľ vo Firebase Console).
 // Dáta čítajú len prihlásení správcovia; chránia ich pravidlá vo firestore.rules.
 import { firebaseConfig, ADMIN_EMAIL, RETENTION_DAYS } from './firebase-config.js';
-import { firebase } from './tracker.js?v=20260925d';   // tracker sa načíta len raz (cez admin.js)
+import { firebase } from './tracker.js?v=20260925e';   // tracker sa načíta len raz (cez admin.js)
 
 const V = '10.12.2';
 const $a = s => document.querySelector(s);
@@ -70,6 +70,8 @@ function render(user) {
   $a('#admCsvC').onclick = () => csv('stitky', data.cards, ['cas', 'name', 'birth', 'age', 'city', 'region', 'country', 'ipPart', 'services', 'sex', 'answers', 'today', 'index', 'partner', 'partnerBirth', 'partnerCity', 'match']);
   $a('#admCsvV').onclick = () => csv('navstevy', data.visits, ['cas', 'city', 'region', 'country', 'ipPart', 'device', 'browser', 'lang', 'ref', 'screen', 'duration']);
   $a('#admPurge').onclick = purge;
+  $a('#admData').addEventListener('click', onDelete);
+  $a('#admData').addEventListener('change', onDelete);
   load();
 }
 
@@ -161,13 +163,15 @@ function dashboard({ visits, cards }) {
   </div>
 
   <section class="adm-box wide"><h4>Poslední štítky (${Math.min(150, cards.length)} z ${cards.length})</h4>
-    <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Čas</th><th>Jméno</th><th>Narozen</th><th>Věk</th><th>Město</th><th>IP</th><th>Služby</th><th>Dnes</th><th>Osudový partner</th><th>Shoda</th></tr></thead><tbody>
-    ${cards.slice(0, 150).map(c => `<tr><td>${escA(c.cas)}</td><td>${escA(c.name)}</td><td>${escA(c.birth)}</td><td>${escA(c.age)}</td><td>${escA(c.city)}</td><td>${escA(c.ipPart)}</td><td>${escA(c.services)}</td><td class="mono">${escA(c.today)}</td><td>${escA(c.partner || '–')}${c.partnerBirth ? ` <small>(${escA(c.partnerBirth)}, ${escA(c.partnerCity)})</small>` : ''}</td><td>${c.match ? c.match + ' %' : '–'}</td></tr>`).join('') || '<tr><td colspan="10" class="muted">Zatím žádné štítky.</td></tr>'}
+    ${delBar('cards')}
+    <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>${chkAll('cards')}</th><th>Čas</th><th>Jméno</th><th>Narozen</th><th>Věk</th><th>Město</th><th>IP</th><th>Služby</th><th>Dnes</th><th>Osudový partner</th><th>Shoda</th><th></th></tr></thead><tbody>
+    ${cards.slice(0, 150).map(c => `<tr>${chk('cards', c.id)}<td>${escA(c.cas)}</td><td>${escA(c.name)}</td><td>${escA(c.birth)}</td><td>${escA(c.age)}</td><td>${escA(c.city)}</td><td>${escA(c.ipPart)}</td><td>${escA(c.services)}</td><td class="mono">${escA(c.today)}</td><td>${escA(c.partner || '–')}${c.partnerBirth ? ` <small>(${escA(c.partnerBirth)}, ${escA(c.partnerCity)})</small>` : ''}</td><td>${c.match ? c.match + ' %' : '–'}</td>${delBtn('cards', c.id)}</tr>`).join('') || '<tr><td colspan="12" class="muted">Zatím žádné štítky.</td></tr>'}
     </tbody></table></div></section>
 
   <section class="adm-box wide"><h4>Poslední návštěvy (${Math.min(150, visits.length)} z ${visits.length})</h4>
-    <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Čas</th><th>Město</th><th>Kraj / země</th><th>IP</th><th>Zařízení</th><th>Prohlížeč</th><th>Čas na stránce</th><th>Odkud</th></tr></thead><tbody>
-    ${visits.slice(0, 150).map(v => `<tr><td>${escA(v.cas)}</td><td>${escA(v.city)}</td><td>${escA([v.region, v.country].filter(Boolean).join(', '))}</td><td>${escA(v.ipPart)}</td><td>${escA(v.device)}</td><td>${escA(v.browser)}</td><td>${fmtDur(v.duration || 0)}</td><td>${escA(v.ref || '–')}</td></tr>`).join('') || '<tr><td colspan="8" class="muted">Zatím žádné návštěvy.</td></tr>'}
+    ${delBar('visits')}
+    <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>${chkAll('visits')}</th><th>Čas</th><th>Město</th><th>Kraj / země</th><th>IP</th><th>Zařízení</th><th>Prohlížeč</th><th>Čas na stránce</th><th>Odkud</th><th></th></tr></thead><tbody>
+    ${visits.slice(0, 150).map(v => `<tr>${chk('visits', v.id)}<td>${escA(v.cas)}</td><td>${escA(v.city)}</td><td>${escA([v.region, v.country].filter(Boolean).join(', '))}</td><td>${escA(v.ipPart)}</td><td>${escA(v.device)}</td><td>${escA(v.browser)}</td><td>${fmtDur(v.duration || 0)}</td><td>${escA(v.ref || '–')}</td>${delBtn('visits', v.id)}</tr>`).join('') || '<tr><td colspan="10" class="muted">Zatím žádné návštěvy.</td></tr>'}
     </tbody></table></div></section>`;
 }
 
@@ -178,6 +182,52 @@ function csv(name, rows, cols) {
   a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
   a.download = `kondiciogram-${name}-${dayKey(new Date())}.csv`;
   document.body.appendChild(a); a.click(); a.remove();
+}
+
+// ---------- mazání jednotlivých záznamů ----------
+const COL_NAME = { cards: 'štítků', visits: 'návštěv' };
+const chk = (col, id) => `<td><input type="checkbox" class="adm-chk" data-col="${col}" data-id="${escA(id)}" aria-label="Vybrat záznam"></td>`;
+const chkAll = col => `<input type="checkbox" class="adm-chk-all" data-col="${col}" aria-label="Vybrat vše">`;
+const delBtn = (col, id) => `<td><button type="button" class="adm-del" data-col="${col}" data-id="${escA(id)}" title="Smazat záznam" aria-label="Smazat záznam">✕</button></td>`;
+const delBar = col => `<div class="adm-delbar"><button type="button" class="btn small ghost adm-del-sel" data-col="${col}">Smazat vybrané</button>
+    <button type="button" class="btn small ghost adm-del-all" data-col="${col}">Smazat všechny ${COL_NAME[col]}</button></div>`;
+
+async function removeDocs(col, ids) {
+  const { F, db } = await firebase();
+  let n = 0;
+  for (let i = 0; i < ids.length; i += 400) {   // dávky po 400 (limit Firestore je 500)
+    const b = F.writeBatch(db);
+    ids.slice(i, i + 400).forEach(id => b.delete(F.doc(db, col, id)));
+    await b.commit(); n += Math.min(400, ids.length - i);
+  }
+  return n;
+}
+async function onDelete(e) {
+  const t = e.target;
+  if (t.classList.contains('adm-chk-all')) {
+    document.querySelectorAll(`.adm-chk[data-col="${t.dataset.col}"]`).forEach(c => c.checked = t.checked);
+    return;
+  }
+  const btn = t.closest('.adm-del, .adm-del-sel, .adm-del-all'); if (!btn || e.type !== 'click') return;
+  const col = btn.dataset.col;
+  let ids, q;
+  if (btn.classList.contains('adm-del')) { ids = [btn.dataset.id]; q = 'Opravdu trvale smazat tento záznam?'; }
+  else if (btn.classList.contains('adm-del-sel')) {
+    ids = [...document.querySelectorAll(`.adm-chk[data-col="${col}"]:checked`)].map(c => c.dataset.id);
+    if (!ids.length) { alert('Nejdřív zaškrtněte záznamy, které chcete smazat.'); return; }
+    q = `Opravdu trvale smazat vybrané záznamy (${ids.length})?`;
+  } else {
+    ids = data[col].map(x => x.id);
+    if (!ids.length) return;
+    q = `Opravdu trvale smazat VŠECHNY záznamy ${COL_NAME[col]} (${ids.length})? Tuto akci nelze vrátit.`;
+  }
+  if (!confirm(q)) return;
+  btn.disabled = true;
+  try {
+    const n = await removeDocs(col, ids);
+    if (ids.length > 1) alert(`Smazáno záznamů: ${n}`);
+  } catch (err) { alert('Mazání se nezdařilo: ' + err.message); }
+  load();
 }
 
 async function purge() {

@@ -971,6 +971,8 @@ function showDash(animatePrint) {
   if (U.services.k) { renderVerdict(); drawScope(); renderRisks(); }
   renderCard($('#dashCard'), cardText(U));
   if (U.services.p) renderMatch();
+  renderFacts(U);
+  $('#shareNote').textContent = '';
   if (!$('#actSel').options.length) $('#actSel').innerHTML = ACTIVITIES.map((a, i) => `<option value="${i}">${esc(a.n)}</option>`).join('');
   $('#planOut').innerHTML = ''; $('#pOut').innerHTML = '';
   if (!$('#yearInp').value) $('#yearInp').value = fromN(today).y;
@@ -1288,6 +1290,41 @@ function printMain(animate) { printTo($('#paper'), U, monthsForRange(), animate)
 $('#rangeSel').addEventListener('change', () => { $('#yearInp').classList.toggle('hidden', $('#rangeSel').value !== 'year'); printMain(true); });
 $('#yearInp').addEventListener('change', () => printMain(true));
 $('#reprintBtn').addEventListener('click', () => printMain(true));
+
+/* ---- zdieľanie (bez osobných údajov: len výsledok a odkaz na stránku) ---- */
+const SITE_URL = 'https://jzac369.github.io/kondiciogram/';
+const isMobile = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+function shareText() {
+  const parts = ['Samočinný počítač SPC-74 ma hodil do stroja!'];
+  if (U.services.k) parts.push(`Môj dnešný index kondície: ${overall(U, dayState(U, todayN()))} %.`);
+  if (U.services.p) { const m = matchData(U, U.sex); if (m && !m.minor) parts.push(`Stroj mi vybral osudového partnera: ${m.name}.`); }
+  parts.push('Vyskúšajte aj vy:');
+  return parts.join(' ');
+}
+function shareNote(t) { const n = $('#shareNote'); n.textContent = t; clearTimeout(shareNote.tm); shareNote.tm = setTimeout(() => n.textContent = '', 6000); }
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); let ok = false; try { ok = document.execCommand('copy'); } catch {} x.remove(); return ok; }
+}
+if (navigator.share) $('.sh-nt').classList.remove('hidden');
+$('#shareRow').addEventListener('click', async e => {
+  const b = e.target.closest('.share-btn'); if (!b || !U) return;
+  const txt = shareText(), url = SITE_URL, enc = encodeURIComponent, full = `${txt} ${url}`;
+  const open = u => window.open(u, '_blank', 'noopener,width=640,height=560');
+  switch (b.dataset.sh) {
+    case 'fb': await copyText(full); open(`https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`); shareNote('Text je skopírovaný, môžete ho vložiť do príspevku.'); break;
+    case 'ms':
+      if (isMobile()) location.href = `fb-messenger://share/?link=${enc(url)}`;
+      else { await copyText(full); open('https://www.messenger.com/'); shareNote('Text s odkazom je skopírovaný, vložte ho do správy (Ctrl+V).'); }
+      break;
+    case 'wa': open(`https://wa.me/?text=${enc(full)}`); break;
+    case 'vb': location.href = `viber://forward?text=${enc(full)}`; break;
+    case 'tg': open(`https://t.me/share/url?url=${enc(url)}&text=${enc(txt)}`); break;
+    case 'x': open(`https://twitter.com/intent/tweet?text=${enc(txt)}&url=${enc(url)}`); break;
+    case 'cp': shareNote(await copyText(full) ? 'Skopírované do schránky.' : 'Kopírovanie sa nepodarilo.'); break;
+    case 'nt': try { await navigator.share({ title: 'Kondiciogram', text: txt, url }); } catch {} break;
+  }
+});
 /* ---- tlač na skutočný papier: plná šírka 31 stĺpcov, bloky mesiacov sa nedelia medzi strany ---- */
 let printSrc = null;
 function buildPrintSheet(u, months) {

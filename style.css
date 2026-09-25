@@ -912,3 +912,42 @@ body.tracking-on .only-local{display:none}
   .tk-text{white-space:normal;transform:none!important;font-size:1.12rem;line-height:1.08;letter-spacing:.04em}
   .flipclock{align-self:stretch;height:auto}
 }
+
+/* ---- zdieľanie ---- */
+.share-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:2px dashed rgba(74,42,20,.3)}
+.share-lbl{font-family:"Righteous";margin-right:4px}
+.share-btn{font:.85rem "Righteous";letter-spacing:.02em;cursor:pointer;color:#fff;border:3px solid var(--brown);border-radius:999px;padding:.35em .9em;box-shadow:3px 3px 0 var(--brown)}
+.share-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--brown)}
+.sh-fb{background:#3b5998}.sh-ms{background:#0084ff}.sh-wa{background:#25a244}.sh-vb{background:#7360f2}.sh-tg{background:#2a9fd6}.sh-x{background:#222}
+.sh-cp,.sh-nt{background:var(--cream);color:var(--brown)}
+.share-btn:hover{filter:brightness(1.1)}
+.share-note{font-size:.85rem;color:var(--teal);flex-basis:100%}
+.share-note:empty{display:none}
+
+/* ---- zaujímavosti a osobná šťastena ---- */
+.facts-wrap{display:grid;grid-template-columns:minmax(260px,1fr) 2.3fr;gap:24px;margin:24px 0;align-items:start}
+@media (max-width:900px){.facts-wrap{grid-template-columns:1fr}}
+.facts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.fact{background:#fffaf0;border:2px solid var(--brown);border-radius:12px;padding:10px 12px 8px;box-shadow:3px 3px 0 rgba(74,42,20,.25)}
+.fact h4{margin:0 0 6px;font:1rem "Righteous";color:var(--brown2);display:flex;align-items:center;gap:6px}
+.fact h4 .ic{width:18px;height:18px}
+.fact p{margin:.3em 0;font-size:.9rem;line-height:1.4}
+.fact-big{font-family:"Courier Prime",monospace;font-weight:700;font-size:1.15rem;color:var(--orange);line-height:1.2}
+.fact-list{margin:0;padding-left:1.1em;font-size:.9rem;line-height:1.45}
+.fortune{position:relative;overflow:hidden;background:linear-gradient(160deg,#2c1a3d,#4a2a5a 60%,#2c1a3d);color:#f6e7c8;text-align:center}
+.fortune .muted{color:#cdb8d9}
+.fortune-title{font-size:2rem;margin-bottom:6px;transform:rotate(-2deg)}
+.fortune-title .film-s{color:#e3a21c}
+.crystal{width:92px;height:92px;margin:6px auto 10px;border-radius:50%;position:relative;
+  background:radial-gradient(circle at 35% 30%,#fff 0 6%,#cfe8ff 10%,#7ea6e0 40%,#3a3f8f 75%,#1b1740);box-shadow:0 0 28px rgba(160,190,255,.55)}
+.crystal i{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(255,255,255,.35),transparent 40%);animation:crystalSpin 6s linear infinite}
+.crystal::after{content:"";position:absolute;left:50%;bottom:-12px;width:70px;height:16px;transform:translateX(-50%);background:#8a5a2b;border-radius:6px 6px 12px 12px;border:2px solid #4a2a14}
+@keyframes crystalSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.crystal i{animation:none}}
+.fortune-no{font-family:"Courier Prime",monospace;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:#e3a21c;margin-top:8px}
+.fortune-out p{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:1.05rem;line-height:1.6;margin:.5em 0 .6em}
+
+/* ---- admin: mazání ---- */
+.adm-delbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+.adm-del{cursor:pointer;background:none;border:2px solid var(--red);color:var(--red);border-radius:6px;font-weight:700;line-height:1;padding:2px 6px}
+.adm-del:hover{background:var(--red);color:#fff}
