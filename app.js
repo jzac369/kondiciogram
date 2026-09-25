@@ -943,9 +943,7 @@ function partnerLines(u, width) {
   wrap('INZERAT', '"' + ascii(m.ad).replace(/[„“]/g, '"') + '"');
   wrap('SHODA', `F ${m.c.p.F} %  C ${m.c.p.C} %  I ${m.c.p.I} %  CELKEM ${m.c.p.T} %`);
   if (m.date != null) {
-    wrap('RANDE', ascii(fmtLongCz(m.date)) + ', ' + m.ticket.time + ', KINO MIR');
-    wrap('FILM', '"' + ascii(m.ticket.film).toUpperCase() + '"');
-    wrap('VSTUPENKA', `RADA ${m.ticket.row}, SEDADLA ${m.ticket.seat} A ${m.ticket.seat + 1}, ${m.ticket.price * 2},- KCS - HRADI VYPOCETNI STREDISKO A MNV`);
+    wrap('RANDE', ascii(fmtLongCz(m.date)));
   }
   L.push('');
   L.push('HLASENI STROJE:');
