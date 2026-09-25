@@ -319,14 +319,12 @@
   <p class="inspired">Voľne inšpirované fenoménom kondiciogramov zo 70. rokov.</p>
   <p>Fanúšikovská hračka k filmu <i>Jáchyme, hoď ho do stroje!</i> (1974).
     <span class="only-local">Všetky údaje zostávajú iba v tomto prehliadači.</span>
-    <span class="only-track">Údaje o návšteve sa ukladajú len s vaším súhlasom.</span></p>
+    <span class="only-track">Údaje sa môžu dočasne ukladať len s vaším súhlasom.</span></p>
   <details class="privacy only-track" id="privacy">
     <summary>Ochrana osobných údajov</summary>
-    <p>Ak súhlasíte, prevádzkovateľ stránky<span id="opName"></span> ukladá na štatistické účely: dátum a čas návštevy, čas strávený na stránke,
-      mesto, kraj a krajinu, skrátenú IP adresu (len prvé dve časti), typ zariadenia a prehliadača a stránku, z ktorej ste prišli.
-      Pri vyplnení štítku aj zadané meno, dátum narodenia, odpovede dotazníka a výsledky (kondiciogram, osudový partner).
-      Mesto a skrátenú IP zisťuje služba ipwho.is, údaje sú uložené v Google Firebase (EÚ). Záznamy sa mažú najneskôr po 12 mesiacoch.
-      Bez súhlasu sa neukladá nič a stránka funguje rovnako. Súhlas môžete kedykoľvek zmeniť:
+    <p>S vaším súhlasom môžu byť dočasne uložené údaje o návšteve (približná poloha, zariadenie, čas na stránke)
+      a údaje zo štítku (meno, dátum narodenia, výsledky) na štatistické účely prevádzkovateľa stránky<span id="opName"></span>.
+      Záznamy sa mažú najneskôr po 12 mesiacoch. Bez súhlasu sa neukladá nič.
       <button type="button" class="btn small ghost" id="consentReset">Zmeniť súhlas</button></p>
   </details>
   <button type="button" class="admin-btn" id="adminBtn">Vstup je pro závodní radu</button>
@@ -334,7 +332,7 @@
 <div id="printSheet" class="print-sheet" aria-hidden="true"></div>
 <script src="names.js"></script>
 <div id="consentBar" class="consent-bar hidden" role="dialog" aria-label="Súhlas so záznamom návštevy">
-  <p><b>Stroj si vedie záznamy.</b> Smieme uložiť vaše mesto, skrátenú IP adresu, čas na stránke a údaje zo štítku (meno, dátum narodenia, výsledky)? <a href="#privacy" onclick="document.getElementById('privacy').open=true">Viac informácií</a></p>
+  <p><b>Stroj si vedie záznamy.</b> S vaším súhlasom môžu byť dočasne uložené údaje o návšteve a zo štítku na štatistické účely. <a href="#privacy" onclick="document.getElementById('privacy').open=true">Viac informácií</a></p>
   <div class="row"><button id="consentYes" class="btn small" type="button">Súhlasím</button><button id="consentNo" class="btn small ghost" type="button">Nesúhlasím</button></div>
 </div>
 <script src="app.js"></script>
