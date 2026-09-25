@@ -370,8 +370,8 @@ function startReg(editing, services) {
   reg = {
     editing,
     step: 0,
-    data: editing ? { name: U.name, birth: U.birth, answers: { ...(U.answers || {}) }, services: sv, sex: U.sex } : { name: '', birth: '', answers: {}, services: sv, sex: null },
-    steps: [...(editing ? [] : ['account']), 'birth', ...(sv.p ? ['seek'] : []), ...(sv.k ? QUESTIONS.map(q => q.id) : [])]
+    data: editing ? { name: U.name, birth: U.birth, answers: { ...(U.answers || {}) }, services: sv, sex: U.sex, gender: U.gender || null } : { name: '', birth: '', answers: {}, services: sv, sex: null, gender: null },
+    steps: [...(editing ? [] : ['account']), 'birth', 'gender', ...(sv.p ? ['seek'] : []), ...(sv.k ? QUESTIONS.map(q => q.id) : [])]
   };
   show('scr-reg');
   renderStep();
@@ -401,6 +401,19 @@ function renderStep() {
       if (t >= 0) { reg.data.birth = v; updRegCard(); }
     };
     $('#rBirth').addEventListener('change', upd); upd();
+  } else if (id === 'gender') {
+    const cur = reg.data.gender, opts = [['m', 'Muž'], ['f', 'Žena']];
+    box.innerHTML = `<div class="q-kicker">Základný údaj · ${reg.step + 1}/${reg.steps.length}</div><h2 class="q-title">${icon('card', 'q-ic')}Ste muž, alebo žena, súdruh?</h2>
+      <div class="opts">${opts.map(([v, t], i) => `<button type="button" class="opt ${cur === v ? 'sel' : ''}" data-v="${v}"><span class="code">${i + 1}</span>${t}</button>`).join('')}</div>
+      <p class="kbd-hint">Odpoveď vyberiete aj klávesom 1 alebo 2.</p>`;
+    box.querySelector('.opts').addEventListener('click', e => {
+      const b = e.target.closest('.opt'); if (!b) return;
+      reg.data.gender = b.dataset.v;
+      if (!reg.data.sex) reg.data.sex = b.dataset.v === 'm' ? 'f' : 'm';   // predvolený výber partnera
+      box.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x === b));
+      beep(660, .04);
+      setTimeout(() => { if (reg && reg.steps[reg.step] === 'gender') nextStep(); }, 260);
+    });
   } else if (id === 'seek') {
     const cur = reg.data.sex, opts = [['f', 'Partnerku (ženu)'], ['m', 'Partnera (muže)']];
     box.innerHTML = `<div class="q-kicker">Výběr osudového partnera · ${reg.step + 1}/${reg.steps.length}</div><h2 class="q-title">${icon('love', 'q-ic')}Koho má stroj hledat?</h2>
@@ -411,7 +424,11 @@ function renderStep() {
       reg.data.sex = b.dataset.v; updRegCard();
       box.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x === b));
       beep(660, .04);
-      setTimeout(() => { if (reg && reg.steps[reg.step] === 'seek') nextStep(); }, 260);
+      const same = reg.data.gender && reg.data.gender === b.dataset.v;
+      let note = box.querySelector('.birth-hint');
+      if (!note) { note = document.createElement('div'); note.className = 'birth-hint'; box.appendChild(note); }
+      note.textContent = same ? SAME_SEX_NOTES[fnv(nameSeed(reg.data.name || '') + reg.data.birth) % SAME_SEX_NOTES.length] : '';
+      setTimeout(() => { if (reg && reg.steps[reg.step] === 'seek') nextStep(); }, same ? 3200 : 260);
     });
   } else {
     const q = QUESTIONS.find(x => x.id === id), cur = reg.data.answers[id];
@@ -428,6 +445,12 @@ function renderStep() {
     });
   }
 }
+const SAME_SEX_NOTES = [
+  '> STROJ ZAZNAMENAL NESTANDARDNI OBJEDNAVKU. PREPOCITAVAM... SCHVALENO. LASKA NEZNA NORMU.',
+  '> ZVLASTNI PRANI PRIJATO. REFERENT SE ZACERVENAL, STROJ NE.',
+  '> FORMULAR TAKOVOU KOLONKU NEMA. STROJ JI DOPSAL PROPISKOU.',
+  '> VEDOUCI STREDISKA NESOUHLASI. STROJ HO PREHLASOVAL 1:0.'
+];
 function updRegCard() { if (reg) renderCard($('#regCard'), cardText(reg.data)); }
 
 // výber dátumu po slovensky: deň / mesiac slovom / rok (namiesto „dd/mm/yyyy“ z prehliadača)
@@ -470,7 +493,8 @@ function nextStep() {
     if (n > todayN()) return err('Ešte ste sa nenarodili? Stroj to neberie.');
     if (n < dn(1900, 0, 1)) return err('Stroj počíta od roku 1900.');
     reg.data.birth = v;
-  } else if (id === 'seek') { if (!reg.data.sex) return err('Vyberte, koho má stroj hledat.'); }
+  } else if (id === 'gender') { if (!reg.data.gender) return err('Vyberte, či ste muž, alebo žena.'); }
+  else if (id === 'seek') { if (!reg.data.sex) return err('Vyberte, koho má stroj hledat.'); }
   else if (reg.data.answers[id] == null) return err('Vyberte jednu možnosť.');
 
   if (reg.step < reg.steps.length - 1) { reg.step++; renderStep(); return; }
@@ -490,7 +514,7 @@ function cardSummary(u) {
 }
 function finishReg() {
   const d = reg.data, demo = reg.editing && U.demo;
-  const card = { name: d.name, birth: d.birth, answers: d.services.k ? d.answers : {}, services: d.services, sex: d.sex || 'f' };
+  const card = { name: d.name, birth: d.birth, answers: d.services.k ? d.answers : {}, services: d.services, sex: d.sex || 'f', gender: d.gender || '' };
   U = derive(demo ? { ...card, demo: true } : card);
   // len aby sa výsledok nestratil po obnovení stránky; žiadne účty ani heslá
   if (!demo) store.set(K_LAST, card);

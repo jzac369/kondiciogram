@@ -789,13 +789,18 @@ input::-webkit-input-placeholder{color:#c9b89c;opacity:1;font-style:italic}
 .topbar{padding-left:max(16px,env(safe-area-inset-left),calc((100% - 1180px) / 2 + 16px));
   padding-right:max(16px,env(safe-area-inset-right),calc((100% - 1180px) / 2 + 16px))}
 
-/* ---- nezaškrtnuté políčka služieb jemne pulzujú, aby bolo jasné, že sa dajú zaškrtnúť ---- */
-.sp-tile input:not(:checked) + .sp-box{animation:boxPulse 1.5s ease-in-out infinite}
-@keyframes boxPulse{
-  0%,100%{transform:translateY(-50%) scale(1);box-shadow:0 0 0 0 rgba(255,176,48,0)}
-  50%{transform:translateY(-50%) scale(1.07);box-shadow:0 0 0 .8cqw rgba(255,176,48,.55),0 0 2.6cqw .6cqw rgba(255,130,20,.45)}
+/* ---- šípka pri nezaškrtnutom políčku: jemne pulzuje a ukazuje, kam kliknúť ---- */
+.sp-arrow{position:absolute;left:-7.4%;width:7.6cqw;top:50%;transform:translateY(-50%);pointer-events:none;
+  filter:drop-shadow(.3cqw .4cqw 0 rgba(20,10,4,.55));animation:arrowNudge 1.1s ease-in-out infinite;transition:opacity .2s}
+.sp-t1 .sp-arrow{top:48.5%}
+.sp-t2 .sp-arrow{top:46.5%}
+.sp-arrow svg{display:block;width:100%;height:auto}
+.sp-tile input:checked ~ .sp-arrow{opacity:0;animation:none}
+@keyframes arrowNudge{
+  0%,100%{transform:translateY(-50%) translateX(0) scale(1)}
+  50%{transform:translateY(-50%) translateX(1.3cqw) scale(1.08)}
 }
-@media (prefers-reduced-motion:reduce){ .sp-tile input:not(:checked) + .sp-box{animation:none;box-shadow:0 0 0 .6cqw rgba(255,176,48,.6)} }
+@media (prefers-reduced-motion:reduce){ .sp-arrow{animation:none} }
 
 /* ---- karta partnera bez fotky ---- */
 .sz-top.one{grid-template-columns:1fr}
